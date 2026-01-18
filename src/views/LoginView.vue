@@ -20,7 +20,7 @@ async function goToGame() {
   let playerId: string
 
   const { data, error } = await supabase
-    .from('Player')
+    .from('player')
     .select('id')
     .eq('nama', nama.value)
     .maybeSingle()
@@ -31,7 +31,7 @@ async function goToGame() {
     playerId = data.id
   } else {
     const { data: newPlayer, error: insertError } = await supabase
-      .from('Player')
+      .from('player')
       .insert({ nama: nama.value, kantor: kantor.value, unit: unit.value })
       .select('id')
       .single()
@@ -45,7 +45,7 @@ async function goToGame() {
 
   // --- CREATE SCORE SESSION IMMEDIATELY ---
   const { data: scoreData, error: scoreError } = await supabase
-    .from('Score')
+    .from('score')
     .insert({ player_id: playerId })
     .select('id')
     .single()

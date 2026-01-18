@@ -23,7 +23,7 @@ onMounted(async () => {
   if (!playerId) return
 
   const { data: player } = await supabase
-    .from('Player')
+    .from('player')
     .select('nama, kantor, unit')
     .eq('id', playerId)
     .single()
@@ -38,7 +38,7 @@ onMounted(async () => {
   if (!sessionId) return
 
   const { data: scoreData } = await supabase
-    .from('Score')
+    .from('score')
     .select('automationSpotter, dragAndDrop, memoryGame')
     .eq('id', sessionId)
     .single()
