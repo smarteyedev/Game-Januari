@@ -1,0 +1,37 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "sentence": "Saya sedang menulis review untuk riset di bidang ____ . Tulis ulasan akademik dengan gaya seorang peneliti tentang konsep dan penerapan ____ dalam organisasi modern. Gunakan bahasa formal dan netral, berikan kerangka teori dan contoh penerapan, dan strukturkan ____ agar mudah dimasukkan ke dalam ____ . Target pembaca saya Adalah ____ di perusahaan.",
+      "blanks": [
+        {
+          "id": "blank-1",
+          "answer": "manajemen sains"
+        },
+        {
+          "id": "blank-2",
+          "answer": "data-driven decision making"
+        },
+        {
+          "id": "blank-3",
+          "answer": "jawaban"
+        },
+        {
+          "id": "blank-4",
+          "answer": "paper ilmiah"
+        },
+        {
+          "id": "blank-5",
+          "answer": "eksekutif"
+        }
+      ],
+      "words": [
+        "paper ilmiah",
+        "data-driven decision making",
+        "jawaban",
+        "manajemen sains",
+        "eksekutif"
+      ]
+    }
+  ]
+}

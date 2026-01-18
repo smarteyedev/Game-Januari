@@ -1,0 +1,69 @@
+{
+  "levels": [
+    {
+      "id": 1,
+      "card": [
+        {
+          "id": 1,
+          "label": "Menyortir email masuk",
+          "idTarget": "zone1",
+          "matched": null
+        },
+        {
+          "id": 2,
+          "label": "Penjadwalan dan Pengingat Rapat",
+          "idTarget": "zone1",
+          "matched": null
+        },
+        {
+          "id": 3,
+          "label": "Memvalidasi kelengkapan dokumen sebelum diteruskan ke supervisor.",
+          "idTarget": "zone1",
+          "matched": null
+        },
+        {
+          "id": 4,
+          "label": "Menjawab Pertanyaan FAQ",
+          "idTarget": "zone1",
+          "matched": null
+        },
+        {
+          "id": 5,
+          "label": "Mengirim pengingat pembayaran atau tugas berdasarkan jadwal.",
+          "idTarget": "zone1",
+          "matched": null
+        },
+        {
+          "id": 6,
+          "label": "Menentukan strategi bisnis perusahaan",
+          "idTarget": "zone2",
+          "matched": null
+        },
+        {
+          "id": 7,
+          "label": "Melakukan coaching & mentoring karyawan",
+          "idTarget": "zone2",
+          "matched": null
+        },
+        {
+          "id": 8,
+          "label": "Menyetujui tindakan hukum perusahaan",
+          "idTarget": "zone2",
+          "matched": null
+        },
+        {
+          "id": 9,
+          "label": "Menilai potensi kepemimpinan karyawan",
+          "idTarget": "zone2",
+          "matched": null
+        },
+        {
+          "id": 10,
+          "label": "Menentukan komposisi tim proyek strategis",
+          "idTarget": "zone2",
+          "matched": null
+        }
+      ]
+    }
+  ]
+}
