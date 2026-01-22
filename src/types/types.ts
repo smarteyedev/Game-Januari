@@ -1,27 +1,4 @@
-export type GamePhase = 'memorize' | 'answer' | 'result' | 'finish'
-export type Order = 'Ascending' | 'Descending'
-export type Validity = 'True' | 'False' | 'Indeterminate'
-export type LeaderboardEntry = {
-  name: string
-  score: number
-  date: number
-}
-
-export interface SortingItem {
-  name: string
-  value: number
-}
-
-export interface SortingGameLevel {
-  criteria: string
-  items: SortingItem[]
-}
-
-export interface LogicGameLevel {
-  statement: string
-  conclusion: string
-  validity: Validity
-}
+export type ContentType = "text" | "svg" | "img"
 
 export interface FillBlank{
     sentence: string
@@ -36,18 +13,25 @@ export interface Blank{
 export interface DragCard {
   id: number
   label: string
-  idTarget: string
-  droppedZone?: string
+  answer: boolean
+  matched?: boolean
 }
 
-export type MemoryCard = {
-  id: number
-  pairId: number
-  type: 'text' | 'logo'
-  text?: string
-  logo?: string
-  flipped: boolean
-  matched: boolean
+// zone id is boolean because there is only two zone, its save memory.
+export interface Zone {
+  id: boolean  // true for "Bisa", false for "Tidak Bisa"
+  label: string
+  cards: DragCard[]
+}
+
+export interface MemoryCard {
+    id: number;
+    pairId: number;
+    contentType: ContentType;
+    text: string;
+    // runtime property
+    flipped?: boolean;
+    matched?: boolean;
 }
 
 export type LevelButtonState = 'unlocked' | 'cleared' | 'locked'

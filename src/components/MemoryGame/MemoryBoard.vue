@@ -16,15 +16,11 @@ const emit = defineEmits<{
     <MemoryCardItem
       v-for="card in props.cards"
       :key="card.id"
-      :type="card.type"
-      :logo="
-        card.type === 'logo'
-          ? (card.text as 'chatgpt' | 'meta' | 'github' | 'gemini' | 'canva')
-          : undefined
-      "
-      :text="card.text"
-      :flipped="card.flipped"
-      :matched="card.matched"
+      :content-type="card.contentType"
+      :logo="card.contentType === 'svg' ? card.text : undefined"
+      :text="card.contentType === 'text' ? card.text : undefined"
+      :flipped="card.flipped || false"
+      :matched="card.matched || false"
       @flip="() => emit('flip', card)"
     />
   </div>

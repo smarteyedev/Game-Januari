@@ -3,41 +3,31 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
 import TaskRow from './TaskRow.vue'
 import SpotZones from './SpotZones.vue'
-import type { DragCard } from '@/types/types'
+import type { DragCard, Zone } from '@/types/types'
 import gameData from '@/assets/gameData/automationSpotter.json'
 import GameHeader from '../GameHeader.vue'
 import GameFooter from '../GameFooter.vue'
 
-const levelIndex = ref(0)
 const allCards = ref<DragCard[]>([])
 const sourceCards = ref<DragCard[]>([])
 
-type ZoneId = 'zone1' | 'zone2'
-
-interface Zone {
-  id: ZoneId
-  label: string
-  cards: DragCard[]
-}
-
-const zones = ref<Record<ZoneId, Zone>>({
-  zone1: {
-    id: 'zone1',
+const zones = ref<Zone[]>([
+  {  // computer science basic true = 1
+    id: true,
     label: 'Bisa',
     cards: [],
   },
-  zone2: {
-    id: 'zone2',
+  {  // computer science basic false = 0
+    id: false,
     label: 'Tidak Bisa',
     cards: [],
   },
-})
+])
 
 const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
 
 const MAX_TIME = 60
-
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME, {})
 
 const emit = defineEmits<{
@@ -58,7 +48,7 @@ onMounted(() => {
 onUnmounted(stop)
 
 function loadLevel() {
-  const level = gameData.levels[levelIndex.value]
+  const level = gameData
   if (!level) return
 
   checkedMap.value = {}
@@ -71,10 +61,12 @@ function loadLevel() {
 
   sourceCards.value = [...allCards.value]
 
-  Object.values(zones.value).forEach((z) => {
-    z.cards = []
+  // Reset all zones
+  zones.value.forEach((zone) => {
+    zone.cards = []
   })
 }
+
 const matchedCount = computed(() => {
   if (!isChecked.value) return 0
   return Object.values(checkedMap.value).filter(Boolean).length
@@ -87,9 +79,10 @@ watch(isLevelWin, (win) => win && stop())
 function checkAnswers() {
   const result: Record<number, boolean> = {}
 
-  Object.values(zones.value).forEach((zone) => {
+  zones.value.forEach((zone) => {
     zone.cards.forEach((card) => {
-      result[card.id] = card.idTarget === zone.id
+      // Direct comparison: card.answer should equal zone.id
+      result[card.id] = card.answer === zone.id
     })
   })
 
@@ -103,8 +96,6 @@ function finishGame() {
     score: isGameOver.value ? 0 : matchedCount.value,
   })
 }
-
-
 </script>
 
 <template>

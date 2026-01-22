@@ -12,8 +12,8 @@ import GithubOutline from '@/components/icons/GithubLogo.vue'
 import GithubFilled from '@/components/icons/GithubLogoFilled.vue'
 
 const props = defineProps<{
-  type: 'text' | 'logo'
-  logo?: 'chatgpt' | 'meta' | 'github' | 'gemini' | 'canva'
+  contentType: 'text' | 'svg' | 'img'
+  logo?: string
   text?: string
   flipped: boolean
   matched: boolean
@@ -85,7 +85,7 @@ const textClass = computed(() => {
       >
         <!-- TEXT CARD -->
         <p
-          v-if="type === 'text'"
+          v-if="contentType === 'text'"
           class="w-full h-full flex items-center justify-center text-center px-3 break-words overflow-hidden"
           :class="textClass"
         >
@@ -93,7 +93,16 @@ const textClass = computed(() => {
         </p>
 
         <!-- LOGO CARD -->
-        <component v-else :is="LogoComponent" class="w-20 h-auto transition-colors duration-300" />
+        <component
+          v-else-if="contentType === 'svg'"
+          :is="LogoComponent"
+          class="w-20 h-auto transition-colors duration-300"
+        />
+
+        <!-- IMAGE CARD  -->
+        <div v-else-if="contentType === 'img'" class="w-full h-full flex items-center justify-center">
+          <img v-if="text" :src="text" alt="Card image" class="max-w-full max-h-full object-contain" />
+        </div>
       </div>
     </div>
   </div>

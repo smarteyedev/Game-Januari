@@ -1,35 +1,32 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import useTimer from '@/composables/useTimer'
-import type { MemoryCard } from '@/types/types'
+import type { MemoryCard, ContentType } from '@/types/types'
 import MemoryBoard from './MemoryBoard.vue'
 import gameData from '@/assets/gameData/memoryGame.json'
 import GameHeader from '../GameHeader.vue'
 import GameFooter from '../GameFooter.vue'
 
-// LEVEL STATE
-const currentLevel = ref(0)
-
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
 }
 
-function loadLevel(levelIndex: number): MemoryCard[] {
-  const level = gameData.levels[levelIndex]
+function loadLevel(): MemoryCard[] {
+  const level = gameData
   if (!level) return []
 
-  // clone to avoid mutating JSON source and ensure correct literal types
+  // Direct mapping from JSON to MemoryCard with game state
   return shuffle(
     level.card.map((card) => ({
       ...card,
-      type: card.type as 'text' | 'logo',
+      contentType: card.contentType as ContentType,
       flipped: false,
       matched: false,
-    })) as MemoryCard[],
+    }))
   )
 }
 
-const cards = ref<MemoryCard[]>(loadLevel(currentLevel.value))
+const cards = ref<MemoryCard[]>(loadLevel())
 
 // GAME STATE
 let firstCard: MemoryCard | null = null
@@ -74,10 +71,16 @@ function flipCard(card: MemoryCard) {
     return
   }
 
+  // Compare cards based on pairId
   if (firstCard.pairId === card.pairId) {
     firstCard.matched = true
     card.matched = true
     firstCard = null
+    
+    // Check immediately after a successful match
+    if (allMatched.value) {
+      stop()
+    }
   } else {
     lock = true
     setTimeout(() => {
@@ -94,11 +97,13 @@ const emit = defineEmits<{
 }>()
 
 function finishGame() {
+  
   emit('cleared', {
     game: 'memoryGame',
     score: allMatched.value ? score.value : 0,
   })
 }
+
 
 import clickSound from '@/assets/sounds/btn_click.ogg'
 
