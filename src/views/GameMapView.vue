@@ -4,20 +4,23 @@ import AutomationSpotter from '@/components/AutomationSpotter/AutomationSpotter.
 import DnDPIntro from '@/components/DragAndDropPrompt/DnDPIntro.vue'
 import DragAndDropPrompt from '@/components/DragAndDropPrompt/DragAndDropPrompt.vue'
 import FeedbackForm from '@/components/feedback/FeedbackForm.vue'
-import GameMap from '@/components/GameMap.vue'
+import GameMap from '@/components/Map/GameMap.vue'
 import GameModal from '@/components/GameModal.vue'
 import IconButton from '@/components/IconButton.vue'
 import LevelButtonIconClear from '@/components/icons/LevelButtonIconClear.vue'
 import LevelButtonIconLocked from '@/components/icons/LevelButtonIconLocked.vue'
 import LevelButtonIconUnlocked from '@/components/icons/LevelButtonIconUnlocked.vue'
-import LevelButton from '@/components/LevelButton.vue'
+import LevelButton from '@/components/Map/LevelButton.vue'
 import MemoryGame from '@/components/MemoryGame/MemoryGame.vue'
 import MGIntro from '@/components/MemoryGame/MGIntro.vue'
 import Score from '@/components/score/Score.vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { LevelButtonState } from '@/types/types'
-import { computed, onBeforeMount, onMounted, ref } from 'vue'
+import { onBeforeMount, onMounted, ref } from 'vue'
 import bgmSound from '@/assets/sounds/bgm.ogg'
+import LevelPath1 from '@/components/Map/LevelPath1.vue'
+import LevelPath2 from '@/components/Map/LevelPath2.vue'
+import GameIntroModal from '@/components/GameIntroModal.vue'
 
 type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
 
@@ -54,14 +57,26 @@ const gameState = ref<Record<GameKey, LevelButtonState>>({
   memoryGame: 'locked',
 })
 
-type ModalView = GameKey | 'feedback' | 'score'
+type ModalView =
+  | { type: 'intro'; game: GameKey }
+  | { type: 'game'; game: GameKey }
+  | { type: 'feedback' }
+  | { type: 'score' }
+  | null
 
-const activeView = ref<ModalView | null>(null)
+const activeView = ref<ModalView>(null)
 const showIntro = ref(false)
 
 function openGame(game: GameKey) {
-  activeView.value = game
-  showIntro.value = true
+  activeView.value = { type: 'intro', game }
+}
+
+function startGame(game: GameKey) {
+  activeView.value = { type: 'game', game }
+}
+
+function closeModal() {
+  activeView.value = null
 }
 
 function closeGame() {
@@ -73,7 +88,6 @@ async function onGameCleared(payload: { game: GameKey; score: number }) {
   const { game, score } = payload
 
   const sessionId = sessionStorage.getItem('score_session_id')
-
   if (!sessionId) return
 
   const columnMap: Record<GameKey, string> = {
@@ -87,19 +101,19 @@ async function onGameCleared(payload: { game: GameKey; score: number }) {
     .update({ [columnMap[game]]: score })
     .eq('id', sessionId)
 
-  // ----- UI logic unchanged -----
   const currentIndex = gameOrder.indexOf(game)
   gameState.value[game] = 'cleared'
 
   const nextGame = gameOrder[currentIndex + 1]
+
   if (nextGame) {
     gameState.value[nextGame] = 'unlocked'
-    closeGame()
+    closeModal()
   } else {
-    activeView.value = 'feedback'
-    showIntro.value = false
+    activeView.value = { type: 'feedback' }
   }
 }
+
 
 const mapRef = ref<InstanceType<typeof GameMap> | null>(null)
 
@@ -155,7 +169,7 @@ onBeforeMount(() => {
 })
 
 function openScore() {
-  activeView.value = 'score'
+  activeView.value = { type: 'score' }
   showIntro.value = false
 }
 
@@ -218,6 +232,21 @@ function toggleFullscreen() {
         </div>
       </div>
       <GameMap ref="mapRef" class="absolute inset-0 min-w-screen min-h-screen z-0" />
+      <LevelPath1       
+      class="absolute origin-top-left"
+        :style="{
+          left: `${587 * mapSize.scaleX}px`,
+          top: `${354 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"></LevelPath1>
+
+      <LevelPath2       
+      class="absolute origin-top-left"
+        :style="{
+          left: `${1156 * mapSize.scaleX}px`,
+          top: `${378 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"></LevelPath2>
 
       <!-- Automation Spotter Button -->
       <LevelButton
@@ -274,44 +303,45 @@ function toggleFullscreen() {
       </LevelButton>
     </div>
 
-    <GameModal
-      v-if="activeView"
-      :title="
-        activeView === 'feedback'
-          ? 'Your Feedback'
-          : activeView === 'score'
-            ? 'Score'
-            : gameMeta[activeView].title
-      "
-      @close="closeGame"
-    >
-      <!-- FEEDBACK -->
-      <template v-if="activeView === 'feedback'">
-        <FeedbackForm @submitted="closeGame" />
-      </template>
+    <!-- INTRO MODAL -->
+<GameIntroModal
+  v-if="activeView?.type === 'intro'"
+  :title="gameMeta[activeView.game].title"
+  @start="startGame(activeView.game)"
+  @close="closeModal"
+>
+  <component :is="gameMeta[activeView.game].intro" />
+</GameIntroModal>
 
-      <template v-else-if="activeView === 'score'">
-        <Score />
-      </template>
+<!-- GAME MODAL -->
+<GameModal
+  v-else-if="activeView?.type === 'game'"
+  :title="gameMeta[activeView.game].title"
+  @close="closeModal"
+>
+  <component
+    :is="gameMeta[activeView.game].component"
+    @cleared="onGameCleared"
+  />
+</GameModal>
 
-      <!-- INTRO -->
-      <template v-else-if="showIntro">
-        <component :is="gameMeta[activeView].intro" />
+<!-- FEEDBACK -->
+<GameModal
+  v-else-if="activeView?.type === 'feedback'"
+  title="Your Feedback"
+  @close="closeModal"
+>
+  <FeedbackForm @submitted="closeModal" />
+</GameModal>
 
-        <div class="flex justify-end mt-6">
-          <IconButton
-            class="px-6 py-2 bg-[#00A3B5] hover:bg-teal-600 text-white rounded-lg font-semibold"
-            @click="showIntro = false"
-          >
-            Start Game
-          </IconButton>
-        </div>
-      </template>
+<!-- SCORE -->
+<GameModal
+  v-else-if="activeView?.type === 'score'"
+  title="Score"
+  @close="closeModal"
+>
+  <Score />
+</GameModal>
 
-      <!-- GAME -->
-      <template v-else>
-        <component :is="gameMeta[activeView].component" @cleared="onGameCleared" />
-      </template>
-    </GameModal>
   </div>
 </template>

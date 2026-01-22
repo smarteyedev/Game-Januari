@@ -26,6 +26,7 @@ const zones = ref<Zone[]>([
 
 const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
+const question = ref("")
 
 const MAX_TIME = 60
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME, {})
@@ -53,6 +54,7 @@ function loadLevel() {
 
   checkedMap.value = {}
   isChecked.value = false
+  question.value = gameData.question
 
   allCards.value = level.card.map((c) => ({
     ...c,
@@ -102,7 +104,7 @@ function finishGame() {
   <div class="flex flex-col items-center gap-4 min-w-full w-[90vw]">
     <GameHeader
       title="Automation Spotter"
-      description="Pilih tugas yang bisa diotomatisasi AI ke kolom Bisa dan yang tidak ke kolom Tidak Bisa"
+      :description="question"
       :time="time"
     >
     </GameHeader>

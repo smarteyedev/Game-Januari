@@ -28,7 +28,7 @@ export interface MemoryCard {
     id: number;
     pairId: number;
     contentType: ContentType;
-    text: string;
+    value: string;
     // runtime property
     flipped?: boolean;
     matched?: boolean;

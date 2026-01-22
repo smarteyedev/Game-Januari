@@ -1,5 +1,6 @@
 {
   "id": 1,
+  "question": "Pilih tugas yang bisa diotomatisasi AI ke kolom Bisa dan yang tidak ke kolom Tidak Bisa",
   "card": [
     {
       "id": 1,
