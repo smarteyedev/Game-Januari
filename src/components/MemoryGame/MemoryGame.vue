@@ -54,6 +54,7 @@ const { time, start, stop } = useTimer(MAX_TIME, {
 const allMatched = computed(() => cards.value.every((card) => card.matched))
 
 function flipCard(card: MemoryCard) {
+  playClick()
   if (lock || card.flipped || card.matched) return
 
   if (!gameStarted.value) {
@@ -97,6 +98,18 @@ function finishGame() {
     game: 'memoryGame',
     score: allMatched.value ? score.value : 0,
   })
+}
+
+import clickSound from '@/assets/sounds/btn_click.ogg'
+
+const audio = new Audio(clickSound)
+
+function playClick() {
+  if (audio) {
+    audio.currentTime = 0
+    audio.volume = 1
+    audio.play()
+  }
 }
 </script>
 

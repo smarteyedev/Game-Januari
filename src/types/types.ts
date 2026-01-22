@@ -23,16 +23,14 @@ export interface LogicGameLevel {
   validity: Validity
 }
 
-export type Blank = {
-  id: string
-  answer: string
+export interface FillBlank{
+    sentence: string
+    blanks: Blank[]
 }
 
-export type FillBlankLevel = {
-  id: number
-  sentence: string
-  blanks: Blank[]
-  words: string[]
+export interface Blank{
+    id: number
+    word: string
 }
 
 export interface DragCard {

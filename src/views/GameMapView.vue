@@ -17,6 +17,7 @@ import Score from '@/components/score/Score.vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { LevelButtonState } from '@/types/types'
 import { computed, onBeforeMount, onMounted, ref } from 'vue'
+import bgmSound from '@/assets/sounds/bgm.ogg'
 
 type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
 
@@ -72,7 +73,7 @@ async function onGameCleared(payload: { game: GameKey; score: number }) {
   const { game, score } = payload
 
   const sessionId = sessionStorage.getItem('score_session_id')
-  console.log(sessionId)
+
   if (!sessionId) return
 
   const columnMap: Record<GameKey, string> = {
@@ -125,18 +126,32 @@ function updateMapSize() {
 }
 
 let observer: ResizeObserver | null = null
+let bgm = new Audio(bgmSound)
+
+function stopAudio(audio : HTMLAudioElement){
+    if (audio) {
+    audio.pause()
+    audio.currentTime = 0
+  }
+}
 
 onMounted(() => {
   updateMapSize()
 
   observer = new ResizeObserver(updateMapSize)
-
   const svg = mapRef.value?.svgRef
+
+  bgm.loop = true
+  bgm.volume = 0.1
+  bgm.play().catch(err => {
+    console.warn('Audio play blocked:', err)
+  })
   if (svg) observer.observe(svg)
 })
 
 onBeforeMount(() => {
   observer?.disconnect()
+  stopAudio(bgm)
 })
 
 function openScore() {
@@ -166,12 +181,12 @@ function toggleFullscreen() {
         </div>
 
         <div class="flex gap-4">
-          <button
+          <IconButton
             @click="openScore"
             class="pb-[10px] pt-[10px] pr-[16px] pl-[16px] text-center bg-[#00A3B5] hover:bg-teal-600 text-white font-semibold rounded-lg w-[100px]"
           >
             Score
-          </button>
+          </IconButton>
 
           <!--Fullscreen Button-->
           <IconButton
@@ -284,12 +299,12 @@ function toggleFullscreen() {
         <component :is="gameMeta[activeView].intro" />
 
         <div class="flex justify-end mt-6">
-          <button
+          <IconButton
             class="px-6 py-2 bg-[#00A3B5] hover:bg-teal-600 text-white rounded-lg font-semibold"
             @click="showIntro = false"
           >
             Start Game
-          </button>
+          </IconButton>
         </div>
       </template>
 

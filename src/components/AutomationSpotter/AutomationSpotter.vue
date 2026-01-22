@@ -103,6 +103,8 @@ function finishGame() {
     score: isGameOver.value ? 0 : matchedCount.value,
   })
 }
+
+
 </script>
 
 <template>

@@ -23,14 +23,15 @@
     />
 
     <!-- SUBMIT -->
-    <button class="bg-[#00A3B5] hover:bg-teal-600 text-white px-4 py-2 rounded" @click="submit">
+    <IconButton class="bg-[#00A3B5] hover:bg-teal-600 text-white px-4 py-2 rounded" @click="submit">
       Submit
-    </button>
+    </IconButton>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import IconButton from '../IconButton.vue';
 
 const emit = defineEmits<{
   (e: 'submitted'): void

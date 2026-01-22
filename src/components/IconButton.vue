@@ -9,10 +9,24 @@ defineProps({
     default: false,
   },
 })
+
+import clickSound from '@/assets/sounds/btn_click.ogg'
+
+const audio = new Audio(clickSound)
+
+function playClick() {
+  if (audio) {
+    audio.currentTime = 0
+    audio.volume = 1
+    audio.play()
+  }
+}
 </script>
 
 <template>
-  <button class="inline-flex items-center justify-center cursor-pointer">
+  <button
+  @click="playClick"
+   class="inline-flex items-center justify-center cursor-pointer">
     <span class="flex justify-center items-center">
       <slot name="icon" />
     </span>

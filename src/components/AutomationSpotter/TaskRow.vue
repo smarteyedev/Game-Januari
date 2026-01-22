@@ -36,6 +36,19 @@ function getChecked(id: number): boolean | null {
   if (!props.isChecked) return null
   return props.checkedMap[id] !== undefined ? props.checkedMap[id] : null
 }
+
+import clickSound from '@/assets/sounds/btn_click.ogg'
+
+const audio = new Audio(clickSound)
+
+function playClick() {
+  if (audio) {
+    audio.currentTime = 0
+    audio.volume = 1
+    audio.play()
+  }
+}
+
 </script>
 
 <template>
@@ -43,6 +56,8 @@ function getChecked(id: number): boolean | null {
     v-model="local"
     :group="{ name: 'cards', pull: true, put: true }"
     item-key="id"
+    @start="playClick"
+    @end="playClick"
     class="flex flex-wrap max-w-full justify-center items-center gap-[8px] w-full min-h-[120px]"
   >
     <DraggableCard

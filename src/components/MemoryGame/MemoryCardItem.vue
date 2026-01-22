@@ -73,7 +73,7 @@ const textClass = computed(() => {
     >
       <!-- BACK -->
       <div
-        class="absolute inset-0 flex items-center justify-center bg-[#E2FEF7] rounded-xl text-white text-3xl font-bold shadow-lg backface-hidden select-none"
+        class="absolute inset-0 flex items-center justify-center bg-[#E2FEF7] rounded-xl text-white text-3xl font-bold shadow-lg backface-hidden select-none cursor-pointer"
       >
         <span class="text-[#00A3B5] text-5xl">?</span>
       </div>

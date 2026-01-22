@@ -1,120 +1,176 @@
 <script setup lang="ts">
-import { ref, computed, watch, onUnmounted, nextTick } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import useTimer from '@/composables/useTimer'
-import DragBlank from './DragBlank.vue'
-import WordPool from './WordPool.vue'
-import gameData from '@/assets/gameData/fillBlank.json'
-import type { FillBlankLevel } from '@/types/types'
+import GameData from '@/assets/gameData/fillBlank.json'
+import type { FillBlank } from '@/types/types'
 import GameHeader from '../GameHeader.vue'
 import GameFooter from '../GameFooter.vue'
-
-//  Game state
-const levelIndex = ref(0)
-const level = computed<FillBlankLevel | null>(() => gameData.levels[levelIndex.value] ?? null)
+import BlankSlot from './BlankSlot.vue'
+import WordItem from './WordItem.vue'
 
 // Timer
 const MAX_TIME = 60
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME)
-
+const slotCorrectness = ref<Record<number, boolean | null>>({})
 //  Words and blanks
-type AnswerMap = Record<string, string | null>
 
-const answers = ref<AnswerMap>({})
-const wordPool = ref<string[]>([])
+onMounted(() => {
+  start()
+})
+
+onUnmounted(() => {
+  stop()
+})
 
 const emit = defineEmits<{
   (e: 'cleared', payload: { game: 'dragAndDropPrompt'; score: number }): void
 }>()
 
-watch(
-  level,
-  (lvl) => {
-    if (!lvl) return
-
-    answers.value = Object.fromEntries(lvl.blanks.map((b) => [b.id, null]))
-
-    wordPool.value = [...lvl.words]
-    start()
-  },
-  { immediate: true },
-)
-
-watch(
-  answers,
-  () => {
-    if (hasChecked.value) {
-      hasChecked.value = false
-    }
-  },
-  { deep: true },
-)
-
-//  Sentence
-const sentenceParts = computed(() => (level.value ? level.value.sentence.split('____') : []))
-
-// Checking logic
-const hasChecked = ref(false)
-
-const correctIds = computed(() => {
-  if (!hasChecked.value || !level.value) return new Set<string>()
-
-  return new Set(
-    level.value.blanks.filter((b) => answers.value[b.id] === b.answer).map((b) => b.id),
-  )
-})
-
-const correctCount = computed(() => correctIds.value.size)
-const totalBlanks = computed(() => level.value?.blanks.length ?? 0)
-
-const isLevelCorrect = computed(() =>
-  hasChecked.value && level.value
-    ? level.value.blanks.every((b) => answers.value[b.id] === b.answer)
-    : false,
-)
-
-function checkAnswers() {
-  hasChecked.value = true
-  if (isLevelCorrect.value) stop()
-}
-
-function restartGame() {
-  stop()
-  levelIndex.value = 0
-  hasChecked.value = false
-  isGameOver.value = false
-  start()
-}
-
-onUnmounted(stop)
-
-const blankState = (id: string) => {
-  if (!hasChecked.value) return 'idle'
-  return answers.value[id] === level.value!.blanks.find((b) => b.id === id)!.answer
-    ? 'correct'
-    : 'wrong'
-}
-
-async function handleSwap(oldWord: string) {
-  // Wait for the blank that lost its word to update its modelValue
-  await nextTick()
-
-  // If a blank became empty (swap from another blank), fill it with the old word.
-  const emptyId = Object.keys(answers.value).find((id) => answers.value[id] === null)
-  if (emptyId) {
-    answers.value[emptyId] = oldWord
-    return
-  }
-
-  // Otherwise push back to the word pool (swap from pool)
-  wordPool.value.push(oldWord)
-}
 
 function finishGame() {
   emit('cleared', {
     game: 'dragAndDropPrompt',
-    score: isGameOver.value ? 0 : correctCount.value,
+    score: isGameOver.value ? 0 : (correctCount.value ?? 0),
   })
 }
+
+const gameData = GameData as FillBlank
+
+function parseSentence(sentence: string) {
+  const regex = /\{\{(\d+)\}\}/g
+  const result: any[] = []
+
+  let lastIndex = 0
+  let match
+
+  while ((match = regex.exec(sentence)) !== null) {
+    // text before slot
+    if (match.index > lastIndex) {
+      result.push({
+        type: 'text',
+        value: sentence.slice(lastIndex, match.index),
+      })
+    }
+
+    // slot - store the expected ID from the placeholder
+    result.push({
+      type: 'slot',
+      id: Number(match[1]),  // Keep the actual ID from the sentence
+      item: null,
+    })
+
+    lastIndex = regex.lastIndex
+  }
+
+  // remaining text
+  if (lastIndex < sentence.length) {
+    result.push({
+      type: 'text',
+      value: sentence.slice(lastIndex),
+    })
+  }
+
+  return result
+}
+
+const board = ref(parseSentence(gameData.sentence))
+const items = ref([...gameData.blanks])
+const slots = ref<Record<number, any>>({})
+
+board.value.forEach(part => {
+  if (part.type === 'slot') {
+    slotCorrectness.value[part.id] = null
+  }
+})
+
+let draggedItem: any | null = null
+let draggedFromIndex: number | null = null
+let draggedFromType: 'pool' | 'board' | null = null
+
+
+function onDragStart(event : DragEvent, item : any, index : number, type : 'pool' | 'board' | null) {
+  playClick()
+  draggedItem = item
+  draggedFromIndex = index
+  draggedFromType = type
+}
+
+function onDrop(event: DragEvent, dropSlotId: number) {
+  playClick()
+  // Get the current item in the target slot
+  const currentSlotItem = slots.value[dropSlotId]
+
+  // Reset correctness for affected slots
+  slotCorrectness.value[dropSlotId] = null
+  if (draggedFromType === 'board' && draggedFromIndex !== null) {
+    slotCorrectness.value[draggedFromIndex] = null
+  }
+
+  if (currentSlotItem) {
+    // If target slot already has an item
+    if (draggedFromType === 'board') {
+      // Swap items between two slots
+      slots.value[dropSlotId] = draggedItem
+      slots.value[draggedFromIndex as number] = currentSlotItem
+    } else if (draggedFromType === 'pool') {
+      // Move from pool to slot, put slot item back to pool
+      slots.value[dropSlotId] = draggedItem
+      const itemIndex = items.value.findIndex(i => i.id === draggedItem.id)
+      if (itemIndex !== -1) items.value.splice(itemIndex, 1)
+      items.value.push(currentSlotItem)
+    }
+  } else {
+    // Target slot is empty
+    slots.value[dropSlotId] = draggedItem
+    
+    if (draggedFromType === 'pool') {
+      // Remove from pool
+      const itemIndex = items.value.findIndex(i => i.id === draggedItem.id)
+      if (itemIndex !== -1) items.value.splice(itemIndex, 1)
+    } else if (draggedFromType === 'board') {
+      // Clear the source slot
+      slots.value[draggedFromIndex as number] = null
+    }
+  }
+
+  // Reset drag state
+  draggedItem = null
+  draggedFromIndex = null
+  draggedFromType = null
+}
+
+const correctCount = ref<number | null>(null)
+
+function checkAnswers() {
+  let count = 0
+  const totalSlots = board.value.filter(part => part.type === 'slot').length
+
+  Object.entries(slots.value).forEach(([slotIdStr, item]) => {
+    const slotId = Number(slotIdStr)
+    const isCorrect = item && item.id === slotId
+    
+    slotCorrectness.value[slotId] = isCorrect
+    
+    if (isCorrect) {
+      count++
+    }
+  })
+
+  correctCount.value = count
+}
+
+import clickSound from '@/assets/sounds/btn_click.ogg'
+
+const audio = new Audio(clickSound)
+
+function playClick() {
+  if (audio) {
+    audio.currentTime = 0
+    audio.volume = 1
+    audio.play()
+  }
+}
+
 </script>
 
 <template>
@@ -127,30 +183,41 @@ function finishGame() {
     </GameHeader>
 
     <!-- Sentence -->
-    <div v-if="level" class="border rounded-xl p-4 text-base text-justify">
-      <template v-for="(part, i) in sentenceParts" :key="i">
-        {{ part }}
-        <DragBlank
-          v-if="level.blanks[i]"
-          v-model="answers[level.blanks[i].id]!"
-          :answer="level.blanks[i].answer"
-          :locked="correctIds.has(level.blanks[i].id)"
-          :show="hasChecked"
-          :state="blankState(level.blanks[i].id)"
-          @swap="handleSwap"
+    <div class="border rounded-xl p-4 text-base text-justify">
+      <template v-for="(part, index) in board" :key="index">
+        <span v-if="part.type === 'text'">
+          {{ part.value }}
+        </span>
+
+        <BlankSlot
+          v-else
+          :item="slots[part.id]"
+          :slotId="part.id"
+          :onDragStart="onDragStart"
+          :isCorrect="slotCorrectness[part.id]"
+          @drop="onDrop"
         />
       </template>
     </div>
 
     <!-- Word pool -->
-    <WordPool v-model="wordPool" />
+    <div class="flex flex-wrap gap-3 justify-center">
+    <WordItem
+      v-for="(item, index) in items"
+      :key="item.id"
+      :item="item"
+      :slotId="index"
+      :inSlot="false"
+      @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+    />
+  </div>
 
     <!-- Actions -->
     <GameFooter
       class="mt-8"
       :isGameOver="isGameOver"
-      :current="correctCount"
-      :target="totalBlanks"
+      :current="correctCount ?? 0"
+      :target="board.filter(part => part.type === 'slot').length"
       @check="checkAnswers"
       :show-progress="true"
       @cleared="finishGame()"
