@@ -17,6 +17,12 @@ export interface DragCard {
   matched?: boolean
 }
 
+export interface IntroData {
+  title: string
+  description: string
+  key_points: string[]
+}
+
 // zone id is boolean because there is only two zone, its save memory.
 export interface Zone {
   id: boolean  // true for "Bisa", false for "Tidak Bisa"

@@ -15,14 +15,21 @@ import MemoryGame from '@/components/MemoryGame/MemoryGame.vue'
 import MGIntro from '@/components/MemoryGame/MGIntro.vue'
 import Score from '@/components/score/Score.vue'
 import { supabase } from '@/lib/supabaseClient'
-import type { LevelButtonState } from '@/types/types'
+import type { IntroData, LevelButtonState } from '@/types/types'
 import { onBeforeMount, onMounted, ref } from 'vue'
 import bgmSound from '@/assets/sounds/bgm.ogg'
 import LevelPath1 from '@/components/Map/LevelPath1.vue'
 import LevelPath2 from '@/components/Map/LevelPath2.vue'
 import GameIntroModal from '@/components/GameIntroModal.vue'
+import GameIntroData from '@/assets/gameData/intro.json'
 
 type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
+
+interface GameIntroMapping {
+  automationSpotter: IntroData
+  dragAndDropPrompt: IntroData
+  memoryGame: IntroData
+}
 
 const gameMeta: Record<
   GameKey,
@@ -50,6 +57,7 @@ const gameMeta: Record<
 }
 
 const gameOrder: GameKey[] = ['automationSpotter', 'dragAndDropPrompt', 'memoryGame']
+const introData = ref<GameIntroMapping | null>(null)
 
 const gameState = ref<Record<GameKey, LevelButtonState>>({
   automationSpotter: 'unlocked',
@@ -67,6 +75,28 @@ type ModalView =
 const activeView = ref<ModalView>(null)
 const showIntro = ref(false)
 
+async function loadIntroData() {
+  try {
+    const introCollection: IntroData[] = GameIntroData.data
+    
+    if (introCollection.length < 3) {
+      throw new Error('Not enough intro data')
+    }
+
+    // Map games to intro items (assuming order in JSON matches game order)
+    const mapping: GameIntroMapping = {
+      automationSpotter: introCollection[0]!,
+      dragAndDropPrompt: introCollection[1]!,
+      memoryGame: introCollection[2]!
+    }
+    
+    introData.value = mapping
+  } catch (error) {
+    console.error('Failed to load intro data:', error)
+  }
+}
+
+
 function openGame(game: GameKey) {
   activeView.value = { type: 'intro', game }
 }
@@ -77,11 +107,6 @@ function startGame(game: GameKey) {
 
 function closeModal() {
   activeView.value = null
-}
-
-function closeGame() {
-  activeView.value = null
-  showIntro.value = false
 }
 
 async function onGameCleared(payload: { game: GameKey; score: number }) {
@@ -151,6 +176,7 @@ function stopAudio(audio : HTMLAudioElement){
 
 onMounted(() => {
   updateMapSize()
+  loadIntroData()
 
   observer = new ResizeObserver(updateMapSize)
   const svg = mapRef.value?.svgRef
@@ -304,14 +330,21 @@ function toggleFullscreen() {
     </div>
 
     <!-- INTRO MODAL -->
-<GameIntroModal
-  v-if="activeView?.type === 'intro'"
-  :title="gameMeta[activeView.game].title"
-  @start="startGame(activeView.game)"
-  @close="closeModal"
->
-  <component :is="gameMeta[activeView.game].intro" />
-</GameIntroModal>
+  <GameIntroModal
+    v-if="activeView?.type === 'intro' && introData"
+    :title="gameMeta[activeView.game].title"
+    :introData="introData[activeView.game]"
+    @start="startGame(activeView.game)"
+    @close="closeModal"
+  />
+  
+  <!-- Fallback if introData not loaded yet -->
+  <GameIntroModal
+    v-else-if="activeView?.type === 'intro'"
+    :title="gameMeta[activeView.game].title"
+    @start="startGame(activeView.game)"
+    @close="closeModal"
+  />
 
 <!-- GAME MODAL -->
 <GameModal

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import IconButton from '@/components/IconButton.vue'
 import UnknownIcon from './icons/UnknownIcon.vue';
+import GameIntro from './GameIntro.vue';
+import type { IntroData } from '@/types/types'
 
 defineProps<{
   title: string
+  introData?: IntroData
 }>()
 
 const emit = defineEmits<{
@@ -15,12 +18,24 @@ const emit = defineEmits<{
 <template>
   <div class="fixed inset-0 z-50 bg-black/50">
     <div class="flex justify-center p-4">
-      <div class="flex flex-col  max-h-[600px] gap-[48px] w-full bg-white rounded-xl p-[40px] justify-center items-center">
+      <div class="flex flex-col max-h-[600px] gap-[48px] w-full bg-white rounded-xl p-[40px] justify-center items-center">
         <div>
             <UnknownIcon></UnknownIcon>
         </div>
 
-        <slot />
+        <!-- Pass introData to GameIntro if it exists -->
+        <GameIntro
+          v-if="introData"
+          :title="introData.title"
+          :description="introData.description"
+          :key_points="introData.key_points"
+        />
+        
+        <!-- Fallback if no introData -->
+        <div v-else class="text-center">
+          <h2 class="text-2xl font-bold mb-4">{{ title }}</h2>
+          <p>Selesaikan minigame!</p>
+        </div>
 
         <div class="flex">
           <IconButton

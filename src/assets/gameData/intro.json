@@ -1,0 +1,35 @@
+{
+    "data":[
+        {
+            "title": "Task Automation & AI Agent",
+            "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
+            "key_points": [
+                "Hemat waktu kerja",
+                "Tingkatkan produktivitas",
+                "Kurangi kesalahan manual"
+            ]
+        },
+                {
+            "title": "Metode Prompt CO-STAR",
+            "description": "Prompt merupakan instruksi utama yang menentukan bagaimana AI memahami dan merespons sebuah permintaan. Salah satu pendekatan penyusunan prompt yang terstruktur adalah metode CO-STAR. Metode ini membantu menyampaikan perintah secara sistematis agar AI memahami konteks, tujuan, dan bentuk respons yang diharapkan.",
+            "key_points": [
+                "Context – menjelaskan latar belakang atau situasi masalah",
+                "Objective – menyatakan tujuan atau hasil yang ingin dicapai",
+                "Style & Tone – menentukan gaya bahasa dan nada respons",
+                "Audience – mengidentifikasi target pengguna atau pembaca",
+                "Response – menetapkan format atau bentuk output yang diinginkan"
+            ]
+        },
+                {
+            "title": "AI Tools untuk Pekerjaan Sehari-hari",
+            "description": "AI Tools membantu menyelesaikan tugas secara cepat dan efisien. Dengan AI, kamu dapat menulis, merancang, atau mengelola data dalam sekejap!",
+            "key_points": [
+                "Chat GPT adalah asisten teks dari OpenAI yang bisa membantu menulis email, membuat artikel, hingga merangkum dokumen.",
+                "Gemini dari Google ini dapat terintegrasi langsung dengan Gmail, Docs, dan Sheets",
+                "GitHub Copilot adalahasisten coding yang membantu menulis dan memahami kode secara otomatis.",
+                "Meta AI adalah tools AI buatan Facebook yang terintegrasi dengan aplikasi WhatsApp, sehingga memungkinkan pengguna untuk untuk tanya jawab dengan bot meta dan mengundang bot ke grup untuk berbagai kegunaan.",
+                "Untuk keperluan visual, Canva AI hadir dengan fitur seperti Magic Write dan Magic Design. Dengan satu kalimat deskripsi, pengguna bisa membuat presentasi, poster, atau konten media sosial dalam hitungan menit."
+            ]
+        }
+    ]
+}
