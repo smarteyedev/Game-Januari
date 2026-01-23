@@ -223,7 +223,7 @@ function toggleFullscreen() {
         <div class="flex gap-4">
           <IconButton
             @click="openScore"
-            class="pb-[10px] pt-[10px] pr-[16px] pl-[16px] text-center bg-[#00A3B5] hover:bg-teal-600 text-white font-semibold rounded-lg w-[100px]"
+            class="pb-[10px] pt-[10px] pr-[16px] pl-[16px] text-center btn-primary hover:bg-teal-600 text-white font-semibold rounded-lg w-[100px]"
           >
             Score
           </IconButton>

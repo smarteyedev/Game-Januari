@@ -1,6 +1,6 @@
 {
     "id": 1,
-    "sentence": "Saya sedang menulis review untuk riset di bidang {{1}} . Tulis ulasan akademik dengan gaya seorang peneliti tentang konsep dan penerapan {{2}} dalam organisasi modern. Gunakan bahasa formal dan netral, berikan kerangka teori dan contoh penerapan, dan strukturkan {{3}} agar mudah dimasukkan ke dalam {{4}} . Target pembaca saya Adalah {{5}} di perusahaan.",
+    "sentence": "Saya sedang menulis review untuk riset di bidang {{1}}. Tulis ulasan akademik dengan gaya seorang peneliti tentang konsep dan penerapan {{2}} dalam organisasi modern. Gunakan bahasa formal dan netral, berikan kerangka teori dan contoh penerapan, dan strukturkan {{3}} agar mudah dimasukkan ke dalam {{4}}. Target pembaca saya Adalah {{5}} di perusahaan.",
     "blanks": [
     {
         "id": 1,

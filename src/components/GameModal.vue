@@ -19,7 +19,7 @@ const emit = defineEmits<{
   <div class="fixed inset-0 z-50 bg-black/50">
     <div class="flex justify-center p-4">
       <div
-        class="max-w-[95vw] w-full max-h-[90vh] bg-white rounded-xl flex flex-col overflow-hidden"
+        class="max-w-[95vw] w-full max-h-[90vh] bg-white rounded-[12px] flex flex-col overflow-hidden shadow-lg"
       >
         <div class="overflow-auto px-6 py-4 flex flex-col">
           <div
