@@ -1,11 +1,11 @@
 <!-- BlankSlot.vue -->
 <template>
   <div
-    class="inline-flex min-w-[100px] min-h-[24px] px-3 border rounded justify-center items-center align-middle blank"
+    class="inline-flex min-w-[100px] min-h-[24px] px-3 rounded justify-center items-center align-middle blank"
     :class="{
-      'bg-green-100 border-green-300': isCorrect === true,
-      'bg-red-100 border-red-300': isCorrect === false,
-      'bg-white': isCorrect === null
+      'bg-green-100 border border-green-300': isCorrect === true,
+      'bg-red-100 border border-red-300': isCorrect === false,
+      'bg-[#E2FEF7]': isCorrect === null
     }"
     @drop.prevent="handleDrop"
     @dragover.prevent

@@ -1,10 +1,13 @@
 <template>
-  <div class="mt-4">
-    <p class="text-lg">AI Tools untuk Pekerjaan Sehari-hari</p>
-    <p class="text-base">
+  <div class="flex flex-col gap-[40px] w-full text-center">
+    <div class="flex flex-col gap-[16px]">
+      <p class="text-lg font-bold">AI Tools untuk Pekerjaan Sehari-hari</p>
+      <p class="text-base">
       AI Tools membantu menyelesaikan tugas secara cepat dan efisien. Dengan AI, kamu dapat menulis,
       merancang, atau mengelola data dalam sekejap!
-    </p>
+      </p>
+    </div>
+    <div class="flex flex-col gap-[6px] text-left">
     <p>Contoh Tools:</p>
     <ul class="text-base list-disc pl-5">
       <li>
@@ -26,5 +29,6 @@
         sosial dalam hitungan menit.
       </li>
     </ul>
+    </div>
   </div>
 </template>
