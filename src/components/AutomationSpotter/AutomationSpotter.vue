@@ -28,8 +28,12 @@ const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
 const question = ref("")
 
-const MAX_TIME = 60
+const MAX_TIME = 180 //second
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME, {})
+
+const hasLost = computed(() => {
+  return isChecked.value && !isLevelWin.value
+})
 
 const emit = defineEmits<{
   (e: 'cleared', payload: { game: 'automationSpotter'; score: number }): void
@@ -44,11 +48,13 @@ function onMoved(ids: number[]) {
 
 onMounted(() => {
   loadLevel()
-  start()
 })
 onUnmounted(stop)
 
 function loadLevel() {
+  stop()
+  start()
+
   const level = gameData
   if (!level) return
 
@@ -63,11 +69,11 @@ function loadLevel() {
 
   sourceCards.value = [...allCards.value]
 
-  // Reset all zones
   zones.value.forEach((zone) => {
     zone.cards = []
   })
 }
+
 
 const matchedCount = computed(() => {
   if (!isChecked.value) return 0
@@ -95,9 +101,14 @@ function checkAnswers() {
 function finishGame() {
   emit('cleared', {
     game: 'automationSpotter',
-    score: isGameOver.value ? 0 : matchedCount.value,
+    score: isGameOver.value ? 0 : 100,
   })
 }
+
+watch(isGameOver, (over) => {
+  if (!over) return
+  isChecked.value = true
+})
 </script>
 
 <template>
@@ -114,6 +125,7 @@ function finishGame() {
       v-model="sourceCards"
       :checked-map="checkedMap"
       :is-checked="isChecked"
+      :disabled="isChecked"
       @moved="onMoved"
     />
 
@@ -122,9 +134,13 @@ function finishGame() {
     <GameFooter
       :current="matchedCount"
       :target="allCards.length"
-      @check="checkAnswers"
+      :is-checked="isChecked"
+      :has-lost="hasLost"
+      :is-win="isLevelWin"
       :show-progress="true"
-      @cleared="finishGame()"
-    ></GameFooter>
+      @check="checkAnswers"
+      @retry="loadLevel"
+      @cleared="finishGame"
+    />
   </div>
 </template>

@@ -10,6 +10,7 @@ const props = defineProps<{
   modelValue: DragCard[]
   checkedMap: Record<number, boolean>
   isChecked: boolean
+  disabled: boolean
 }>()
 
 const emit = defineEmits<{
@@ -50,6 +51,7 @@ function updateModel(newVal: DragCard[]) {
       :model-value="modelValue"
       @update:model-value="updateModel"
       :group="{ name: 'cards', pull: true, put: true }"
+      :disabled="disabled"
       item-key="id"
       class="relative flex flex-col gap-2 min-h-[120px] md:min-h-[160px] p-2"
     >

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
 import GameData from '@/assets/gameData/fillBlank.json'
 import type { FillBlank } from '@/types/types'
@@ -9,9 +9,10 @@ import BlankSlot from './BlankSlot.vue'
 import WordItem from './WordItem.vue'
 
 // Timer
-const MAX_TIME = 60
+const MAX_TIME = 180 //second
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME)
 const slotCorrectness = ref<Record<number, boolean | null>>({})
+const isLocked = ref(false)
 //  Words and blanks
 
 onMounted(() => {
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 function finishGame() {
   emit('cleared', {
     game: 'dragAndDropPrompt',
-    score: isGameOver.value ? 0 : (correctCount.value ?? 0),
+    score: isGameOver.value ? 0 : 100,
   })
 }
 
@@ -96,6 +97,7 @@ function onDragStart(event : DragEvent, item : any, index : number, type : 'pool
 }
 
 function onDrop(event: DragEvent, dropSlotId: number) {
+  if (isLocked.value) return
   playClick()
   // Get the current item in the target slot
   const currentSlotItem = slots.value[dropSlotId]
@@ -140,24 +142,71 @@ function onDrop(event: DragEvent, dropSlotId: number) {
 }
 
 const correctCount = ref<number | null>(null)
+const isChecked = ref(false)
+const isWin = ref(false)
+
+const hasLost = computed(() =>
+  isChecked.value && !isWin.value
+)
 
 function checkAnswers() {
+  isChecked.value = true
+
   let count = 0
   const totalSlots = board.value.filter(part => part.type === 'slot').length
 
   Object.entries(slots.value).forEach(([slotIdStr, item]) => {
     const slotId = Number(slotIdStr)
     const isCorrect = item && item.id === slotId
-    
+
     slotCorrectness.value[slotId] = isCorrect
-    
-    if (isCorrect) {
-      count++
-    }
+    if (isCorrect) count++
   })
 
   correctCount.value = count
+
+  if (count === totalSlots) {
+    // WIN
+    isWin.value = true
+    isLocked.value = true
+    stop()
+  } else {
+    // NOT WIN
+    isWin.value = false
+    isLocked.value = true
+    stop()
+  }
 }
+
+
+watch(isGameOver, (over) => {
+  if (over) {
+    isChecked.value = true
+    isWin.value = false
+    isLocked.value = true
+  }
+})
+
+function retryGame() {
+  slots.value = {}
+  slotCorrectness.value = {}
+
+  board.value.forEach(part => {
+    if (part.type === 'slot') {
+      slotCorrectness.value[part.id] = null
+    }
+  })
+
+  items.value = [...gameData.blanks]
+
+  correctCount.value = null
+  isLocked.value = false
+  isChecked.value = false
+  isWin.value = false
+
+  start()
+}
+
 
 import clickSound from '@/assets/sounds/btn_click.ogg'
 
@@ -195,6 +244,7 @@ function playClick() {
           :slotId="part.id"
           :onDragStart="onDragStart"
           :isCorrect="slotCorrectness[part.id]"
+          :disabled="isLocked"
           @drop="onDrop"
         />
       </template>
@@ -208,6 +258,7 @@ function playClick() {
       :item="item"
       :slotId="index"
       :inSlot="false"
+      :disabled="isLocked"
       @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
     />
   </div>
@@ -220,7 +271,11 @@ function playClick() {
       :target="board.filter(part => part.type === 'slot').length"
       @check="checkAnswers"
       :show-progress="true"
+      :has-lost="hasLost"
+      :is-checked="isChecked"
+      :is-win="isWin"
       @cleared="finishGame()"
+      @retry="retryGame"
     ></GameFooter>
   </div>
 </template>

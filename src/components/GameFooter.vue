@@ -6,16 +6,17 @@ const props = defineProps<{
   current?: number
   target?: number
   showProgress?: boolean
+  isChecked?: boolean
+  isWin?: boolean
+  hasLost?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'check'): void
+  (e: 'retry'): void
   (e: 'cleared'): void
 }>()
 
-function continueNextLevel() {
-  emit('cleared')
-}
 </script>
 
 <template>
@@ -47,15 +48,24 @@ function continueNextLevel() {
               />
             </svg>
           </template>
-          Check
+          Submit
         </IconButton>
       </slot>
     </div>
 
     <!-- RIGHT ACTION -->
     <div class="flex gap-4 items-end">
+        <IconButton
+        v-if="hasLost"
+        @click="emit('retry')"
+        class="btn-primary hover:bg-teal-600 text-white rounded-lg inline-flex items-center justify-center min-w-[128px] min-h-[30px]"
+      >
+        Retry
+      </IconButton>
+
       <IconButton
-        @click="continueNextLevel"
+      v-else-if="isChecked && isWin"
+        @click="emit('cleared')"
         class="btn-primary hover:bg-teal-600 text-white rounded-lg inline-flex items-center justify-center min-w-[128px] min-h-[30px]"
       >
         Continue

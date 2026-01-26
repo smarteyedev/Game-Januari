@@ -15,6 +15,7 @@
       :item="item"
       :slotId="slotId"
       :inSlot="true"
+      :disabled="disabled"
       @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')"
     />
   </div>
@@ -29,6 +30,7 @@ const props = defineProps<{
   slotId: number
   onDragStart?: (e: DragEvent, item: Blank, slotId: number, type: 'board' | 'pool') => void
   isCorrect: boolean | null | undefined
+  disabled: boolean
 }>()
 
 const emit = defineEmits(['drop'])

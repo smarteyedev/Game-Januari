@@ -29,6 +29,7 @@ const emit = defineEmits<{
       v-model="zone.cards"
       :checked-map="checkedMap"
       :is-checked="isChecked"
+      :disabled="isChecked"
       :className="zone.id 
         ? 'bg-green-100 flex-1 text-[#00A3B5]' 
         : 'bg-red-100  flex-1 text-[#DA4A4A]'"

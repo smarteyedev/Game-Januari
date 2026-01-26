@@ -9,7 +9,9 @@ const props = defineProps<{
   modelValue: DragCard[]
   checkedMap: Record<number, boolean>
   isChecked: boolean
+  disabled: boolean
 }>()
+
 const emit = defineEmits<{
   (e: 'update:modelValue', v: DragCard[]): void
   (e: 'moved', ids: number[]): void
@@ -56,6 +58,7 @@ function playClick() {
     v-model="local"
     :group="{ name: 'cards', pull: true, put: true }"
     item-key="id"
+    :disabled="disabled"
     @start="playClick"
     @end="playClick"
     class="flex flex-wrap max-w-full justify-center items-center gap-[8px] w-full min-h-[120px]"

@@ -34,15 +34,11 @@ let lock = false
 
 const turns = ref(0)
 const gameStarted = ref(false)
-const score = ref(100)
-const MAX_TURNS_BEFORE_PENALTY = 10
-const PENALTY_PER_FLIP = 2
-const MAX_TIME = 60
+const MAX_TIME = 180 //second
 const gameOver = ref(false)
 
 const { time, start, stop } = useTimer(MAX_TIME, {
   onFinish: () => {
-    score.value = 0
     lock = true
     gameOver.value = true
   },
@@ -51,6 +47,7 @@ const { time, start, stop } = useTimer(MAX_TIME, {
 const allMatched = computed(() => cards.value.every((card) => card.matched))
 
 function flipCard(card: MemoryCard) {
+  if(gameOver.value) return
   playClick()
   if (lock || card.flipped || card.matched) return
 
@@ -61,10 +58,6 @@ function flipCard(card: MemoryCard) {
 
   card.flipped = true
   turns.value++
-
-  if (turns.value > MAX_TURNS_BEFORE_PENALTY) {
-    score.value = Math.max(0, score.value - PENALTY_PER_FLIP)
-  }
 
   if (!firstCard) {
     firstCard = card
@@ -100,7 +93,7 @@ function finishGame() {
   
   emit('cleared', {
     game: 'memoryGame',
-    score: allMatched.value ? score.value : 0,
+    score: allMatched.value ? 100 : 0,
   })
 }
 
@@ -116,6 +109,15 @@ function playClick() {
     audio.play()
   }
 }
+
+function retryGame() {
+  cards.value = loadLevel()
+  firstCard = null
+  lock = false
+  gameStarted.value = false
+  gameOver.value = false
+  stop()
+}
 </script>
 
 <template>
@@ -130,7 +132,14 @@ function playClick() {
       <MemoryBoard :cards="cards" @flip="flipCard" />
     </div>
 
-    <GameFooter @cleared="finishGame()" class="mt-8">
+    <GameFooter 
+    :is-win="allMatched"
+    :has-lost="gameOver && !allMatched"
+    :is-checked="allMatched"
+    @cleared="finishGame"
+    @retry="retryGame"
+     class="mt-8"
+     >
       <template #left>
         <p class="text-lg font-semibold">Card Turns: {{ turns }}</p>
       </template>
