@@ -2,4 +2,4 @@
   <RouterView></RouterView>
 </template>
 
-<style src="./assets/main.css"></style>
+<style src="@/assets/css/tailwind.css"></style>

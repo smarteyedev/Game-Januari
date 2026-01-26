@@ -3,8 +3,8 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
 import GameData from '@/assets/gameData/fillBlank.json'
 import type { FillBlank } from '@/types/types'
-import GameHeader from '../GameHeader.vue'
-import GameFooter from '../GameFooter.vue'
+import GameHeader from '../molecules/GameHeader.vue'
+import GameFooter from '../molecules/GameFooter.vue'
 import BlankSlot from './BlankSlot.vue'
 import WordItem from './WordItem.vue'
 
@@ -89,7 +89,7 @@ let draggedFromIndex: number | null = null
 let draggedFromType: 'pool' | 'board' | null = null
 
 
-function onDragStart(event : DragEvent, item : any, index : number, type : 'pool' | 'board' | null) {
+function onDragStart(event: DragEvent, item: any, index: number, type: 'pool' | 'board' | null) {
   playClick()
   draggedItem = item
   draggedFromIndex = index
@@ -124,7 +124,7 @@ function onDrop(event: DragEvent, dropSlotId: number) {
   } else {
     // Target slot is empty
     slots.value[dropSlotId] = draggedItem
-    
+
     if (draggedFromType === 'pool') {
       // Remove from pool
       const itemIndex = items.value.findIndex(i => i.id === draggedItem.id)
@@ -223,12 +223,9 @@ function playClick() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 min-w-full w-[90vw]">
-    <GameHeader
-      title="Drag and Drop Prompt"
-      description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
-      :time="time"
-    >
+  <div class="flex flex-col items-center gap-4 w-full max-w-full">
+    <GameHeader title="Drag and Drop Prompt"
+      description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
     </GameHeader>
 
     <!-- Sentence -->
@@ -238,44 +235,21 @@ function playClick() {
           {{ part.value }}
         </span>
 
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-          @drop="onDrop"
-        />
+        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+          :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
       </template>
     </div>
 
     <!-- Word pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-    <WordItem
-      v-for="(item, index) in items"
-      :key="item.id"
-      :item="item"
-      :slotId="index"
-      :inSlot="false"
-      :disabled="isLocked"
-      @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
-    />
-  </div>
+      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
+        :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+    </div>
 
     <!-- Actions -->
-    <GameFooter
-      class="mt-8"
-      :isGameOver="isGameOver"
-      :current="correctCount ?? 0"
-      :target="board.filter(part => part.type === 'slot').length"
-      @check="checkAnswers"
-      :show-progress="true"
-      :has-lost="hasLost"
-      :is-checked="isChecked"
-      :is-win="isWin"
-      @cleared="finishGame()"
-      @retry="retryGame"
-    ></GameFooter>
+    <GameFooter slot="footer" class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
+      :target="board.filter(part => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
+      :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
+    </GameFooter>
   </div>
 </template>

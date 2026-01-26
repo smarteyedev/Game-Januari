@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { toTimeMmss } from '@/utils/formatter'
-import IconButton from './IconButton.vue'
+import UiAtomsLabel from '@/components/atoms/label/index.vue'
+import { UiLabel } from '../atoms/label';
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     description?: string
     time: number
@@ -15,10 +16,10 @@ const props = withDefaults(
 
 <template>
   <div class="flex items-center justify-between h-12 w-full">
-    <span class="text-base font-semibold">
-      {{ description }}
-    </span>
+    <UiLabel :label="description" name="header-label" />
 
-    <span class="text-base font-semibold"> Time: {{ toTimeMmss(time) }} </span>
+    <span class="text-base font-semibold">
+      Time: {{ toTimeMmss(time) }}
+    </span>
   </div>
 </template>

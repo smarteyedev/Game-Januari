@@ -5,8 +5,8 @@ import TaskRow from './TaskRow.vue'
 import SpotZones from './SpotZones.vue'
 import type { DragCard, Zone } from '@/types/types'
 import gameData from '@/assets/gameData/automationSpotter.json'
-import GameHeader from '../GameHeader.vue'
-import GameFooter from '../GameFooter.vue'
+import GameHeader from '../molecules/GameHeader.vue'
+import GameFooter from '../molecules/GameFooter.vue'
 
 const allCards = ref<DragCard[]>([])
 const sourceCards = ref<DragCard[]>([])
@@ -76,7 +76,6 @@ function loadLevel() {
 
 
 const matchedCount = computed(() => {
-  if (!isChecked.value) return 0
   return Object.values(checkedMap.value).filter(Boolean).length
 })
 
@@ -112,35 +111,18 @@ watch(isGameOver, (over) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 min-w-full w-[90vw]">
-    <GameHeader
-      title="Automation Spotter"
-      :description="question"
-      :time="time"
-    >
+  <div class="flex flex-col items-center gap-4 w-full max-w-full">
+    <GameHeader title="Automation Spotter" :description="question" :time="time">
     </GameHeader>
 
     <!-- Cards -->
-    <TaskRow
-      v-model="sourceCards"
-      :checked-map="checkedMap"
-      :is-checked="isChecked"
-      :disabled="isChecked"
-      @moved="onMoved"
-    />
+    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+      @moved="onMoved" />
 
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-    <GameFooter
-      :current="matchedCount"
-      :target="allCards.length"
-      :is-checked="isChecked"
-      :has-lost="hasLost"
-      :is-win="isLevelWin"
-      :show-progress="true"
-      @check="checkAnswers"
-      @retry="loadLevel"
-      @cleared="finishGame"
-    />
+    <GameFooter slot="footer" :current="matchedCount" :target="allCards.length" :is-checked="isChecked"
+      :has-lost="hasLost" :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel"
+      @cleared="finishGame" />
   </div>
 </template>

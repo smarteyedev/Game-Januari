@@ -9,17 +9,13 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [
     vue(),
+    vueDevTools(),
     tailwindcss()
   ],
-  server: {
-    watch: {
-      usePolling: true,
-      interval: 100
-    }
-  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  
 })
