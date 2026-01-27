@@ -17,7 +17,9 @@
     type="button"
   >
     <!-- Prepend content, usually for icons or other elements -->
-    <slot name="prepend" class="ui-button__prepend">
+    <slot
+name="prepend"
+class="ui-button__prepend">
       <!-- Loading slot content (if loading is true) -->
       <UiAtomsIcon
         v-if="loading || icon"
@@ -32,12 +34,16 @@
     </slot>
 
     <!-- Default slot for the label/text -->
-    <div v-if="$slots.default && !square" class="ui-button__label">
+    <div
+v-if="$slots.default && !square"
+class="ui-button__label">
       <slot />
     </div>
 
     <!-- Append content, usually for icons or other elements -->
-    <slot name="append" class="ui-button__append">
+    <slot
+name="append"
+class="ui-button__append">
       <UiAtomsIcon
         v-if="iconAppend"
         :name="iconAppend"

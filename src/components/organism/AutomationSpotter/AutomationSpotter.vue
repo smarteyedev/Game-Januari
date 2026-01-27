@@ -4,10 +4,11 @@ import useTimer from '@/composables/useTimer'
 import TaskRow from './TaskRow.vue'
 import SpotZones from './SpotZones.vue'
 import type { DragCard, Zone } from '@/types/types'
-import GameHeader from '../molecules/GameHeader.vue'
-import GameFooter from '../molecules/GameFooter.vue'
 import useApi from '@/composables/useApi'
 import type { ApiResponse } from '@/types/types'
+import GameHeader from '@/components/molecules/GameHeader.vue'
+import GameFooter from '@/components/molecules/GameFooter.vue'
+import useGameSession from '@/composables/useGameSession'
 
 const allCards = ref<DragCard[]>([])
 const sourceCards = ref<DragCard[]>([])
@@ -76,27 +77,33 @@ onMounted(() => {
 })
 onUnmounted(stop)
 
-function loadLevel() {
+function shuffle<T>(array: T[]): T[] {
+  return [...array].sort(() => Math.random() - 0.5)
+}
+
+const { startSession, submitScore } = useGameSession('automationSpotter')
+
+async function loadLevel() {
   if (!gameData.value) return
 
   stop()
   start()
 
+  // start new session every retry
+  await startSession()
+
   checkedMap.value = {}
   isChecked.value = false
   question.value = gameData.value.question
 
-  allCards.value = gameData.value.card.map((c) => ({
-    ...c,
-    matched: false,
-  }))
+  allCards.value = shuffle(
+    gameData.value.card.map((c) => ({ ...c, matched: false }))
+  )
 
   sourceCards.value = [...allCards.value]
-
-  zones.value.forEach((zone) => {
-    zone.cards = []
-  })
+  zones.value.forEach((zone) => (zone.cards = []))
 }
+
 
 const matchedCount = computed(() => {
   return Object.values(checkedMap.value).filter(Boolean).length
@@ -130,6 +137,7 @@ function checkAnswers() {
 }
 
 function finishGame() {
+  submitScore(isLevelWin.value ? 100 : 0)
   emit('cleared', {
     game: 'automationSpotter',
     score: isGameOver.value ? 0 : 100,
@@ -154,32 +162,13 @@ watch(isGameOver, (over) => {
     <template v-else>
       <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-      <TaskRow
-        v-model="sourceCards"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        :disabled="isChecked"
-        @moved="onMoved"
-      />
+      <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+        @moved="onMoved" />
 
-      <SpotZones
-        :zones="zones"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        @moved="onMoved"
-      />
+      <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-      <GameFooter
-        :current="matchedCount"
-        :target="allCards.length"
-        :is-checked="isChecked"
-        :has-lost="hasLost"
-        :is-win="isLevelWin"
-        :show-progress="true"
-        @check="checkAnswers"
-        @retry="loadLevel"
-        @cleared="finishGame"
-      />
+      <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+        :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
     </template>
   </div>
 </template>

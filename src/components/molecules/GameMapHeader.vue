@@ -20,7 +20,9 @@
         @click="$emit('toggleFullscreen')"
       >
         <template #prepend>
-          <UiAtomsIcon name="material-symbols:fullscreen" class="h-9 w-9 text-white" />
+          <UiAtomsIcon
+name="material-symbols:fullscreen"
+class="h-9 w-9 text-white" />
         </template>
       </UiButton>
     </div>

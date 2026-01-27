@@ -3,10 +3,11 @@ import { ref, computed, onMounted } from 'vue'
 import useTimer from '@/composables/useTimer'
 import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
 import MemoryBoard from './MemoryBoard.vue'
-import GameHeader from '../molecules/GameHeader.vue'
-import GameFooter from '../molecules/GameFooter.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
+import GameFooter from '@/components/molecules/GameFooter.vue'
+import GameHeader from '@/components/molecules/GameHeader.vue'
+import useGameSession from '@/composables/useGameSession'
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
@@ -34,9 +35,12 @@ async function fetchLevel() {
   }
 }
 
+const { startSession, submitScore } = useGameSession('memoryGame')
+
 function loadLevel(): MemoryCard[] {
   if (!gameData.value) return []
 
+  startSession()
   return shuffle(
     gameData.value.card.map((card) => ({
       ...card,
@@ -111,6 +115,7 @@ const emit = defineEmits<{
 }>()
 
 function finishGame() {
+  submitScore(allMatched.value ? 100 : 0)
   emit('cleared', {
     game: 'memoryGame',
     score: allMatched.value ? 100 : 0,
@@ -143,26 +148,14 @@ onMounted(() => {
 
 <template>
   <div class="gap-4 w-full max-w-full">
-    <GameHeader
-      title="Memory Game"
-      description="Pasangkan kartu dengan deskripsi yang benar!"
-      :time="time"
-    />
+    <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
     <div class="flex justify-center">
       <MemoryBoard :cards="cards" @flip="flipCard" />
     </div>
 
-    <GameFooter
-      slot="footer"
-      :hide-submit="true"
-      :is-win="allMatched"
-      :has-lost="gameOver && !allMatched"
-      :is-checked="allMatched"
-      @cleared="finishGame"
-      @retry="retryGame"
-      class="mt-8"
-    >
+    <GameFooter slot="footer" :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+      :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
       <template #left>
         <p class="text-lg font-semibold">Card Turns: {{ turns }}</p>
       </template>

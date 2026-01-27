@@ -1,60 +1,55 @@
 <script setup lang="ts">
 import { UiButton } from '@/components/atoms/button'
 import InputField from '@/components/molecules/InputField.vue'
-import { supabase } from '@/lib/supabaseClient'
+import useApi from '@/composables/useApi'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSessionStore } from '@/stores/session'
+import { type ApiResponse } from '@/types/types'
 
 const router = useRouter()
+const sessionStore = useSessionStore()
 
 const nama = ref('')
 const kantor = ref('')
 const unit = ref('')
 
 const isFormValid = computed(() => {
-  return nama.value.trim() !== '' && kantor.value.trim() !== '' && unit.value.trim() !== ''
+  return nama.value.trim() && kantor.value.trim() && unit.value.trim()
 })
+
+const { post, loading, error } = useApi()
+
+async function createGuestSession() {
+  try {
+
+    const res = await post<ApiResponse<{
+      guestId: string
+      accessToken: string
+      expiresAt: string
+    }>>('/api/v1/guest/session', {
+      nama: nama.value,
+      kantor: kantor.value,
+      unit: unit.value
+    })
+
+    if (res.success && res.data) {
+      // save session in Pinia
+      sessionStore.setGuestSession({
+        guestId: res.data.guestId,
+        accessToken: res.data.accessToken,
+        expiresAt: res.data.expiresAt
+      })
+    }
+  } catch (err) {
+    console.error('Failed to create guest session', err)
+  }
+}
 
 async function goToGame() {
   if (!isFormValid.value) return
 
-  let playerId: string
-
-  const { data, error } = await supabase
-    .from('Player')
-    .select('id')
-    .eq('nama', nama.value)
-    .maybeSingle()
-
-  if (error) return console.error(error)
-
-  if (data) {
-    playerId = data.id
-  } else {
-    const { data: newPlayer, error: insertError } = await supabase
-      .from('Player')
-      .insert({ nama: nama.value, kantor: kantor.value, unit: unit.value })
-      .select('id')
-      .single()
-
-    if (insertError) return console.error(insertError)
-
-    playerId = newPlayer.id
-  }
-
-  localStorage.setItem('player_id', playerId)
-
-  // --- CREATE SCORE SESSION IMMEDIATELY ---
-  const { data: scoreData, error: scoreError } = await supabase
-    .from('Score')
-    .insert({ player_id: playerId })
-    .select('id')
-    .single()
-
-  if (scoreError) return console.error(scoreError)
-
-  sessionStorage.setItem('score_session_id', scoreData.id)
-
+  await createGuestSession()
   router.push('/game')
 }
 </script>
