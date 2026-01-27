@@ -38,20 +38,26 @@ export default function useGameSession(gameId: string) {
     return sessionId.value
   }
 
-  async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
-    if (!sessionId.value || !sessionStore.guest?.accessToken) return
-    try {
-      const res = await post(
-        `/api/v1/hpl/session/${sessionId.value}/submit`,
-        { score, answers, timeMs },
-        { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
-      )
-    } catch (err) {
-      console.error('Failed to submit score', err)
-    } finally {
-      sessionId.value = null // clear after submission
-    }
+async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
+  if (!sessionId.value || !sessionStore.guest?.accessToken) return
+
+  try {
+    const res = await post(
+      `/api/v1/hpl/session/${sessionId.value}/submit`,
+      { score, answers, timeMs },
+      { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
+    )
+
+    console.log('Submit score response:', res)
+
+    return res
+  } catch (err) {
+    console.error('Failed to submit score', err)
+    throw err
+  } finally {
+    sessionId.value = null
   }
+}
 
   return { sessionId, startSession, submitScore, loading, error, invalidateSession }
 }
