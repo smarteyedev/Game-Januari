@@ -1,35 +1,36 @@
 <template>
-  <div class="ui-progress-bar" :style="{
-    '--progress-total': progress || 0,
-    '--progress-max': max || 100,
-    '--progress-background-color': ui?.backgroundColor,
-    '--progress-color': ui?.color,
-  }">
+  <div
+    class="ui-progress-bar"
+    :style="{
+      '--progress-total': progress || 0,
+      '--progress-max': max || 100,
+      '--progress-background-color': ui?.backgroundColor,
+      '--progress-color': ui?.color,
+    }"
+  >
     <div class="ui-progress-bar__meter"></div>
     <div class="ui-progress-bar__value"></div>
     <div class="ui-progress-bar__text" v-if="showLabel">
-      <slot name="label" v-bind="{ percent }">
-        {{ percent }}%
-      </slot>
+      <slot name="label" v-bind="{ percent }"> {{ percent }}% </slot>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import type { IProgressBarProps } from "@/components/atoms/progressBar/types.ts";
-import { computed, toRefs } from "vue";
+import type { IProgressBarProps } from '@/components/atoms/progressBar/types.ts'
+import { computed, toRefs } from 'vue'
 
 const props = withDefaults(defineProps<IProgressBarProps>(), {
   progress: 0,
   max: 100,
   showLabel: false,
-  ui: () => ({})
-});
+  ui: () => ({}),
+})
 
-const { progress, max } = toRefs(props);
+const { progress, max } = toRefs(props)
 
 const percent = computed(() => {
-  return Math.floor((Number(progress.value) / Number(max.value)) * 100) || 0;
+  return Math.floor((Number(progress.value) / Number(max.value)) * 100) || 0
 })
 </script>
 
@@ -39,7 +40,7 @@ const percent = computed(() => {
   --progress-max: 100;
   --progress-color: var(--color-primary-500);
   --progress-label-color: var(--color-gray-50, white);
-  --progress-background-color: var(--color-gray-50, #EAEAEA);
+  --progress-background-color: var(--color-gray-50, #eaeaea);
 
   --progress-percentage: calc((var(--progress-total) / var(--progress-max)) * 100%);
 
@@ -58,7 +59,7 @@ const percent = computed(() => {
 
 .ui-progress-bar__meter {
   width: 100%;
-  background-color: var(--progress-background-color, #EAEAEA);
+  background-color: var(--progress-background-color, #eaeaea);
 }
 
 .ui-progress-bar__text,
@@ -80,7 +81,6 @@ const percent = computed(() => {
   overflow: hidden;
   text-align: center;
   color: var(--progress-label-color);
-
 }
 
 .ui-progress-bar__value {

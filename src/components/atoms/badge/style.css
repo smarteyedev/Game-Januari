@@ -86,7 +86,7 @@
 .ui-badge--outline {
   --badge-border-color: var(--badge-color);
   --badge-background-color: transparent;
- }
+}
 
 /** COLOR **/
 .ui-badge--soft {

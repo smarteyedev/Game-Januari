@@ -11,7 +11,7 @@ const hasIcon = !!slots.icon
 </script>
 
 <template>
-  <div class="flex gap-[8px] items-center">
+  <div class="flex gap-2 items-center">
     <!-- Use icon if provided, otherwise use bullet if bullet prop is true -->
     <template v-if="hasIcon">
       <slot name="icon" />

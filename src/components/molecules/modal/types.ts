@@ -1,6 +1,7 @@
-export type TModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'full';
-export type TModalFooterPosition = 'left' | 'center' | 'right';
-export type TModalPosition = 'top-left'
+export type TModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'full'
+export type TModalFooterPosition = 'left' | 'center' | 'right'
+export type TModalPosition =
+  | 'top-left'
   | 'top-center'
   | 'top-right'
   | 'center-left'
@@ -8,7 +9,7 @@ export type TModalPosition = 'top-left'
   | 'center-right'
   | 'bottom-left'
   | 'bottom-center'
-  | 'bottom-right';
+  | 'bottom-right'
 
 export interface IModalFooter {
   cancel?: string
@@ -19,25 +20,25 @@ export interface IModalFooter {
 }
 
 export interface IModalUi {
-  contentGap?: string;
-  padding?: string;
-  offset?: string;
-  minHeight?: string;
-  maxHeight?: string;
-  contentMinHeight?: string;
-  contentMaxHeight?: string;
+  contentGap?: string
+  padding?: string
+  offset?: string
+  minHeight?: string
+  maxHeight?: string
+  contentMinHeight?: string
+  contentMaxHeight?: string
 }
 
-export type TModalScrollMode = 'root' | 'modal' | 'content';
+export type TModalScrollMode = 'root' | 'modal' | 'content'
 
 export interface IModalProps {
-  title?: string;
-  size?: TModalSize;
-  position?: TModalPosition;
-  preventClose?: boolean;
-  footer?: IModalFooter;
-  divider?: boolean;
-  overlay?: boolean;
-  scrollMode?: TModalScrollMode;
+  title?: string
+  size?: TModalSize
+  position?: TModalPosition
+  preventClose?: boolean
+  footer?: IModalFooter
+  divider?: boolean
+  overlay?: boolean
+  scrollMode?: TModalScrollMode
   ui?: IModalUi
 }

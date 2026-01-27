@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
-import GameData from '@/assets/gameData/fillBlank.json'
-import type { FillBlank } from '@/types/types'
+import type { ApiResponse, Blank, FillBlank } from '@/types/types'
 import GameHeader from '../molecules/GameHeader.vue'
 import GameFooter from '../molecules/GameFooter.vue'
 import BlankSlot from './BlankSlot.vue'
 import WordItem from './WordItem.vue'
+import clickSound from '@/assets/sounds/btn_click.ogg'
+import useApi from '@/composables/useApi'
 
 // Timer
 const MAX_TIME = 180 //second
@@ -16,7 +17,7 @@ const isLocked = ref(false)
 //  Words and blanks
 
 onMounted(() => {
-  start()
+  fetchLevel()
 })
 
 onUnmounted(() => {
@@ -27,7 +28,6 @@ const emit = defineEmits<{
   (e: 'cleared', payload: { game: 'dragAndDropPrompt'; score: number }): void
 }>()
 
-
 function finishGame() {
   emit('cleared', {
     game: 'dragAndDropPrompt',
@@ -35,7 +35,53 @@ function finishGame() {
   })
 }
 
-const gameData = GameData as FillBlank
+const { get, loading, error } = useApi()
+const gameData = ref<{
+  sentence: string
+  blanks: Blank[]
+} | null>(null)
+
+async function fetchLevel() {
+  try {
+    const res = await get<
+      ApiResponse<{
+        sentence: string
+        blanks: Blank[]
+      }>
+    >('/api/v1/minigames/drag-and-drop/levels/1')
+
+    gameData.value = res.data
+    loadLevel()
+  } catch (err) {
+    console.error('Failed to load level', err)
+  }
+}
+
+function loadLevel() {
+  if (!gameData.value) return
+
+  board.value = parseSentence(gameData.value.sentence)
+
+  slots.value = {}
+  slotCorrectness.value = {}
+
+  board.value.forEach((part) => {
+    if (part.type === 'slot') {
+      slots.value[part.id] = null
+      slotCorrectness.value[part.id] = null
+    }
+  })
+
+  items.value = [...gameData.value.blanks]
+
+  correctCount.value = null
+  isChecked.value = false
+  isWin.value = false
+  isLocked.value = false
+
+  stop()
+  start()
+}
 
 function parseSentence(sentence: string) {
   const regex = /\{\{(\d+)\}\}/g
@@ -56,7 +102,7 @@ function parseSentence(sentence: string) {
     // slot - store the expected ID from the placeholder
     result.push({
       type: 'slot',
-      id: Number(match[1]),  // Keep the actual ID from the sentence
+      id: Number(match[1]), // Keep the actual ID from the sentence
       item: null,
     })
 
@@ -74,11 +120,11 @@ function parseSentence(sentence: string) {
   return result
 }
 
-const board = ref(parseSentence(gameData.sentence))
-const items = ref([...gameData.blanks])
-const slots = ref<Record<number, any>>({})
+const board = ref<any[]>([])
+const items = ref<Blank[]>([])
+const slots = ref<Record<number, Blank | null>>({})
 
-board.value.forEach(part => {
+board.value.forEach((part) => {
   if (part.type === 'slot') {
     slotCorrectness.value[part.id] = null
   }
@@ -87,7 +133,6 @@ board.value.forEach(part => {
 let draggedItem: any | null = null
 let draggedFromIndex: number | null = null
 let draggedFromType: 'pool' | 'board' | null = null
-
 
 function onDragStart(event: DragEvent, item: any, index: number, type: 'pool' | 'board' | null) {
   playClick()
@@ -117,7 +162,7 @@ function onDrop(event: DragEvent, dropSlotId: number) {
     } else if (draggedFromType === 'pool') {
       // Move from pool to slot, put slot item back to pool
       slots.value[dropSlotId] = draggedItem
-      const itemIndex = items.value.findIndex(i => i.id === draggedItem.id)
+      const itemIndex = items.value.findIndex((i) => i.id === draggedItem.id)
       if (itemIndex !== -1) items.value.splice(itemIndex, 1)
       items.value.push(currentSlotItem)
     }
@@ -127,7 +172,7 @@ function onDrop(event: DragEvent, dropSlotId: number) {
 
     if (draggedFromType === 'pool') {
       // Remove from pool
-      const itemIndex = items.value.findIndex(i => i.id === draggedItem.id)
+      const itemIndex = items.value.findIndex((i) => i.id === draggedItem.id)
       if (itemIndex !== -1) items.value.splice(itemIndex, 1)
     } else if (draggedFromType === 'board') {
       // Clear the source slot
@@ -145,15 +190,13 @@ const correctCount = ref<number | null>(null)
 const isChecked = ref(false)
 const isWin = ref(false)
 
-const hasLost = computed(() =>
-  isChecked.value && !isWin.value
-)
+const hasLost = computed(() => isChecked.value && !isWin.value)
 
 function checkAnswers() {
   isChecked.value = true
 
   let count = 0
-  const totalSlots = board.value.filter(part => part.type === 'slot').length
+  const totalSlots = board.value.filter((part) => part.type === 'slot').length
 
   Object.entries(slots.value).forEach(([slotIdStr, item]) => {
     const slotId = Number(slotIdStr)
@@ -178,7 +221,6 @@ function checkAnswers() {
   }
 }
 
-
 watch(isGameOver, (over) => {
   if (over) {
     isChecked.value = true
@@ -188,27 +230,27 @@ watch(isGameOver, (over) => {
 })
 
 function retryGame() {
+  if (!gameData.value) return
+
   slots.value = {}
   slotCorrectness.value = {}
 
-  board.value.forEach(part => {
+  board.value.forEach((part) => {
     if (part.type === 'slot') {
       slotCorrectness.value[part.id] = null
     }
   })
 
-  items.value = [...gameData.blanks]
+  items.value = [...gameData.value.blanks]
 
   correctCount.value = null
   isLocked.value = false
   isChecked.value = false
   isWin.value = false
 
+  stop()
   start()
 }
-
-
-import clickSound from '@/assets/sounds/btn_click.ogg'
 
 const audio = new Audio(clickSound)
 
@@ -219,13 +261,15 @@ function playClick() {
     audio.play()
   }
 }
-
 </script>
 
 <template>
   <div class="flex flex-col items-center gap-4 w-full max-w-full">
-    <GameHeader title="Drag and Drop Prompt"
-      description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
+    <GameHeader
+      title="Drag and Drop Prompt"
+      description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
+      :time="time"
+    >
     </GameHeader>
 
     <!-- Sentence -->
@@ -235,21 +279,46 @@ function playClick() {
           {{ part.value }}
         </span>
 
-        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
+        <BlankSlot
+          v-else
+          :item="slots[part.id]"
+          :slotId="part.id"
+          :onDragStart="onDragStart"
+          :isCorrect="slotCorrectness[part.id]"
+          :disabled="isLocked"
+          @drop="onDrop"
+        />
       </template>
     </div>
 
     <!-- Word pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-        :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+      <WordItem
+        v-for="(item, index) in items"
+        :key="item.id"
+        :item="item"
+        :slotId="index"
+        :inSlot="false"
+        :disabled="isLocked"
+        @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+      />
     </div>
 
     <!-- Actions -->
-    <GameFooter slot="footer" class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
-      :target="board.filter(part => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
-      :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
+    <GameFooter
+      slot="footer"
+      class="mt-8"
+      :isGameOver="isGameOver"
+      :current="correctCount ?? 0"
+      :target="board.filter((part) => part.type === 'slot').length"
+      @check="checkAnswers"
+      :show-progress="true"
+      :has-lost="hasLost"
+      :is-checked="isChecked"
+      :is-win="isWin"
+      @cleared="finishGame()"
+      @retry="retryGame"
+    >
     </GameFooter>
   </div>
 </template>

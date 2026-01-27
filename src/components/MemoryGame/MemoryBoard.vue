@@ -9,10 +9,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div
-    class="grid gap-4 w-full p-4 justify-center"
-    style="grid-template-columns: repeat(auto-fit, minmax(100px, 1fr))"
-  >
+  <div class="grid gap-4 w-full p-4 justify-center grid-cols-5 grid-rows-2">
     <MemoryCardItem
       v-for="card in props.cards"
       :key="card.id"

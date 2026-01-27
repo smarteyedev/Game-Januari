@@ -2,19 +2,19 @@
 import AutomationSpotter from '@/components/AutomationSpotter/AutomationSpotter.vue'
 import DragAndDropPrompt from '@/components/DragAndDropPrompt/DragAndDropPrompt.vue'
 import FeedbackForm from '@/components/organism/FeedbackForm.vue'
-import GameMap from '@/components/Map/GameMap.vue'
+import GameMap from '@/components/atoms/map/GameMap.vue'
 import GameModal from '@/components/organism/GameModal.vue'
 import LevelButtonIconClear from '@/components/icons/LevelButtonIconClear.vue'
 import LevelButtonIconLocked from '@/components/icons/LevelButtonIconLocked.vue'
 import LevelButtonIconUnlocked from '@/components/icons/LevelButtonIconUnlocked.vue'
-import LevelButton from '@/components/Map/LevelButton.vue'
+import LevelButton from '@/components/molecules/LevelButton.vue'
 import MemoryGame from '@/components/MemoryGame/MemoryGame.vue'
 import { supabase } from '@/lib/supabaseClient'
 import type { IntroData, LevelButtonState } from '@/types/types'
 import { onBeforeMount, onMounted, ref } from 'vue'
 import bgmSound from '@/assets/sounds/bgm.ogg'
-import LevelPath1 from '@/components/Map/LevelPath1.vue'
-import LevelPath2 from '@/components/Map/LevelPath2.vue'
+import LevelPath1 from '@/components/atoms/map/LevelPath1.vue'
+import LevelPath2 from '@/components/atoms/map//LevelPath2.vue'
 import GameIntroModal from '@/components/organism/GameIntroModal.vue'
 import GameIntroData from '@/assets/gameData/intro.json'
 import GameMapHeader from '@/components/molecules/GameMapHeader.vue'
@@ -83,7 +83,7 @@ async function loadIntroData() {
     const mapping: GameIntroMapping = {
       automationSpotter: introCollection[0]!,
       dragAndDropPrompt: introCollection[1]!,
-      memoryGame: introCollection[2]!
+      memoryGame: introCollection[2]!,
     }
 
     introData.value = mapping
@@ -186,7 +186,7 @@ onMounted(() => {
 
   bgm.loop = true
   bgm.volume = 0.1
-  bgm.play().catch(err => {
+  bgm.play().catch((err) => {
     console.warn('Audio play blocked:', err)
   })
   if (svg) observer.observe(svg)
@@ -211,28 +211,42 @@ function toggleFullscreen() {
 <template>
   <div ref="appRoot" class="w-screen h-screen">
     <div class="relative w-full h-full">
-
-      <GameMapHeader @toggle-fullscreen="toggleFullscreen"></GameMapHeader>
+      <GameMapHeader
+        title="Explore Artificial Intelligence (AI) Tools"
+        @toggle-fullscreen="toggleFullscreen"
+      >
+      </GameMapHeader>
 
       <GameMap ref="mapRef" class="absolute inset-0 min-w-screen min-h-screen z-0" />
-      <LevelPath1 class="absolute origin-top-left" :style="{
-        left: `${587 * mapSize.scaleX}px`,
-        top: `${354 * mapSize.scaleY}px`,
-        transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
-      }"></LevelPath1>
+      <LevelPath1
+        class="absolute origin-top-left"
+        :style="{
+          left: `${587 * mapSize.scaleX}px`,
+          top: `${354 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"
+      ></LevelPath1>
 
-      <LevelPath2 class="absolute origin-top-left" :style="{
-        left: `${1156 * mapSize.scaleX}px`,
-        top: `${378 * mapSize.scaleY}px`,
-        transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
-      }"></LevelPath2>
+      <LevelPath2
+        class="absolute origin-top-left"
+        :style="{
+          left: `${1156 * mapSize.scaleX}px`,
+          top: `${378 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"
+      ></LevelPath2>
 
       <!-- Automation Spotter Button -->
-      <LevelButton class="absolute origin-top-left" :style="{
-        left: `${511 * mapSize.scaleX}px`,
-        top: `${441 * mapSize.scaleY}px`,
-        transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
-      }" :state="gameState.automationSpotter" @open="openGame('automationSpotter')">
+      <LevelButton
+        class="absolute origin-top-left"
+        :style="{
+          left: `${511 * mapSize.scaleX}px`,
+          top: `${441 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"
+        :state="gameState.automationSpotter"
+        @open="openGame('automationSpotter')"
+      >
         <template #default="{ state }">
           <LevelButtonIconUnlocked v-if="state === 'unlocked'" />
           <LevelButtonIconClear v-else-if="state === 'cleared'" />
@@ -241,11 +255,16 @@ function toggleFullscreen() {
       </LevelButton>
 
       <!-- Drag and Drop Prompt Button -->
-      <LevelButton class="absolute origin-top-left" :style="{
-        left: `${1089 * mapSize.scaleX}px`,
-        top: `${318 * mapSize.scaleY}px`,
-        transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
-      }" :state="gameState.dragAndDropPrompt" @open="openGame('dragAndDropPrompt')">
+      <LevelButton
+        class="absolute origin-top-left"
+        :style="{
+          left: `${1089 * mapSize.scaleX}px`,
+          top: `${318 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"
+        :state="gameState.dragAndDropPrompt"
+        @open="openGame('dragAndDropPrompt')"
+      >
         <template #default="{ state }">
           <LevelButtonIconUnlocked v-if="state === 'unlocked'" />
           <LevelButtonIconClear v-else-if="state === 'cleared'" />
@@ -254,11 +273,16 @@ function toggleFullscreen() {
       </LevelButton>
 
       <!-- Memory Game Button -->
-      <LevelButton class="absolute origin-top-left" :style="{
-        left: `${1183 * mapSize.scaleX}px`,
-        top: `${654 * mapSize.scaleY}px`,
-        transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
-      }" :state="gameState.memoryGame" @open="openGame('memoryGame')">
+      <LevelButton
+        class="absolute origin-top-left"
+        :style="{
+          left: `${1183 * mapSize.scaleX}px`,
+          top: `${654 * mapSize.scaleY}px`,
+          transform: `scale(${Math.min(mapSize.scaleX, mapSize.scaleY)})`,
+        }"
+        :state="gameState.memoryGame"
+        @open="openGame('memoryGame')"
+      >
         <template #default="{ state }">
           <LevelButtonIconUnlocked v-if="state === 'unlocked'" />
           <LevelButtonIconClear v-else-if="state === 'cleared'" />
@@ -267,21 +291,36 @@ function toggleFullscreen() {
       </LevelButton>
     </div>
 
-    <GameIntroModal v-if="activeView?.type === 'intro'" :modelValue="showIntroModal"
-      :title="gameMeta[activeView.game].title" :introData="introData?.[activeView.game]"
-      @update:modelValue="showIntroModal = $event" @start="startGame(activeView.game)" @close="closeModal" />
+    <GameIntroModal
+      v-if="activeView?.type === 'intro'"
+      :modelValue="showIntroModal"
+      :title="gameMeta[activeView.game].title"
+      :introData="introData?.[activeView.game]"
+      @update:modelValue="showIntroModal = $event"
+      @start="startGame(activeView.game)"
+      @close="closeModal"
+    />
 
     <!-- GAME MODAL -->
-    <GameModal v-if="activeView?.type === 'game'" :modelValue="showGameModal" :title="gameMeta[activeView.game].title"
-      @update:modelValue="showGameModal = $event" @close="closeModal">
+    <GameModal
+      v-if="activeView?.type === 'game'"
+      :modelValue="showGameModal"
+      :title="gameMeta[activeView.game].title"
+      @update:modelValue="showGameModal = $event"
+      @close="closeModal"
+    >
       <component :is="gameMeta[activeView.game].component" @cleared="onGameCleared" />
     </GameModal>
 
     <!-- FEEDBACK MODAL -->
-    <GameModal v-if="activeView?.type === 'feedback'" :modelValue="showFeedbackModal" title="Your Feedback"
-      @update:modelValue="showFeedbackModal = $event" @close="closeModal">
+    <GameModal
+      v-if="activeView?.type === 'feedback'"
+      :modelValue="showFeedbackModal"
+      title="Your Feedback"
+      @update:modelValue="showFeedbackModal = $event"
+      @close="closeModal"
+    >
       <FeedbackForm @submitted="closeModal" />
     </GameModal>
-
   </div>
 </template>

@@ -1,31 +1,14 @@
 <template>
-  <div
-    class="ui-label"
-    :style="genStyle"
-  >
-    <label
-      :for="name"
-      class="ui-label__text"
-    >
-      <slot
-        name="label"
-        v-bind="{ label }"
-      >
+  <div class="ui-label" :style="genStyle">
+    <label :for="name" class="ui-label__text">
+      <slot name="label" v-bind="{ label }">
         {{ label }}
       </slot>
     </label>
 
-    <Tooltip
-      v-if="tooltip"
-      placement="right"
-      trigger="hover"
-      v-bind="floatingVueConfig"
-    >
+    <Tooltip v-if="tooltip" placement="right" trigger="hover" v-bind="floatingVueConfig">
       <template #default="slotProps">
-        <slot
-          name="tooltip-icon"
-          v-bind="slotProps"
-        >
+        <slot name="tooltip-icon" v-bind="slotProps">
           <UiAtomsIcon
             name="mdi-information-outline"
             width="17"
@@ -48,11 +31,11 @@
 </template>
 
 <script lang="ts" setup>
-import {Tooltip} from 'floating-vue';
-import UiAtomsIcon from '../icon/index.vue';
-import {toKebabCase} from "@/utils/string.ts";
-import type {ILabelProps, ILabelUi} from "@/components/atoms/label/types.ts";
-import { computed, toRefs } from 'vue';
+import { Tooltip } from 'floating-vue'
+import UiAtomsIcon from '../icon/index.vue'
+import { toKebabCase } from '@/utils/string.ts'
+import type { ILabelProps, ILabelUi } from '@/components/atoms/label/types.ts'
+import { computed, toRefs } from 'vue'
 
 const props = withDefaults(defineProps<ILabelProps>(), {
   name: '',
@@ -60,29 +43,29 @@ const props = withDefaults(defineProps<ILabelProps>(), {
   tooltip: '',
   ui: () => ({}),
   floatingVueConfig: () => ({}),
-});
+})
 
 defineSlots<{
-  label: (props: { label?: string }) => any;
-  'tooltip-icon': () => any;
-  'tooltip-content': () => any;
+  label: (props: { label?: string }) => any
+  'tooltip-icon': () => any
+  'tooltip-content': () => any
 }>()
 
-const {ui} = toRefs(props);
+const { ui } = toRefs(props)
 
 const genStyle = computed(() => {
-  const styles:Record<string, any> = {};
+  const styles: Record<string, any> = {}
 
-  for(const key in ui.value) {
-    const value = ui.value[key as keyof ILabelUi];
+  for (const key in ui.value) {
+    const value = ui.value[key as keyof ILabelUi]
 
-    if(value) {
-      const styleKey = `--label-${toKebabCase(key)}`;
-      styles[styleKey] = value;
+    if (value) {
+      const styleKey = `--label-${toKebabCase(key)}`
+      styles[styleKey] = value
     }
   }
 
-  return styles;
+  return styles
 })
 </script>
 
@@ -100,6 +83,6 @@ const genStyle = computed(() => {
 }
 
 .ui-label__text {
-  @apply block text-sm font-semibold ;
+  @apply block text-sm font-semibold;
 }
 </style>

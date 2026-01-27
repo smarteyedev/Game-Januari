@@ -7,9 +7,16 @@ interface Props {
   title: string
   modelValue: boolean
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'full'
-  position?: 'top-left' | 'top-center' | 'top-right' |
-  'center-left' | 'center' | 'center-right' |
-  'bottom-left' | 'bottom-center' | 'bottom-right'
+  position?:
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'center-left'
+    | 'center'
+    | 'center-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right'
   showClose?: boolean
 }
 
@@ -34,9 +41,18 @@ const onClose = () => {
 </script>
 
 <template>
-  <UiModal :modelValue="modelValue" :title="title" :size="size" :position="position" :overlay="true"
-    :prevent-close="false" scroll-mode="root" :divider="true" @update:modelValue="emit('update:modelValue', $event)"
-    @cancel="onClose">
+  <UiModal
+    :modelValue="modelValue"
+    :title="title"
+    :size="size"
+    :position="position"
+    :overlay="true"
+    :prevent-close="false"
+    scroll-mode="root"
+    :divider="true"
+    @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose"
+  >
     <!-- Header Extra Slot for custom header content -->
     <template #header-extra>
       <slot name="header-extra" />
@@ -45,8 +61,12 @@ const onClose = () => {
     <!-- Custom Close Button Slot -->
     <template #close-btn="{ onClick }">
       <slot name="close-btn" :on-click="onClick">
-        <UiButton v-if="showClose" variant="ghost" @click="onClick"
-          class="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded cursor-pointer">
+        <UiButton
+          v-if="showClose"
+          variant="ghost"
+          @click="onClick"
+          class="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded cursor-pointer"
+        >
           <template #prepend>
             <UiIcon name="material-symbols:close-small" class="h-9 w-9 text-gray" />
           </template>
@@ -55,7 +75,7 @@ const onClose = () => {
     </template>
 
     <!-- Main Content -->
-    <div class=" flex-1">
+    <div class="flex-1">
       <slot />
     </div>
 
@@ -70,7 +90,11 @@ const onClose = () => {
 
     <!-- Full Footer Override -->
     <template #footer="{ onNegativeClick, onPositiveClick }">
-      <slot name="footer" :on-negative-click="onNegativeClick" :on-positive-click="onPositiveClick" />
+      <slot
+        name="footer"
+        :on-negative-click="onNegativeClick"
+        :on-positive-click="onPositiveClick"
+      />
     </template>
   </UiModal>
 </template>

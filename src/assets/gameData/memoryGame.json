@@ -18,14 +18,12 @@
       "pairId": 2,
       "contentType": "text",
       "value": "Digunakan untuk membantu menulis dan memahami kode secara otomatis."
-
     },
     {
       "id": 4,
       "pairId": 2,
       "contentType": "svg",
       "value": "github"
-
     },
     {
       "id": 5,
@@ -38,7 +36,6 @@
       "pairId": 3,
       "contentType": "svg",
       "value": "canva"
-
     },
     {
       "id": 7,

@@ -1,41 +1,58 @@
 <template>
-  <div class="ui-modal" :class="[
-    `ui-modal--${size || 'md'}`,
-    `ui-modal--scroll-${scrollMode || 'root'}`,
-    {
-      'ui-modal--divider': divider,
-    }
-  ]" :style="{
-    '--modal-offset': ui?.offset,
-    '--modal-content-gap': ui?.contentGap,
-    '--modal-content-padding': ui?.padding,
-    '--modal-footer-position': footerActionPosition(footer?.position),
+  <div
+    class="ui-modal"
+    :class="[
+      `ui-modal--${size || 'md'}`,
+      `ui-modal--scroll-${scrollMode || 'root'}`,
+      {
+        'ui-modal--divider': divider,
+      },
+    ]"
+    :style="{
+      '--modal-offset': ui?.offset,
+      '--modal-content-gap': ui?.contentGap,
+      '--modal-content-padding': ui?.padding,
+      '--modal-footer-position': footerActionPosition(footer?.position),
 
-    '--modal-min-height': ui?.minHeight,
-    '--modal-max-height': ui?.maxHeight,
-    '--modal-content-min-height': ui?.contentMinHeight,
-    '--modal-content-max-height': ui?.contentMaxHeight,
-  }">
+      '--modal-min-height': ui?.minHeight,
+      '--modal-max-height': ui?.maxHeight,
+      '--modal-content-min-height': ui?.contentMinHeight,
+      '--modal-content-max-height': ui?.contentMaxHeight,
+    }"
+  >
     <Transition name="overlay-fade">
       <div v-if="model && overlay" class="ui-modal__overlay" />
     </Transition>
 
     <Transition name="modal-fade">
-      <div v-if="model" class="ui-modal__modal-container" :class="[modalPositionClass]"
-        @click="!preventClose && onCancel()">
-        <div class="ui-modal__content-wrapper"> <!-- -> Boundary hack for flex positioning issue -->
+      <div
+        v-if="model"
+        class="ui-modal__modal-container"
+        :class="[modalPositionClass]"
+        @click="!preventClose && onCancel()"
+      >
+        <div class="ui-modal__content-wrapper">
+          <!-- -> Boundary hack for flex positioning issue -->
 
           <!-- Actual modal content -->
           <div class="ui-modal__content" @click.stop>
             <!-- Header Slot -->
-            <header v-if="title || $slots['header-title'] || $slots['header-extra']" class="ui-modal__header">
+            <header
+              v-if="title || $slots['header-title'] || $slots['header-extra']"
+              class="ui-modal__header"
+            >
               <div v-if="title || $slots['header-title']" class="ui-modal__title">
                 <slot name="header-title">
                   <span v-if="title" class="ui-modal__title-text">{{ title }}</span>
                 </slot>
 
                 <slot name="close-btn" v-bind="{ onClick: onCancel }">
-                  <UiAtomsIcon name="uil-times" class="ui-modal__close" size="24" @click="onCancel" />
+                  <UiAtomsIcon
+                    name="uil-times"
+                    class="ui-modal__close"
+                    size="24"
+                    @click="onCancel"
+                  />
                 </slot>
               </div>
               <!-- Extra content for header e.g. stepper -->
@@ -53,14 +70,26 @@
                 <div class="ui-modal__footer">
                   <div class="ui-modal__footer__action">
                     <slot name="footer-left" v-bind="{ onNegativeClick: onCancel }">
-                      <Button v-if="footer?.cancel" color="ghost" size="md" variant="outline"
-                        class="ui-modal__footer__action--cancel" :disabled="footer?.cancelDisabled" @click="onCancel">
+                      <Button
+                        v-if="footer?.cancel"
+                        color="ghost"
+                        size="md"
+                        variant="outline"
+                        class="ui-modal__footer__action--cancel"
+                        :disabled="footer?.cancelDisabled"
+                        @click="onCancel"
+                      >
                         {{ footer?.cancel }}
                       </Button>
                     </slot>
                     <slot name="footer-right" v-bind="{ onPositiveClick: onOK }">
-                      <Button v-if="footer?.ok" size="md" class="ui-modal__footer__action--ok"
-                        :disabled="footer?.okDisabled" @click="onOK">
+                      <Button
+                        v-if="footer?.ok"
+                        size="md"
+                        class="ui-modal__footer__action--ok"
+                        :disabled="footer?.okDisabled"
+                        @click="onOK"
+                      >
                         {{ footer?.ok }}
                       </Button>
                     </slot>
@@ -76,10 +105,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, watch } from 'vue';
+import { computed, onMounted, onUnmounted, watch } from 'vue'
 import Button from '../../atoms/button/index.vue'
 import UiAtomsIcon from '../../atoms/icon/index.vue'
-import type { IModalProps, TModalFooterPosition } from "./types.ts";
+import type { IModalProps, TModalFooterPosition } from './types.ts'
 
 const props = withDefaults(defineProps<IModalProps>(), {
   preventClose: false,
@@ -90,18 +119,18 @@ const props = withDefaults(defineProps<IModalProps>(), {
   scrollMode: 'root',
 })
 
-const model = defineModel<boolean>({ required: true, });
+const model = defineModel<boolean>({ required: true })
 const emit = defineEmits(['ok', 'cancel'])
 
 defineSlots<{
-  'default': () => any;
-  'header-title': () => any;
-  'header-extra': () => any;
-  'close-btn': (props: { onClick: () => void }) => any;
-  'footer': (props: { onNegativeClick: () => void, onPositiveClick: () => void }) => any;
-  'footer-left': (props: { onNegativeClick: () => void }) => any;
-  'footer-right': (props: { onPositiveClick: () => void }) => any;
-}>();
+  default: () => any
+  'header-title': () => any
+  'header-extra': () => any
+  'close-btn': (props: { onClick: () => void }) => any
+  footer: (props: { onNegativeClick: () => void; onPositiveClick: () => void }) => any
+  'footer-left': (props: { onNegativeClick: () => void }) => any
+  'footer-right': (props: { onPositiveClick: () => void }) => any
+}>()
 
 // Computed class for modal position
 const modalPositionClass = computed(() => {
@@ -122,7 +151,7 @@ const footerActionPosition = (position?: TModalFooterPosition): string => {
 }
 
 const closeModal = () => {
-  model.value = false;
+  model.value = false
 }
 
 const onOK = () => {
@@ -138,7 +167,7 @@ const onCancel = () => {
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.key === 'Escape' && model.value) {
     if (!props.preventClose) {
-      onCancel();
+      onCancel()
     }
   }
 }
@@ -353,7 +382,6 @@ to allow overflow to behave correctly for the target.
   gap: 0.75rem;
 }
 
-
 .ui-modal--divider {
   .ui-modal__header {
     padding-bottom: 0.625rem;
@@ -380,7 +408,8 @@ to allow overflow to behave correctly for the target.
 /* Transition for Modal Content */
 .modal-fade-enter-active,
 .modal-fade-leave-active {
-  transition: opacity 0.2s ease,
+  transition:
+    opacity 0.2s ease,
     transform 0.2s ease;
 }
 

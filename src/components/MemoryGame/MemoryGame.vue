@@ -1,32 +1,53 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import useTimer from '@/composables/useTimer'
-import type { MemoryCard, ContentType } from '@/types/types'
+import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
 import MemoryBoard from './MemoryBoard.vue'
-import gameData from '@/assets/gameData/memoryGame.json'
 import GameHeader from '../molecules/GameHeader.vue'
 import GameFooter from '../molecules/GameFooter.vue'
+import clickSound from '@/assets/sounds/btn_click.ogg'
+import useApi from '@/composables/useApi'
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
 }
 
-function loadLevel(): MemoryCard[] {
-  const level = gameData
-  if (!level) return []
+const { get, loading, error } = useApi()
+const gameData = ref<{
+  id: number
+  card: MemoryCard[]
+} | null>(null)
 
-  // Direct mapping from JSON to MemoryCard with game state
+async function fetchLevel() {
+  try {
+    const res = await get<
+      ApiResponse<{
+        id: number
+        card: MemoryCard[]
+      }>
+    >('/api/v1/minigames/memory-game/levels/1')
+
+    gameData.value = res.data
+    cards.value = loadLevel()
+  } catch (err) {
+    console.error('Failed to load level', err)
+  }
+}
+
+function loadLevel(): MemoryCard[] {
+  if (!gameData.value) return []
+
   return shuffle(
-    level.card.map((card) => ({
+    gameData.value.card.map((card) => ({
       ...card,
       contentType: card.contentType as ContentType,
       flipped: false,
       matched: false,
-    }))
+    })),
   )
 }
 
-const cards = ref<MemoryCard[]>(loadLevel())
+const cards = ref<MemoryCard[]>([])
 
 // GAME STATE
 let firstCard: MemoryCard | null = null
@@ -90,15 +111,11 @@ const emit = defineEmits<{
 }>()
 
 function finishGame() {
-
   emit('cleared', {
     game: 'memoryGame',
     score: allMatched.value ? 100 : 0,
   })
 }
-
-
-import clickSound from '@/assets/sounds/btn_click.ogg'
 
 const audio = new Audio(clickSound)
 
@@ -118,18 +135,34 @@ function retryGame() {
   gameOver.value = false
   stop()
 }
+
+onMounted(() => {
+  fetchLevel()
+})
 </script>
 
 <template>
-  <div class=" gap-4 w-full max-w-full">
-    <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+  <div class="gap-4 w-full max-w-full">
+    <GameHeader
+      title="Memory Game"
+      description="Pasangkan kartu dengan deskripsi yang benar!"
+      :time="time"
+    />
 
     <div class="flex justify-center">
       <MemoryBoard :cards="cards" @flip="flipCard" />
     </div>
 
-    <GameFooter slot="footer" :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-      :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
+    <GameFooter
+      slot="footer"
+      :hide-submit="true"
+      :is-win="allMatched"
+      :has-lost="gameOver && !allMatched"
+      :is-checked="allMatched"
+      @cleared="finishGame"
+      @retry="retryGame"
+      class="mt-8"
+    >
       <template #left>
         <p class="text-lg font-semibold">Card Turns: {{ turns }}</p>
       </template>

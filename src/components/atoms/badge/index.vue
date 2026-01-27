@@ -13,10 +13,7 @@
     :style="genStyle"
   >
     <!-- prepend slot -->
-    <slot
-      name="prepend"
-      class="ui-badge__prepend"
-    >
+    <slot name="prepend" class="ui-badge__prepend">
       <UiAtomsIcon
         v-if="icon"
         :name="icon"
@@ -28,18 +25,12 @@
     </slot>
 
     <!-- default slot -->
-    <div
-      v-if="$slots.default"
-      class="ui-badge__label"
-    >
-      <slot/>
+    <div v-if="$slots.default" class="ui-badge__label">
+      <slot />
     </div>
 
     <!-- append slot -->
-    <slot
-      name="append"
-      class="ui-badge__append"
-    >
+    <slot name="append" class="ui-badge__append">
       <UiAtomsIcon
         v-if="iconAppend"
         :name="iconAppend"
@@ -53,37 +44,34 @@
 </template>
 
 <script setup lang="ts">
-import UiAtomsIcon from '../icon/index.vue';
-import {toKebabCase} from "@/utils/string.ts";
-import type {IBadgeProps, IBadgeUi, TBadgeSize} from "@/components/atoms/badge/types.ts";
-import { computed, toRefs } from 'vue';
+import UiAtomsIcon from '../icon/index.vue'
+import { toKebabCase } from '@/utils/string.ts'
+import type { IBadgeProps, IBadgeUi, TBadgeSize } from '@/components/atoms/badge/types.ts'
+import { computed, toRefs } from 'vue'
 
-const props = withDefaults(
-  defineProps<IBadgeProps>(),
-  {
-    color: 'primary',
-    variant: 'soft',
-    size: 'md',
-    type: 'badge',
-    square: false,
-  },
-);
+const props = withDefaults(defineProps<IBadgeProps>(), {
+  color: 'primary',
+  variant: 'soft',
+  size: 'md',
+  type: 'badge',
+  square: false,
+})
 
-const {ui, color, variant, size, type, square} = toRefs(props);
+const { ui, color, variant, size, type, square } = toRefs(props)
 
 const genStyle = computed(() => {
-  const styles: Record<string, any> = {};
+  const styles: Record<string, any> = {}
 
   for (const key in ui.value) {
-    const value = ui.value[key as keyof IBadgeUi];
+    const value = ui.value[key as keyof IBadgeUi]
 
     if (value) {
-      const styleKey = `--badge-${toKebabCase(key)}`;
-      styles[styleKey] = value;
+      const styleKey = `--badge-${toKebabCase(key)}`
+      styles[styleKey] = value
     }
   }
 
-  return styles;
+  return styles
 })
 
 function getIconSize(size: TBadgeSize) {
@@ -92,8 +80,8 @@ function getIconSize(size: TBadgeSize) {
     sm: 14,
     md: 16,
     lg: 16,
-  };
-  return customSize[size];
+  }
+  return customSize[size]
 }
 </script>
 

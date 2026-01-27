@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import InputField from '@/components/InputField.vue'
+import { UiButton } from '@/components/atoms/button'
+import InputField from '@/components/molecules/InputField.vue'
 import { supabase } from '@/lib/supabaseClient'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
@@ -60,7 +61,7 @@ async function goToGame() {
 
 <template>
   <div class="w-screen h-screen flex justify-center items-center">
-    <div class="flex flex-col justify-center items-center w-[400px] h-[400px]">
+    <div class="flex flex-col justify-center items-center w-100 h-100">
       <p class="text-2xl font-semibold text-gray-800 text-center mb-2">Selamat Datang!</p>
       <p class="text-sm text-gray-500 text-center mb-6">Silahkan isi data diri</p>
       <form @submit.prevent="goToGame" class="flex flex-col gap-4 w-full">
@@ -70,9 +71,7 @@ async function goToGame() {
 
         <InputField id="unit" v-model="unit" label="Unit" required />
 
-        <button class="w-full bg-[#00A3B5] hover:bg-teal-600 text-white py-2 rounded font-semibold">
-          Masuk
-        </button>
+        <UiButton type="submit" class="w-full py-2 rounded font-semibold"> Masuk </UiButton>
       </form>
     </div>
   </div>
