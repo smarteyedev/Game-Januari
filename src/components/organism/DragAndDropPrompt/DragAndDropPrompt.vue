@@ -43,6 +43,10 @@ const gameData = ref<{
   blanks: Blank[]
 } | null>(null)
 
+function shuffle<T>(array: T[]): T[] {
+  return [...array].sort(() => Math.random() - 0.5)
+}
+
 async function fetchLevel() {
   try {
     const res = await get<
@@ -77,7 +81,7 @@ function loadLevel() {
     }
   })
 
-  items.value = [...gameData.value.blanks]
+  items.value = shuffle(gameData.value.blanks)
 
   correctCount.value = null
   isChecked.value = false
@@ -246,7 +250,7 @@ function retryGame() {
     }
   })
 
-  items.value = [...gameData.value.blanks]
+  items.value = shuffle(gameData.value.blanks)
 
   correctCount.value = null
   isLocked.value = false
@@ -270,58 +274,71 @@ function playClick() {
 
 <template>
   <div class="flex flex-col items-center gap-4 w-full max-w-full">
-    <GameHeader
-title="Drag and Drop Prompt"
-      description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
-:time="time">
-    </GameHeader>
-
-    <!-- Sentence -->
-    <div class="border rounded-xl p-4 text-base text-justify">
-      <template
-v-for="(part, index) in board"
-:key="index">
-        <span v-if="part.type === 'text'">
-          {{ part.value }}
-        </span>
-
-        <BlankSlot
-v-else
-:item="slots[part.id]"
-:slotId="part.id"
-:onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]"
-:disabled="isLocked"
-@drop="onDrop" />
-      </template>
+    <div v-if="loading">
+      <UiLoading class="grid place-items-center" />
     </div>
 
-    <!-- Word pool -->
-    <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-v-for="(item, index) in items"
-:key="item.id"
-:item="item"
-:slotId="index"
-:inSlot="false"
-        :disabled="isLocked"
-@dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+    <div v-else-if="error">
+      <p>Failed to load game</p>
+      <button @click="fetchLevel">Retry</button>
     </div>
 
-    <!-- Actions -->
-    <GameFooter
-slot="footer"
-class="mt-8"
-:isGameOver="isGameOver"
-:current="correctCount ?? 0"
-      :target="board.filter((part) => part.type === 'slot').length"
-@check="checkAnswers"
-:show-progress="true"
-      :has-lost="hasLost"
-:is-checked="isChecked"
-:is-win="isWin"
-@cleared="finishGame()"
-@retry="retryGame">
-    </GameFooter>
+    <template v-else>
+      <GameHeader
+        title="Drag and Drop Prompt"
+        description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
+        :time="time"
+      >
+      </GameHeader>
+
+      <!-- Sentence -->
+      <div class="border rounded-xl p-4 text-base text-justify">
+        <template v-for="(part, index) in board" :key="index">
+          <span v-if="part.type === 'text'">
+            {{ part.value }}
+          </span>
+
+          <BlankSlot
+            v-else
+            :item="slots[part.id]"
+            :slotId="part.id"
+            :onDragStart="onDragStart"
+            :isCorrect="slotCorrectness[part.id]"
+            :disabled="isLocked"
+            @drop="onDrop"
+          />
+        </template>
+      </div>
+
+      <!-- Word pool -->
+      <div class="flex flex-wrap gap-3 justify-center">
+        <WordItem
+          v-for="(item, index) in items"
+          :key="item.id"
+          :item="item"
+          :slotId="index"
+          :inSlot="false"
+          :disabled="isLocked"
+          @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+        />
+      </div>
+
+      <!-- Actions -->
+      <GameFooter
+        slot="footer"
+        class="mt-8"
+        :isGameOver="isGameOver"
+        :current="correctCount ?? 0"
+        :target="board.filter((part) => part.type === 'slot').length"
+        @check="checkAnswers"
+        :show-progress="true"
+        :has-lost="hasLost"
+        :is-checked="isChecked"
+        :is-win="isWin"
+        @cleared="finishGame()"
+        @retry="retryGame"
+      >
+      </GameFooter>
+    </template>
   </div>
 </template>

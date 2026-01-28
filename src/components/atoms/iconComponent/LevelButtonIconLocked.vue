@@ -1,10 +1,5 @@
 <template>
-  <svg
-width="76"
-height="76"
-viewBox="0 0 82 82"
-fill="none"
-xmlns="http://www.w3.org/2000/svg">
+  <svg width="76" height="76" viewBox="0 0 82 82" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path
       opacity="0.5"
       d="M41 79C61.9868 79 79 61.9868 79 41C79 20.0132 61.9868 3 41 3C20.0132 3 3 20.0132 3 41C3 61.9868 20.0132 79 41 79Z"
@@ -24,11 +19,7 @@ xmlns="http://www.w3.org/2000/svg">
     </g>
     <defs>
       <clipPath id="clip0_4019_412">
-        <rect
-width="48"
-height="48"
-fill="white"
-transform="translate(17 17)" />
+        <rect width="48" height="48" fill="white" transform="translate(17 17)" />
       </clipPath>
     </defs>
   </svg>

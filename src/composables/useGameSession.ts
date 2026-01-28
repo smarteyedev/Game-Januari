@@ -15,7 +15,7 @@ export default function useGameSession(gameId: string) {
       await post(
         `/api/v1/hpl/session/${sessionId.value}/invalidate`,
         {},
-        { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
+        { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
       )
     } catch (err) {
       console.warn('Failed to invalidate previous session', err)
@@ -32,31 +32,30 @@ export default function useGameSession(gameId: string) {
     const res = await post<ApiResponse<{ sessionId: string }>>(
       '/api/v1/hpl/session/start',
       { minigameId: gameId },
-      { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
+      { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
     )
     if (res.success && res.data?.sessionId) sessionId.value = res.data.sessionId
     return sessionId.value
   }
 
-async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
-  if (!sessionId.value || !sessionStore.guest?.accessToken) return
+  async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
+    if (!sessionId.value || !sessionStore.guest?.accessToken) return
 
-  try {
-    const res = await post(
-      `/api/v1/hpl/session/${sessionId.value}/submit`,
-      { score, answers, timeMs },
-      { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
-    )
+    try {
+      const res = await post(
+        `/api/v1/hpl/session/${sessionId.value}/submit`,
+        { score, answers, timeMs },
+        { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
+      )
 
-
-    return res
-  } catch (err) {
-    console.error('Failed to submit score', err)
-    throw err
-  } finally {
-    sessionId.value = null
+      return res
+    } catch (err) {
+      console.error('Failed to submit score', err)
+      throw err
+    } finally {
+      sessionId.value = null
+    }
   }
-}
 
   return { sessionId, startSession, submitScore, loading, error, invalidateSession }
 }

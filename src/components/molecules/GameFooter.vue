@@ -44,18 +44,12 @@ const emit = defineEmits<{
       </UiButton>
 
       <!-- RETRY -->
-      <UiButton
-v-else-if="hasLost"
-class="h-7.5 min-w-32 rounded-sm"
-@click="emit('retry')">
+      <UiButton v-else-if="hasLost" class="h-7.5 min-w-32 rounded-sm" @click="emit('retry')">
         Retry
       </UiButton>
 
       <!-- CONTINUE -->
-      <UiButton
-v-else-if="isWin"
-class="h-7.5 min-w-32 rounded-sm"
-@click="emit('cleared')">
+      <UiButton v-else-if="isWin" class="h-7.5 min-w-32 rounded-sm" @click="emit('cleared')">
         Continue
       </UiButton>
     </div>

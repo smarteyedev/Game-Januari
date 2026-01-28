@@ -21,8 +21,5 @@ defineExpose({
 </script>
 
 <template>
-  <Icon
-:icon="name"
-:width="normalizedWidth"
-:height="normalizedHeight" />
+  <Icon :icon="name" :width="normalizedWidth" :height="normalizedHeight" />
 </template>

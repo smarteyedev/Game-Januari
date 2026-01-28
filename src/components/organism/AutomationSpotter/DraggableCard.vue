@@ -18,8 +18,5 @@ const normalizedChecked = computed(() => {
 </script>
 
 <template>
-  <Card
-:label="card.label"
-:isInZone="isInZone"
-:checked="normalizedChecked" />
+  <Card :label="card.label" :isInZone="isInZone" :checked="normalizedChecked" />
 </template>
