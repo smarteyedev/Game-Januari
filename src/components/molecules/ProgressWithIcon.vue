@@ -28,13 +28,12 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
 
       <!-- Star -->
       <UiIcon
-        name="mdi:star"
-        size="16"
-        :class="[
-          'shrink-0 transition-all duration-300',
-          isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
-        ]"
-      />
+name="mdi:star"
+size="16"
+:class="[
+        'shrink-0 transition-all duration-300',
+        isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
+      ]" />
 
       <!-- Label -->
       <span class="text-[12px] leading-4.5 text-black/80 whitespace-nowrap">

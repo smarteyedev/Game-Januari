@@ -1,15 +1,7 @@
 <template>
-  <div
-class="ui-loading"
-:style="genStyle">
+  <div class="ui-loading" :style="genStyle">
     <slot name="loading-icon">
-      <UiAtomsIcon
-        name="uil-spinner"
-        width="24"
-        height="24"
-        mode="svg"
-        class="ui-loading__icon animate-spin"
-      />
+      <UiAtomsIcon name="uil-spinner" width="24" height="24" mode="svg" class="ui-loading__icon animate-spin" />
     </slot>
     <slot name="loading-label">
       <div class="ui-loading__label">
@@ -58,15 +50,15 @@ const genStyle = computed(() => {
 
 .ui-loading {
   @apply relative w-full flex items-center gap-2 justify-center;
+}
 
-  &__icon {
-    color: var(--loading-icon-color);
-  }
+.ui-loading__icon {
+  color: var(--loading-icon-color);
+}
 
-  &__label {
-    @apply font-semibold text-center;
-    color: var(--loading-label-color);
-    font-size: 14px;
-  }
+.ui-loading__label {
+  @apply font-semibold text-center;
+  color: var(--loading-label-color);
+  font-size: 14px;
 }
 </style>

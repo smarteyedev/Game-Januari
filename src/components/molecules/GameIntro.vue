@@ -17,7 +17,11 @@ const _ = defineProps<{
       </p>
     </div>
     <div class="flex flex-col gap-1.5 text-left">
-      <IconLabel v-for="(point, index) in key_points" :key="index" :label="point" :bullet="true"></IconLabel>
+      <IconLabel
+v-for="(point, index) in key_points"
+:key="index"
+:label="point"
+:bullet="true"></IconLabel>
     </div>
   </div>
 </template>

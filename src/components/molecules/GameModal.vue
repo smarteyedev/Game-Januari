@@ -41,8 +41,16 @@ const onClose = () => {
 </script>
 
 <template>
-  <UiModal :modelValue="modelValue" :title="title" :size="size" :position="position" :overlay="true"
-    :prevent-close="false" scroll-mode="root" :divider="true" @update:modelValue="emit('update:modelValue', $event)"
+  <UiModal
+:modelValue="modelValue"
+:title="title"
+:size="size"
+:position="position"
+:overlay="true"
+    :prevent-close="false"
+scroll-mode="root"
+:divider="true"
+@update:modelValue="emit('update:modelValue', $event)"
     @cancel="onClose">
     <!-- Header Extra Slot for custom header content -->
     <template #header-extra>
@@ -51,11 +59,18 @@ const onClose = () => {
 
     <!-- Custom Close Button Slot -->
     <template #close-btn="{ onClick }">
-      <slot name="close-btn" :on-click="onClick">
-        <UiButton v-if="showClose" variant="ghost" @click="onClick"
+      <slot
+name="close-btn"
+:on-click="onClick">
+        <UiButton
+v-if="showClose"
+variant="ghost"
+@click="onClick"
           class="h-8 w-8 flex items-center justify-center hover:bg-gray-100 rounded cursor-pointer">
           <template #prepend>
-            <UiIcon name="material-symbols:close-small" class="h-9 w-9 text-gray" />
+            <UiIcon
+name="material-symbols:close-small"
+class="h-9 w-9 text-gray" />
           </template>
         </UiButton>
       </slot>
@@ -68,16 +83,23 @@ const onClose = () => {
 
     <!-- Footer Slots -->
     <template #footer-left="{ onNegativeClick }">
-      <slot name="footer-left" :on-negative-click="onNegativeClick" />
+      <slot
+name="footer-left"
+:on-negative-click="onNegativeClick" />
     </template>
 
     <template #footer-right="{ onPositiveClick }">
-      <slot name="footer-right" :on-positive-click="onPositiveClick" />
+      <slot
+name="footer-right"
+:on-positive-click="onPositiveClick" />
     </template>
 
     <!-- Full Footer Override -->
     <template #footer="{ onNegativeClick, onPositiveClick }">
-      <slot name="footer" :on-negative-click="onNegativeClick" :on-positive-click="onPositiveClick" />
+      <slot
+name="footer"
+:on-negative-click="onNegativeClick"
+:on-positive-click="onPositiveClick" />
     </template>
   </UiModal>
 </template>

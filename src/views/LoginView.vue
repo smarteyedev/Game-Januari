@@ -81,7 +81,7 @@ async function goToGame() {
       <p class="text-red-600 font-medium mb-4">
         {{ formError }}
       </p>
-      <UiButton @click="formError = null">
+      <UiButton @click="formError = null" class="px-2">
         Coba lagi
       </UiButton>
     </div>
