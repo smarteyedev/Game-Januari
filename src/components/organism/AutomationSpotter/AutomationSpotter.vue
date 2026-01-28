@@ -160,15 +160,34 @@ watch(isGameOver, (over) => {
     </div>
 
     <template v-else>
-      <GameHeader title="Automation Spotter" :description="question" :time="time" />
+      <GameHeader
+title="Automation Spotter"
+:description="question"
+:time="time" />
 
-      <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+      <TaskRow
+v-model="sourceCards"
+:checked-map="checkedMap"
+:is-checked="isChecked"
+:disabled="isChecked"
         @moved="onMoved" />
 
-      <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
+      <SpotZones
+:zones="zones"
+:checked-map="checkedMap"
+:is-checked="isChecked"
+@moved="onMoved" />
 
-      <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
-        :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
+      <GameFooter
+:current="matchedCount"
+:target="allCards.length"
+:is-checked="isChecked"
+:has-lost="hasLost"
+        :is-win="isLevelWin"
+:show-progress="true"
+@check="checkAnswers"
+@retry="loadLevel"
+@cleared="finishGame" />
     </template>
   </div>
 </template>

@@ -48,7 +48,6 @@ async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
       { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } }
     )
 
-    console.log('Submit score response:', res)
 
     return res
   } catch (err) {

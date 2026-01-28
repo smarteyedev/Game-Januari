@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AutomationSpotter from '@/components/organism/AutomationSpotter/AutomationSpotter.vue'
 import DragAndDropPrompt from '@/components/organism/DragAndDropPrompt/DragAndDropPrompt.vue'
-import FeedbackForm from '@/components/molecules/FeedbackForm.vue'
+import FeedbackForm from '@/components/organism/FeedbackForm.vue'
 import GameMap from '@/components/atoms/map/GameMap.vue'
 import GameModal from '@/components/molecules/GameModal.vue'
 import LevelButtonIconClear from '@/components/atoms/iconComponent/LevelButtonIconClear.vue'
