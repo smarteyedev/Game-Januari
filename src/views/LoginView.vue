@@ -17,10 +17,8 @@ const unit = ref('')
 
 const formError = ref<string | null>(null)
 
-const isFormValid = computed(() =>
-  !!nama.value.trim() &&
-  !!kantor.value.trim() &&
-  !!unit.value.trim()
+const isFormValid = computed(
+  () => !!nama.value.trim() && !!kantor.value.trim() && !!unit.value.trim(),
 )
 
 const { post, loading } = useApi()
@@ -53,8 +51,7 @@ async function createGuestSession() {
 
     return true
   } catch (err: any) {
-    formError.value =
-      err?.message || 'Terjadi kesalahan. Silakan coba lagi.'
+    formError.value = err?.message || 'Terjadi kesalahan. Silakan coba lagi.'
     return false
   }
 }
@@ -81,20 +78,14 @@ async function goToGame() {
       <p class="text-red-600 font-medium mb-4">
         {{ formError }}
       </p>
-      <UiButton @click="formError = null" class="px-2">
-        Coba lagi
-      </UiButton>
+      <UiButton @click="formError = null" class="px-2"> Coba lagi </UiButton>
     </div>
 
     <!-- form -->
     <div v-else class="flex flex-col justify-center items-center w-100 h-100">
-      <p class="text-2xl font-semibold text-gray-800 text-center mb-2">
-        Selamat Datang!
-      </p>
+      <p class="text-2xl font-semibold text-gray-800 text-center mb-2">Selamat Datang!</p>
 
-      <p class="text-sm text-gray-500 text-center mb-6">
-        Silahkan isi data diri
-      </p>
+      <p class="text-sm text-gray-500 text-center mb-6">Silahkan isi data diri</p>
 
       <form @submit.prevent="goToGame" class="flex flex-col gap-4 w-full">
         <InputField id="nama" v-model="nama" label="Nama" required />
@@ -106,7 +97,11 @@ async function goToGame() {
           {{ formError }}
         </p>
 
-        <UiButton type="submit" class="w-full py-2 rounded font-semibold" :disabled="!isFormValid || loading">
+        <UiButton
+          type="submit"
+          class="w-full py-2 rounded font-semibold"
+          :disabled="!isFormValid || loading"
+        >
           <span v-if="loading">Loading...</span>
           <span v-else>Masuk</span>
         </UiButton>

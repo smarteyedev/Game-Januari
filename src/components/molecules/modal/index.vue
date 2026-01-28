@@ -21,9 +21,7 @@
     }"
   >
     <Transition name="overlay-fade">
-      <div
-v-if="model && overlay"
-class="ui-modal__overlay" />
+      <div v-if="model && overlay" class="ui-modal__overlay" />
     </Transition>
 
     <Transition name="modal-fade">
@@ -37,26 +35,18 @@ class="ui-modal__overlay" />
           <!-- -> Boundary hack for flex positioning issue -->
 
           <!-- Actual modal content -->
-          <div
-class="ui-modal__content"
-@click.stop>
+          <div class="ui-modal__content" @click.stop>
             <!-- Header Slot -->
             <header
               v-if="title || $slots['header-title'] || $slots['header-extra']"
               class="ui-modal__header"
             >
-              <div
-v-if="title || $slots['header-title']"
-class="ui-modal__title">
+              <div v-if="title || $slots['header-title']" class="ui-modal__title">
                 <slot name="header-title">
-                  <span
-v-if="title"
-class="ui-modal__title-text">{{ title }}</span>
+                  <span v-if="title" class="ui-modal__title-text">{{ title }}</span>
                 </slot>
 
-                <slot
-name="close-btn"
-v-bind="{ onClick: onCancel }">
+                <slot name="close-btn" v-bind="{ onClick: onCancel }">
                   <UiAtomsIcon
                     name="uil-times"
                     class="ui-modal__close"
@@ -75,17 +65,11 @@ v-bind="{ onClick: onCancel }">
             </div>
 
             <!-- Footer Slot with Default Close Button -->
-            <footer
-v-if="footer || $slots.footer"
-class="ui-modal__footer-wrapper">
-              <slot
-name="footer"
-v-bind="{ onNegativeClick: onCancel, onPositiveClick: onOK }">
+            <footer v-if="footer || $slots.footer" class="ui-modal__footer-wrapper">
+              <slot name="footer" v-bind="{ onNegativeClick: onCancel, onPositiveClick: onOK }">
                 <div class="ui-modal__footer">
                   <div class="ui-modal__footer__action">
-                    <slot
-name="footer-left"
-v-bind="{ onNegativeClick: onCancel }">
+                    <slot name="footer-left" v-bind="{ onNegativeClick: onCancel }">
                       <Button
                         v-if="footer?.cancel"
                         color="ghost"
@@ -98,9 +82,7 @@ v-bind="{ onNegativeClick: onCancel }">
                         {{ footer?.cancel }}
                       </Button>
                     </slot>
-                    <slot
-name="footer-right"
-v-bind="{ onPositiveClick: onOK }">
+                    <slot name="footer-right" v-bind="{ onPositiveClick: onOK }">
                       <Button
                         v-if="footer?.ok"
                         size="md"

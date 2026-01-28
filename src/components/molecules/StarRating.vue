@@ -1,25 +1,23 @@
 <template>
-  <div
-class="flex justify-center gap-3 mt-6"
-role="radiogroup"
-:aria-label="ariaLabel">
+  <div class="flex justify-center gap-3 mt-6" role="radiogroup" :aria-label="ariaLabel">
     <button
-v-for="s in max"
-:key="s"
-type="button"
+      v-for="s in max"
+      :key="s"
+      type="button"
       class="cursor-pointer select-none text-5xl leading-none bg-transparent border-0"
       :class="s <= (localHover || localValue) ? 'text-yellow-400' : 'text-gray-300'"
-@click="updateValue(s)"
+      @click="updateValue(s)"
       @mouseenter="localHover = s"
-@mouseleave="localHover = 0"
-@keydown.space.prevent="updateValue(s)"
+      @mouseleave="localHover = 0"
+      @keydown.space.prevent="updateValue(s)"
       @keydown.enter.prevent="updateValue(s)"
-@keydown.left.prevent="focusPrev($event)"
+      @keydown.left.prevent="focusPrev($event)"
       @keydown.right.prevent="focusNext($event)"
-:aria-checked="s === localValue"
-role="radio"
-:aria-label="`${s} star`"
-      tabindex="0">
+      :aria-checked="s === localValue"
+      role="radio"
+      :aria-label="`${s} star`"
+      tabindex="0"
+    >
       ★
     </button>
   </div>

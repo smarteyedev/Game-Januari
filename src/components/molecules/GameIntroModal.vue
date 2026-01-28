@@ -70,9 +70,7 @@ const onStart = () => {
       />
 
       <!-- FALLBACK -->
-      <div
-v-else
-class="w-full">
+      <div v-else class="w-full">
         <h2 class="text-[28px] leading-9 font-bold text-[#1E1E1E] mb-4">
           {{ title }}
         </h2>

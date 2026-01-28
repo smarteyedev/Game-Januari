@@ -1,9 +1,7 @@
 <template>
   <div class="flex flex-col h-full gap-4 w-full">
     <!-- STAR RATING -->
-    <StarRating
-v-model="rating"
-:max="5" />
+    <StarRating v-model="rating" :max="5" />
 
     <!-- FEEDBACK -->
     <textarea
@@ -13,9 +11,7 @@ v-model="rating"
     />
 
     <!-- SUBMIT -->
-    <UiButton
-class="bg-[#00A3B5] hover:bg-teal-600 text-white px-4 py-2 rounded"
-@click="submit">
+    <UiButton class="bg-[#00A3B5] hover:bg-teal-600 text-white px-4 py-2 rounded" @click="submit">
       Submit
     </UiButton>
   </div>

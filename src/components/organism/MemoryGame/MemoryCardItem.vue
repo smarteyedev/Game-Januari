@@ -64,9 +64,7 @@ const textClass = computed(() => {
 </script>
 
 <template>
-  <div
-class="w-full aspect-3/4 perspective"
-@click="!flipped && !matched && emit('flip')">
+  <div class="w-full aspect-3/4 perspective" @click="!flipped && !matched && emit('flip')">
     <div
       class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
       :class="{ 'rotate-y-180': flipped || matched }"

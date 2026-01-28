@@ -13,9 +13,7 @@
     :style="genStyle"
   >
     <!-- prepend slot -->
-    <slot
-name="prepend"
-class="ui-badge__prepend">
+    <slot name="prepend" class="ui-badge__prepend">
       <UiAtomsIcon
         v-if="icon"
         :name="icon"
@@ -27,16 +25,12 @@ class="ui-badge__prepend">
     </slot>
 
     <!-- default slot -->
-    <div
-v-if="$slots.default"
-class="ui-badge__label">
+    <div v-if="$slots.default" class="ui-badge__label">
       <slot />
     </div>
 
     <!-- append slot -->
-    <slot
-name="append"
-class="ui-badge__append">
+    <slot name="append" class="ui-badge__append">
       <UiAtomsIcon
         v-if="iconAppend"
         :name="iconAppend"

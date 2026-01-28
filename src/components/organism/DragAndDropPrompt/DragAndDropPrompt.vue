@@ -286,57 +286,59 @@ function playClick() {
 
     <template v-else>
       <GameHeader
-title="Drag and Drop Prompt"
+        title="Drag and Drop Prompt"
         description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
-:time="time">
+        :time="time"
+      >
       </GameHeader>
 
       <!-- Sentence -->
       <div class="border rounded-xl p-4 text-base text-justify">
-        <template
-v-for="(part, index) in board"
-:key="index">
+        <template v-for="(part, index) in board" :key="index">
           <span v-if="part.type === 'text'">
             {{ part.value }}
           </span>
 
           <BlankSlot
-v-else
-:item="slots[part.id]"
-:slotId="part.id"
-:onDragStart="onDragStart"
+            v-else
+            :item="slots[part.id]"
+            :slotId="part.id"
+            :onDragStart="onDragStart"
             :isCorrect="slotCorrectness[part.id]"
-:disabled="isLocked"
-@drop="onDrop" />
+            :disabled="isLocked"
+            @drop="onDrop"
+          />
         </template>
       </div>
 
       <!-- Word pool -->
       <div class="flex flex-wrap gap-3 justify-center">
         <WordItem
-v-for="(item, index) in items"
-:key="item.id"
-:item="item"
-:slotId="index"
-:inSlot="false"
+          v-for="(item, index) in items"
+          :key="item.id"
+          :item="item"
+          :slotId="index"
+          :inSlot="false"
           :disabled="isLocked"
-@dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+          @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+        />
       </div>
 
       <!-- Actions -->
       <GameFooter
-#footer
-class="mt-8"
-:isGameOver="isGameOver"
-:current="correctCount ?? 0"
+        #footer
+        class="mt-8"
+        :isGameOver="isGameOver"
+        :current="correctCount ?? 0"
         :target="board.filter((part) => part.type === 'slot').length"
-@check="checkAnswers"
-:show-progress="true"
+        @check="checkAnswers"
+        :show-progress="true"
         :has-lost="hasLost"
-:is-checked="isChecked"
-:is-win="isWin"
-@cleared="finishGame()"
-@retry="retryGame">
+        :is-checked="isChecked"
+        :is-win="isWin"
+        @cleared="finishGame()"
+        @retry="retryGame"
+      >
       </GameFooter>
     </template>
   </div>
