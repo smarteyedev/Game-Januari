@@ -160,7 +160,10 @@ watch(isGameOver, (over) => {
     </div>
 
     <template v-else>
-      <GameHeader title="Automation Spotter" :description="question" :time="time" />
+      <GameHeader
+title="Automation Spotter"
+:description="question"
+:time="time" />
 
       <TaskRow
         v-model="sourceCards"

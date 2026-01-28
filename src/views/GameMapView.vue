@@ -153,13 +153,17 @@ function toggleFullscreen() {
 </script>
 
 <template>
-  <div ref="appRoot" class="w-screen h-screen">
+  <div
+ref="appRoot"
+class="w-screen h-screen">
     <GameMapHeader
       title="Explore Artificial Intelligence (AI) Tools"
       @toggle-fullscreen="toggleFullscreen"
     />
 
-    <GameMap ref="mapRef" class="absolute inset-0 min-w-screen min-h-screen z-0" />
+    <GameMap
+ref="mapRef"
+class="absolute inset-0 min-w-screen min-h-screen z-0" />
 
     <LevelPath1
       class="absolute origin-top-left"
@@ -246,7 +250,9 @@ function toggleFullscreen() {
       @update:modelValue="showGameModal = $event"
       @close="closeModal"
     >
-      <component :is="gameMeta[activeView.game].component" @cleared="onGameCleared" />
+      <component
+:is="gameMeta[activeView.game].component"
+@cleared="onGameCleared" />
     </GameModal>
 
     <GameModal

@@ -8,6 +8,7 @@ import useApi from '@/composables/useApi'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import useGameSession from '@/composables/useGameSession'
+import { UiLoading } from '@/components/atoms/loading'
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
@@ -158,26 +159,14 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <GameHeader
-        title="Memory Game"
-        description="Pasangkan kartu dengan deskripsi yang benar!"
-        :time="time"
-      />
+      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
       <div class="flex justify-center">
         <MemoryBoard :cards="cards" @flip="flipCard" />
       </div>
 
-      <GameFooter
-        slot="footer"
-        :hide-submit="true"
-        :is-win="allMatched"
-        :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched"
-        @cleared="finishGame"
-        @retry="retryGame"
-        class="mt-8"
-      >
+      <GameFooter slot="footer" :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
         <template #left>
           <p class="text-lg font-semibold">Card Turns: {{ turns }}</p>
         </template>

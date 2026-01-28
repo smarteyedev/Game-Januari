@@ -8,6 +8,16 @@ import { defineConfig } from "eslint/config";
 const compat = new FlatCompat();
 
 export default defineConfig([
+    {
+    ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.output/**",
+      "**/.nuxt/**",
+      "**/coverage/**"
+    ]
+  },
+  
   { files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], plugins: { js }, extends: ["js/recommended"] },
   { files: ["**/*.{js,mjs,cjs,ts,mts,cts,vue}"], languageOptions: { globals: {...globals.browser, ...globals.node} } },
   tseslint.configs.recommended,

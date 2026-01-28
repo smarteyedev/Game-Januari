@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { toTimeMmss } from '@/utils/formatter'
-import UiAtomsLabel from '@/components/atoms/label/index.vue'
 import { UiLabel } from '../atoms/label'
 
 withDefaults(
