@@ -5,11 +5,13 @@ import useApi from '@/composables/useApi'
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
+import { useGameProgress } from '@/stores/gameProgress'
 import type { ApiResponse } from '@/types/types'
 import { UiLoading } from '@/components/atoms/loading'
 
 const router = useRouter()
 const sessionStore = useSessionStore()
+const progress = useGameProgress()
 
 const nama = ref('')
 const kantor = ref('')
@@ -48,6 +50,13 @@ async function createGuestSession() {
       accessToken: res.data.accessToken,
       expiresAt: res.data.expiresAt,
     })
+
+    // reset progress for new guest
+    try {
+      progress.resetProgress()
+    } catch (e) {
+      /* ignore */
+    }
 
     return true
   } catch (err: any) {
@@ -97,11 +106,7 @@ async function goToGame() {
           {{ formError }}
         </p>
 
-        <UiButton
-          type="submit"
-          class="w-full py-2 rounded font-semibold"
-          :disabled="!isFormValid || loading"
-        >
+        <UiButton type="submit" class="w-full py-2 rounded font-semibold" :disabled="!isFormValid || loading">
           <span v-if="loading">Loading...</span>
           <span v-else>Masuk</span>
         </UiButton>
