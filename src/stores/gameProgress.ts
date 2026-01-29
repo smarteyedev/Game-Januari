@@ -30,7 +30,9 @@ const DEFAULT_LEVELS: Record<GameKey, LevelButtonState> = {
 }
 
 export const useGameProgress = defineStore('gameProgress', () => {
-  const levels = ref<Record<GameKey, LevelButtonState>>(loadOrDefault(STORAGE_KEYS.levels, DEFAULT_LEVELS))
+  const levels = ref<Record<GameKey, LevelButtonState>>(
+    loadOrDefault(STORAGE_KEYS.levels, DEFAULT_LEVELS),
+  )
   const bgmMuted = ref<boolean>(loadOrDefault(STORAGE_KEYS.bgmMuted, false))
   const bgmVolume = ref<number>(loadOrDefault(STORAGE_KEYS.bgmVolume, 0.1))
 

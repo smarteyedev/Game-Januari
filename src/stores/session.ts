@@ -1,11 +1,6 @@
+import type { GuestSession } from '@/types/types'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-
-interface GuestSession {
-  guestId: string
-  accessToken: string
-  expiresAt: string
-}
 
 export const useSessionStore = defineStore('session', () => {
   const guest = ref<GuestSession | null>(null)

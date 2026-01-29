@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import AutomationSpotter from '@/components/organism/AutomationSpotter/AutomationSpotter.vue'
 import DragAndDropPrompt from '@/components/organism/DragAndDropPrompt/DragAndDropPrompt.vue'
-import FeedbackForm from '@/components/organism/FeedbackForm.vue'
+import FeedbackModal from '@/components/molecules/FeedbackModal.vue'
 import GameMap from '@/components/atoms/map/GameMap.vue'
 import GameModal from '@/components/molecules/GameModal.vue'
 import LevelButtonIconClear from '@/components/atoms/iconComponent/LevelButtonIconClear.vue'
@@ -9,7 +9,7 @@ import LevelButtonIconLocked from '@/components/atoms/iconComponent/LevelButtonI
 import LevelButtonIconUnlocked from '@/components/atoms/iconComponent/LevelButtonIconUnlocked.vue'
 import LevelButton from '@/components/molecules/LevelButton.vue'
 import MemoryGame from '@/components/organism/MemoryGame/MemoryGame.vue'
-import { type IntroData, type LevelButtonState } from '@/types/types'
+import { type GameIntroMapping, type GameKey, type IntroData } from '@/types/types'
 import { onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useGameProgress } from '@/stores/gameProgress'
 import bgmSound from '@/assets/sounds/bgm.ogg'
@@ -18,14 +18,6 @@ import LevelPath2 from '@/components/atoms/map/LevelPath2.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameIntroData from '@/assets/gameData/intro.json'
 import GameMapHeader from '@/components/molecules/GameMapHeader.vue'
-
-type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
-
-interface GameIntroMapping {
-  automationSpotter: IntroData
-  dragAndDropPrompt: IntroData
-  memoryGame: IntroData
-}
 
 const gameMeta: Record<GameKey, { title: string; component: any }> = {
   automationSpotter: { title: 'Automation Spotter', component: AutomationSpotter },
@@ -225,9 +217,7 @@ function toggleFullscreen() {
       <component :is="gameMeta[activeView.game].component" @cleared="onGameCleared" />
     </GameModal>
 
-    <GameModal v-if="activeView?.type === 'feedback'" :modelValue="showFeedbackModal" title="Your Feedback"
-      @update:modelValue="showFeedbackModal = $event" @close="closeModal">
-      <FeedbackForm @submitted="closeModal" />
-    </GameModal>
+    <FeedbackModal v-if="activeView?.type === 'feedback'" :modelValue="showFeedbackModal"
+      @update:modelValue="showFeedbackModal = $event" @close="closeModal" @submitted="closeModal" />
   </div>
 </template>

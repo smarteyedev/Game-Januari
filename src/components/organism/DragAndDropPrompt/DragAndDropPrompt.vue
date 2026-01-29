@@ -219,12 +219,10 @@ function checkAnswers() {
   correctCount.value = count
 
   if (count === totalSlots) {
-    // WIN
     isWin.value = true
     isLocked.value = true
     stop()
   } else {
-    // NOT WIN
     isWin.value = false
     isLocked.value = true
     stop()

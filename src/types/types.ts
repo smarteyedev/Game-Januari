@@ -50,3 +50,17 @@ export type ApiResponse<T> = {
 }
 
 export type LevelButtonState = 'unlocked' | 'cleared' | 'locked'
+
+export type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
+
+export interface GameIntroMapping {
+  automationSpotter: IntroData
+  dragAndDropPrompt: IntroData
+  memoryGame: IntroData
+}
+
+export interface GuestSession {
+  guestId: string
+  accessToken: string
+  expiresAt: string
+}
