@@ -1,23 +1,24 @@
 <script setup lang="ts">
 import AutomationSpotter from '@/components/organism/AutomationSpotter/AutomationSpotter.vue'
 import DragAndDropPrompt from '@/components/organism/DragAndDropPrompt/DragAndDropPrompt.vue'
-import FeedbackModal from '@/components/molecules/FeedbackModal.vue'
 import GameMap from '@/components/atoms/map/GameMap.vue'
-import GameModal from '@/components/molecules/GameModal.vue'
 import LevelButtonIconClear from '@/components/atoms/iconComponent/LevelButtonIconClear.vue'
 import LevelButtonIconLocked from '@/components/atoms/iconComponent/LevelButtonIconLocked.vue'
 import LevelButtonIconUnlocked from '@/components/atoms/iconComponent/LevelButtonIconUnlocked.vue'
 import LevelButton from '@/components/molecules/LevelButton.vue'
 import MemoryGame from '@/components/organism/MemoryGame/MemoryGame.vue'
 import { type GameIntroMapping, type GameKey, type IntroData } from '@/types/types'
-import { onBeforeMount, onMounted, ref, watch } from 'vue'
+import { defineAsyncComponent, onBeforeMount, onMounted, ref, watch } from 'vue'
 import { useGameProgress } from '@/stores/gameProgress'
 import bgmSound from '@/assets/sounds/bgm.ogg'
 import LevelPath1 from '@/components/atoms/map/LevelPath1.vue'
 import LevelPath2 from '@/components/atoms/map/LevelPath2.vue'
-import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameIntroData from '@/assets/gameData/intro.json'
 import GameMapHeader from '@/components/molecules/GameMapHeader.vue'
+
+const GameIntroModal = defineAsyncComponent(() => import("@/components/molecules/GameIntroModal.vue"));
+const GameModal = defineAsyncComponent(() => import("@/components/molecules/GameModal.vue"));
+const FeedbackModal = defineAsyncComponent(() => import("@/components/molecules/FeedbackModal.vue"));
 
 const gameMeta: Record<GameKey, { title: string; component: any }> = {
   automationSpotter: { title: 'Automation Spotter', component: AutomationSpotter },

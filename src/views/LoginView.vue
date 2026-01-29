@@ -16,6 +16,7 @@ const progress = useGameProgress()
 const nama = ref('')
 const kantor = ref('')
 const unit = ref('')
+const isNavigating = ref(false)
 
 const formError = ref<string | null>(null)
 
@@ -66,19 +67,24 @@ async function createGuestSession() {
 }
 
 async function goToGame() {
-  if (!isFormValid.value || loading.value) return
+  if (!isFormValid.value || loading.value || isNavigating.value) return
 
+  isNavigating.value = true
   const success = await createGuestSession()
+
   if (success) {
     router.push('/game')
+  } else {
+    isNavigating.value = false
   }
 }
+
 </script>
 
 <template>
   <div class="w-screen h-screen flex justify-center items-center">
     <!-- loading state -->
-    <div v-if="loading">
+    <div v-if="loading || isNavigating">
       <UiLoading class="grid place-items-center" />
     </div>
 
@@ -106,11 +112,7 @@ async function goToGame() {
           {{ formError }}
         </p>
 
-        <UiButton
-          type="submit"
-          class="w-full py-2 rounded font-semibold"
-          :disabled="!isFormValid || loading"
-        >
+        <UiButton type="submit" class="w-full py-2 rounded font-semibold" :disabled="!isFormValid || loading">
           <span v-if="loading">Loading...</span>
           <span v-else>Masuk</span>
         </UiButton>
