@@ -36,7 +36,7 @@ async function fetchLevel() {
   }
 }
 
-const { startSession, submitScore } = useGameSession('memoryGame')
+const { startSession, submitScore, apiFinishGame } = useGameSession('game_003', 'memory-game')
 
 function loadLevel(): MemoryCard[] {
   if (!gameData.value) return []
@@ -117,6 +117,7 @@ const emit = defineEmits<{
 
 function finishGame() {
   submitScore(allMatched.value ? 100 : 0)
+  apiFinishGame('game_003')
   emit('cleared', {
     game: 'memoryGame',
     score: allMatched.value ? 100 : 0,
@@ -159,26 +160,14 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <GameHeader
-        title="Memory Game"
-        description="Pasangkan kartu dengan deskripsi yang benar!"
-        :time="time"
-      />
+      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
       <div class="flex justify-center">
         <MemoryBoard :cards="cards" @flip="flipCard" />
       </div>
 
-      <GameFooter
-        #footer
-        :hide-submit="true"
-        :is-win="allMatched"
-        :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched"
-        @cleared="finishGame"
-        @retry="retryGame"
-        class="mt-8"
-      >
+      <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
       </GameFooter>
     </template>
   </div>

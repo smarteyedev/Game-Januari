@@ -82,7 +82,7 @@ function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
 }
 
-const { startSession, submitScore } = useGameSession('automationSpotter')
+const { startSession, submitScore, apiFinishGame } = useGameSession('game_001', 'automation-spotter')
 
 async function loadLevel() {
   if (!gameData.value) return
@@ -136,6 +136,7 @@ function checkAnswers() {
 
 function finishGame() {
   submitScore(isLevelWin.value ? 100 : 0)
+  apiFinishGame('game_001')
   emit('cleared', {
     game: 'automationSpotter',
     score: isGameOver.value ? 0 : 100,
@@ -162,32 +163,13 @@ watch(isGameOver, (over) => {
     <template v-else>
       <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-      <TaskRow
-        v-model="sourceCards"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        :disabled="isChecked"
-        @moved="onMoved"
-      />
+      <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+        @moved="onMoved" />
 
-      <SpotZones
-        :zones="zones"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        @moved="onMoved"
-      />
+      <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-      <GameFooter
-        :current="matchedCount"
-        :target="allCards.length"
-        :is-checked="isChecked"
-        :has-lost="hasLost"
-        :is-win="isLevelWin"
-        :show-progress="true"
-        @check="checkAnswers"
-        @retry="loadLevel"
-        @cleared="finishGame"
-      />
+      <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+        :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
     </template>
   </div>
 </template>
