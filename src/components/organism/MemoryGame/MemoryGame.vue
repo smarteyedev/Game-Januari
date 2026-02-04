@@ -115,13 +115,18 @@ const emit = defineEmits<{
   (e: 'cleared', payload: { game: 'memoryGame'; score: number }): void
 }>()
 
-function finishGame() {
-  submitScore(allMatched.value ? 100 : 0)
-  apiFinishGame('game_003')
-  emit('cleared', {
-    game: 'memoryGame',
-    score: allMatched.value ? 100 : 0,
-  })
+async function finishGame() {
+  try {
+    await submitScore(allMatched.value ? 100 : 0)
+    await apiFinishGame('game_003')
+  } catch (err) {
+    console.error('Error finishing game flow', err)
+  } finally {
+    emit('cleared', {
+      game: 'memoryGame',
+      score: allMatched.value ? 100 : 0,
+    })
+  }
 }
 
 const audio = new Audio(clickSound)

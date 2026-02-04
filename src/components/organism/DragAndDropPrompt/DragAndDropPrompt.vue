@@ -30,13 +30,18 @@ const emit = defineEmits<{
   (e: 'cleared', payload: { game: 'dragAndDropPrompt'; score: number }): void
 }>()
 
-function finishGame() {
-  submitScore(isWin.value ? 100 : 0)
-  apiFinishGame('game_002')
-  emit('cleared', {
-    game: 'dragAndDropPrompt',
-    score: isGameOver.value ? 0 : 100,
-  })
+async function finishGame() {
+  try {
+    await submitScore(isWin.value ? 100 : 0)
+    await apiFinishGame('game_002')
+  } catch (err) {
+    console.error('Error finishing game flow', err)
+  } finally {
+    emit('cleared', {
+      game: 'dragAndDropPrompt',
+      score: isGameOver.value ? 0 : 100,
+    })
+  }
 }
 
 const { get, loading, error } = useApi()

@@ -134,13 +134,20 @@ function checkAnswers() {
   isChecked.value = true
 }
 
-function finishGame() {
-  submitScore(isLevelWin.value ? 100 : 0)
-  apiFinishGame('game_001')
-  emit('cleared', {
-    game: 'automationSpotter',
-    score: isGameOver.value ? 0 : 100,
-  })
+async function finishGame() {
+  try {
+    await submitScore(isLevelWin.value ? 100 : 0)
+    await apiFinishGame('game_001')
+  } catch (err) {
+    console.error('Error finishing game flow', err)
+  } finally {
+
+
+    emit('cleared', {
+      game: 'automationSpotter',
+      score: isGameOver.value ? 0 : 100,
+    })
+  }
 }
 
 watch(isGameOver, (over) => {

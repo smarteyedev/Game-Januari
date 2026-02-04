@@ -48,6 +48,14 @@ export default function useGameSession(gameId: string, minigameId: string) {
         { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
       )
 
+      // Treat API-level failures as exceptions as well
+      if (res && (res.success === false || (res as any).error)) {
+        const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+        const err = new Error(msg)
+        ;(err as any).apiError = res
+        throw err
+      }
+
       return res
     } catch (err) {
       console.error('Failed to submit score', err)
@@ -64,6 +72,14 @@ export default function useGameSession(gameId: string, minigameId: string) {
         { sessionId: sessionId.value },
         { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
       )
+
+      // Treat API-level failures as exceptions as well
+      if (res && (res.success === false || (res as any).error)) {
+        const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+        const err = new Error(msg)
+        ;(err as any).apiError = res
+        throw err
+      }
 
       return res
     } catch (err) {
