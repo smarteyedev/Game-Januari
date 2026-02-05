@@ -31,9 +31,16 @@ export default function useGameSession(gameId: string, minigameId: string) {
     if (!sessionStore.guest?.accessToken) return null
     const res = await post<ApiResponse<{ sessionId: string }>>(
       '/api/v1/hpl/game/launch',
-      { gameId: gameId, minigameId: minigameId},
+      { gameId: gameId, minigameId: minigameId },
       { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
     )
+    if (res && (res.success === false || (res as any).error)) {
+      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+      const err = new Error(msg)
+      ;(err as any).apiError = res
+      throw err
+    }
+
     if (res.success && res.data?.sessionId) sessionId.value = res.data.sessionId
     return sessionId.value
   }
@@ -63,10 +70,10 @@ export default function useGameSession(gameId: string, minigameId: string) {
     }
   }
 
-  async function apiFinishGame(gameId: string){
+  async function apiFinishGame(gameId: string) {
     if (!sessionId.value || !sessionStore.guest?.accessToken) return
 
-       try {
+    try {
       const res = await post(
         `/api/v1/hpl/game/${gameId}/next`,
         { sessionId: sessionId.value },

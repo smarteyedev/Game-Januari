@@ -63,6 +63,13 @@ async function fetchLevel() {
       }>
     >('/api/v1/minigames/drag-and-drop/levels/1')
 
+    if (res && (res.success === false || (res as any).error)) {
+      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+      const err = new Error(msg)
+      ;(err as any).apiError = res
+      throw err
+    }
+
     gameData.value = res.data
     loadLevel()
   } catch (err) {
@@ -146,60 +153,49 @@ board.value.forEach((part) => {
   }
 })
 
-let draggedItem: any | null = null
-let draggedFromIndex: number | null = null
-let draggedFromType: 'pool' | 'board' | null = null
+const draggedItem = ref<Blank | null>(null)
+const draggedFromIndex = ref<number | null>(null)
+const draggedFromType = ref<'pool' | 'board' | null>(null)
 
-function onDragStart(_: DragEvent, item: any, index: number, type: 'pool' | 'board' | null) {
+function onDragStart(_: DragEvent, item: Blank, index: number, type: 'pool' | 'board') {
   playClick()
-  draggedItem = item
-  draggedFromIndex = index
-  draggedFromType = type
+  draggedItem.value = item
+  draggedFromIndex.value = index
+  draggedFromType.value = type
 }
 
 function onDrop(_: DragEvent, dropSlotId: number) {
-  if (isLocked.value) return
-  playClick()
-  // Get the current item in the target slot
+  if (isLocked.value || !draggedItem.value) return
+
   const currentSlotItem = slots.value[dropSlotId]
 
-  // Reset correctness for affected slots
   slotCorrectness.value[dropSlotId] = null
-  if (draggedFromType === 'board' && draggedFromIndex !== null) {
-    slotCorrectness.value[draggedFromIndex] = null
+  if (draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
+    slotCorrectness.value[draggedFromIndex.value] = null
   }
 
   if (currentSlotItem) {
-    // If target slot already has an item
-    if (draggedFromType === 'board') {
-      // Swap items between two slots
-      slots.value[dropSlotId] = draggedItem
-      slots.value[draggedFromIndex as number] = currentSlotItem
-    } else if (draggedFromType === 'pool') {
-      // Move from pool to slot, put slot item back to pool
-      slots.value[dropSlotId] = draggedItem
-      const itemIndex = items.value.findIndex((i) => i.id === draggedItem.id)
-      if (itemIndex !== -1) items.value.splice(itemIndex, 1)
+    if (draggedFromType.value === 'board') {
+      slots.value[dropSlotId] = draggedItem.value
+      slots.value[draggedFromIndex.value!] = currentSlotItem
+    } else {
+      slots.value[dropSlotId] = draggedItem.value
+      items.value = items.value.filter((i) => i.id !== draggedItem.value!.id)
       items.value.push(currentSlotItem)
     }
   } else {
-    // Target slot is empty
-    slots.value[dropSlotId] = draggedItem
+    slots.value[dropSlotId] = draggedItem.value
 
-    if (draggedFromType === 'pool') {
-      // Remove from pool
-      const itemIndex = items.value.findIndex((i) => i.id === draggedItem.id)
-      if (itemIndex !== -1) items.value.splice(itemIndex, 1)
-    } else if (draggedFromType === 'board') {
-      // Clear the source slot
-      slots.value[draggedFromIndex as number] = null
+    if (draggedFromType.value === 'pool') {
+      items.value = items.value.filter((i) => i.id !== draggedItem.value!.id)
+    } else {
+      slots.value[draggedFromIndex.value!] = null
     }
   }
 
-  // Reset drag state
-  draggedItem = null
-  draggedFromIndex = null
-  draggedFromType = null
+  draggedItem.value = null
+  draggedFromIndex.value = null
+  draggedFromType.value = null
 }
 
 const correctCount = ref<number | null>(null)
@@ -289,32 +285,63 @@ function playClick() {
     </div>
 
     <template v-else>
-      <GameHeader title="Drag and Drop Prompt"
-        description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
+      <GameHeader
+        title="Drag and Drop Prompt"
+        description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
+        :time="time"
+      >
       </GameHeader>
 
       <!-- Sentence -->
       <div class="border rounded-xl p-4 text-base text-justify">
-        <template v-for="(part, index) in board" :key="index">
+        <template
+          v-for="(part, index) in board"
+          :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
+        >
           <span v-if="part.type === 'text'">
             {{ part.value }}
           </span>
 
-          <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-            :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
+          <BlankSlot
+            v-else
+            :item="slots[part.id]"
+            :slotId="part.id"
+            :onDragStart="onDragStart"
+            :isCorrect="slotCorrectness[part.id]"
+            :disabled="isLocked"
+            @drop="onDrop"
+          />
         </template>
       </div>
 
       <!-- Word pool -->
       <div class="flex flex-wrap gap-3 justify-center">
-        <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-          :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+        <WordItem
+          v-for="(item, index) in items"
+          :key="item.id"
+          :item="item"
+          :slotId="index"
+          :inSlot="false"
+          :disabled="isLocked"
+          @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+        />
       </div>
 
       <!-- Actions -->
-      <GameFooter #footer class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
-        :target="board.filter((part) => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
-        :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
+      <GameFooter
+        #footer
+        class="mt-8"
+        :isGameOver="isGameOver"
+        :current="correctCount ?? 0"
+        :target="board.filter((part) => part.type === 'slot').length"
+        @check="checkAnswers"
+        :show-progress="true"
+        :has-lost="hasLost"
+        :is-checked="isChecked"
+        :is-win="isWin"
+        @cleared="finishGame()"
+        @retry="retryGame"
+      >
       </GameFooter>
     </template>
   </div>
