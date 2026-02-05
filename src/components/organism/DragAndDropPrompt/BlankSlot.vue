@@ -12,6 +12,7 @@
   >
     <WordItem
       v-if="item"
+      :key="item?.id"
       :item="item"
       :slotId="slotId"
       :inSlot="true"

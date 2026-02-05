@@ -78,7 +78,6 @@ async function goToGame() {
     isNavigating.value = false
   }
 }
-
 </script>
 
 <template>
@@ -112,7 +111,11 @@ async function goToGame() {
           {{ formError }}
         </p>
 
-        <UiButton type="submit" class="w-full py-2 rounded font-semibold" :disabled="!isFormValid || loading">
+        <UiButton
+          type="submit"
+          class="w-full py-2 rounded font-semibold"
+          :disabled="!isFormValid || loading"
+        >
           <span v-if="loading">Loading...</span>
           <span v-else>Masuk</span>
         </UiButton>

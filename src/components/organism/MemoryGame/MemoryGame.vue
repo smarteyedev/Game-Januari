@@ -29,6 +29,13 @@ async function fetchLevel() {
       }>
     >('/api/v1/minigames/memory-game/levels/1')
 
+    if (res && (res.success === false || (res as any).error)) {
+      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+      const err = new Error(msg)
+      ;(err as any).apiError = res
+      throw err
+    }
+
     gameData.value = res.data
     cards.value = loadLevel()
   } catch (err) {
@@ -165,14 +172,26 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+      <GameHeader
+        title="Memory Game"
+        description="Pasangkan kartu dengan deskripsi yang benar!"
+        :time="time"
+      />
 
       <div class="flex justify-center">
         <MemoryBoard :cards="cards" @flip="flipCard" />
       </div>
 
-      <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
+      <GameFooter
+        #footer
+        :hide-submit="true"
+        :is-win="allMatched"
+        :has-lost="gameOver && !allMatched"
+        :is-checked="allMatched"
+        @cleared="finishGame"
+        @retry="retryGame"
+        class="mt-8"
+      >
       </GameFooter>
     </template>
   </div>
