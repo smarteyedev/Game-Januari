@@ -3,35 +3,16 @@ import useApi from '@/composables/useApi'
 import { useSessionStore } from '@/stores/session'
 import type { ApiResponse } from '@/types/types'
 
-export default function useGameSession(gameId: string, minigameId: string) {
+export default function useGameSession( minigameId: string) {
   const sessionStore = useSessionStore()
-  const { post, loading, error } = useApi()
+  const { post, get, loading, error } = useApi()
   const sessionId = ref<string | null>(null)
 
-  // Invalidate previous session
-  async function invalidateSession() {
-    if (!sessionId.value || !sessionStore.guest?.accessToken) return
-    try {
-      await post(
-        `/api/v1/hpl/session/${sessionId.value}/invalidate`,
-        {},
-        { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
-      )
-    } catch (err) {
-      console.warn('Failed to invalidate previous session', err)
-    } finally {
-      sessionId.value = null
-    }
-  }
-
   async function startSession() {
-    // Invalidate old session before creating a new one
-    await invalidateSession()
-
     if (!sessionStore.guest?.accessToken) return null
     const res = await post<ApiResponse<{ sessionId: string }>>(
       '/api/v1/hpl/game/launch',
-      { gameId: gameId, minigameId: minigameId },
+      { gameId: sessionStore.guest.gameId, minigameId: minigameId },
       { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
     )
     if (res && (res.success === false || (res as any).error)) {
@@ -43,6 +24,22 @@ export default function useGameSession(gameId: string, minigameId: string) {
 
     if (res.success && res.data?.sessionId) sessionId.value = res.data.sessionId
     return sessionId.value
+  }
+
+    async function getSession() {
+    if (!sessionStore.guest?.accessToken) return null
+    const res = await get<ApiResponse<{ data: any }>>(
+      `/api/v1/hpl/session/${sessionId.value}`,
+      { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
+    )
+    if (res && (res.success === false || (res as any).error)) {
+      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
+      const err = new Error(msg)
+      ;(err as any).apiError = res
+      throw err
+    }
+
+    return res.data
   }
 
   async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
@@ -70,12 +67,12 @@ export default function useGameSession(gameId: string, minigameId: string) {
     }
   }
 
-  async function apiFinishGame(gameId: string) {
+  async function apiNextGame() {
     if (!sessionId.value || !sessionStore.guest?.accessToken) return
 
     try {
       const res = await post(
-        `/api/v1/hpl/game/${gameId}/next`,
+        `/api/v1/hpl/game/${sessionStore.guest.gameId}/next`,
         { sessionId: sessionId.value },
         { headers: { Authorization: `Bearer ${sessionStore.guest.accessToken}` } },
       )
@@ -92,10 +89,8 @@ export default function useGameSession(gameId: string, minigameId: string) {
     } catch (err) {
       console.error('Failed to finish game', err)
       throw err
-    } finally {
-      sessionId.value = null
     }
   }
 
-  return { sessionId, startSession, submitScore, loading, error, invalidateSession, apiFinishGame }
+  return { sessionId, startSession, submitScore, apiNextGame, getSession, loading, error }
 }

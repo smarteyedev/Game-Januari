@@ -46,6 +46,7 @@ router.beforeEach(async (to, _, next) => {
           guestId: res.data.guestId,
           accessToken: res.data.accessToken,
           expiresAt: res.data.expiresAt,
+          gameId: String(token),
         })
 
         try {

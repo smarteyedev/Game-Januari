@@ -63,4 +63,5 @@ export interface GuestSession {
   guestId: string
   accessToken: string
   expiresAt: string
+  gameId: string
 }

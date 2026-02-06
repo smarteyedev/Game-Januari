@@ -32,7 +32,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-      ;(err as any).apiError = res
+        ; (err as any).apiError = res
       throw err
     }
 
@@ -43,12 +43,9 @@ async function fetchLevel() {
   }
 }
 
-const { startSession, submitScore, apiFinishGame } = useGameSession('game_003', 'memory-game')
-
 function loadLevel(): MemoryCard[] {
   if (!gameData.value) return []
 
-  startSession()
   return shuffle(
     gameData.value.card.map((card) => ({
       ...card,
@@ -123,17 +120,10 @@ const emit = defineEmits<{
 }>()
 
 async function finishGame() {
-  try {
-    await submitScore(allMatched.value ? 100 : 0)
-    await apiFinishGame('game_003')
-  } catch (err) {
-    console.error('Error finishing game flow', err)
-  } finally {
-    emit('cleared', {
-      game: 'memoryGame',
-      score: allMatched.value ? 100 : 0,
-    })
-  }
+  emit('cleared', {
+    game: 'memoryGame',
+    score: allMatched.value ? 100 : 0,
+  })
 }
 
 const audio = new Audio(clickSound)
@@ -172,26 +162,14 @@ onMounted(() => {
     </div>
 
     <template v-else>
-      <GameHeader
-        title="Memory Game"
-        description="Pasangkan kartu dengan deskripsi yang benar!"
-        :time="time"
-      />
+      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
       <div class="flex justify-center">
         <MemoryBoard :cards="cards" @flip="flipCard" />
       </div>
 
-      <GameFooter
-        #footer
-        :hide-submit="true"
-        :is-win="allMatched"
-        :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched"
-        @cleared="finishGame"
-        @retry="retryGame"
-        class="mt-8"
-      >
+      <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
       </GameFooter>
     </template>
   </div>

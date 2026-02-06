@@ -50,6 +50,7 @@ async function createGuestSession() {
       guestId: res.data.guestId,
       accessToken: res.data.accessToken,
       expiresAt: res.data.expiresAt,
+      gameId: crypto.randomUUID()
     })
 
     // reset progress for new guest
@@ -111,11 +112,7 @@ async function goToGame() {
           {{ formError }}
         </p>
 
-        <UiButton
-          type="submit"
-          class="w-full py-2 rounded font-semibold"
-          :disabled="!isFormValid || loading"
-        >
+        <UiButton type="submit" class="w-full py-2 rounded font-semibold" :disabled="!isFormValid || loading">
           <span v-if="loading">Loading...</span>
           <span v-else>Masuk</span>
         </UiButton>

@@ -69,7 +69,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-      ;(err as any).apiError = res
+        ; (err as any).apiError = res
       throw err
     }
 
@@ -89,19 +89,11 @@ function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
 }
 
-const { startSession, submitScore, apiFinishGame } = useGameSession(
-  'game_001',
-  'automation-spotter',
-)
-
 async function loadLevel() {
   if (!gameData.value) return
 
   stop()
   start()
-
-  // start new session every retry
-  await startSession()
 
   checkedMap.value = {}
   isChecked.value = false
@@ -145,17 +137,11 @@ function checkAnswers() {
 }
 
 async function finishGame() {
-  try {
-    await submitScore(isLevelWin.value ? 100 : 0)
-    await apiFinishGame('game_001')
-  } catch (err) {
-    console.error('Error finishing game flow', err)
-  } finally {
-    emit('cleared', {
-      game: 'automationSpotter',
-      score: isGameOver.value ? 0 : 100,
-    })
-  }
+
+  emit('cleared', {
+    game: 'automationSpotter',
+    score: isGameOver.value ? 0 : 100,
+  })
 }
 
 watch(isGameOver, (over) => {
@@ -178,32 +164,13 @@ watch(isGameOver, (over) => {
     <template v-else>
       <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-      <TaskRow
-        v-model="sourceCards"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        :disabled="isChecked"
-        @moved="onMoved"
-      />
+      <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+        @moved="onMoved" />
 
-      <SpotZones
-        :zones="zones"
-        :checked-map="checkedMap"
-        :is-checked="isChecked"
-        @moved="onMoved"
-      />
+      <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-      <GameFooter
-        :current="matchedCount"
-        :target="allCards.length"
-        :is-checked="isChecked"
-        :has-lost="hasLost"
-        :is-win="isLevelWin"
-        :show-progress="true"
-        @check="checkAnswers"
-        @retry="loadLevel"
-        @cleared="finishGame"
-      />
+      <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+        :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
     </template>
   </div>
 </template>
