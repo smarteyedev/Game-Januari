@@ -4,6 +4,7 @@ import GameIntro from '../molecules/GameIntro.vue'
 import type { IntroData } from '@/types/types'
 import { UiButton } from '../atoms/button'
 import UnknownIcon from '../atoms/iconComponent/UnknownIcon.vue'
+import ButtonText from '../atoms/ButtonText.vue'
 
 interface Props {
   title: string
@@ -32,16 +33,8 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal
-    :modelValue="modelValue"
-    size="md"
-    position="center"
-    :overlay="true"
-    :prevent-close="false"
-    scroll-mode="modal"
-    @update:modelValue="emit('update:modelValue', $event)"
-    @cancel="onClose"
-  >
+  <UiModal :modelValue="modelValue" size="md" position="center" :overlay="true" :prevent-close="false"
+    scroll-mode="modal" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center w-full">
@@ -57,17 +50,10 @@ const onStart = () => {
     </template>
 
     <!-- MAIN CONTENT -->
-    <div
-      class="flex flex-col items-center p-10 gap-12 w-169.25 bg-white rounded-[40px] text-center"
-    >
+    <div class="flex flex-col items-center p-10 gap-12 w-169.25 bg-white rounded-[40px] text-center">
       <!-- INTRO CONTENT -->
-      <GameIntro
-        v-if="introData"
-        :title="introData.title"
-        :description="introData.description"
-        :key_points="introData.key_points"
-        class="w-full"
-      />
+      <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
+        :key_points="introData.key_points" class="w-full" />
 
       <!-- FALLBACK -->
       <div v-else class="w-full">
@@ -78,12 +64,9 @@ const onStart = () => {
       </div>
 
       <!-- START BUTTON -->
-      <UiButton
-        @click="onStart"
-        class="flex flex-row items-center justify-center px-4 py-2.5 gap-0.5 w-41 min-w-32 h-14 bg-[#00A3B5] rounded-[10px] text-white text-[18px] leading-7 font-medium"
-      >
-        Start Game
-      </UiButton>
+      <ButtonText text="Mulai Game" @click="onStart" variant="primary" size="md">
+
+      </ButtonText>
     </div>
 
     <!-- EMPTY FOOTER -->

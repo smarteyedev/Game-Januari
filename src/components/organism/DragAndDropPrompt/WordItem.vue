@@ -1,14 +1,7 @@
 <!-- WordItem.vue -->
 <template>
-  <Card
-    :label="item.word"
-    :inSlot="inSlot"
-    :disabled="disabled"
-    :draggable="!disabled"
-    @dragstart="dragStart"
-    :noBackground="true"
-    class="bg-transparent"
-  />
+  <Card :label="item.word" :inSlot="inSlot" :disabled="disabled" :draggable="!disabled" @dragstart="dragStart"
+    :noBackground="true" class="bg-transparent" />
 </template>
 
 <script setup lang="ts">

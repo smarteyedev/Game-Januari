@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { UiButton } from '../atoms/button'
+import ButtonText from '../atoms/ButtonText.vue';
 import ProgressWithIcon from './ProgressWithIcon.vue'
 
 defineProps<{
@@ -20,38 +21,29 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div
-    class="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-3 sm:gap-0 min-h-10.5"
-  >
+  <div class="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-3 sm:gap-0 min-h-10.5">
     <!-- LEFT -->
     <div class="w-full sm:w-71.25">
-      <ProgressWithIcon
-        v-if="showProgress && current !== undefined && target !== undefined"
-        :current="current"
-        :target="target"
-      />
+      <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
+        :target="target" />
     </div>
 
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4">
       <!-- SUBMIT -->
-      <UiButton
-        v-if="!hideSubmit && !isChecked"
-        class="h-7.5 min-w-32 rounded-sm"
-        @click="emit('check')"
-      >
-        Submit
-      </UiButton>
+      <ButtonText v-if="!hideSubmit && !isChecked" variant="primary" size="md" @click="emit('check')" text="Submit">
+
+      </ButtonText>
 
       <!-- RETRY -->
-      <UiButton v-else-if="hasLost" class="h-7.5 min-w-32 rounded-sm" @click="emit('retry')">
-        Retry
-      </UiButton>
+      <ButtonText v-else-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
+
+      </ButtonText>
 
       <!-- CONTINUE -->
-      <UiButton v-else-if="isWin" class="h-7.5 min-w-32 rounded-sm" @click="emit('cleared')">
-        Continue
-      </UiButton>
+      <ButtonText v-else-if="isWin" text="Continue" variant="primary" size="md" @click="emit('cleared')">
+
+      </ButtonText>
     </div>
   </div>
 </template>
