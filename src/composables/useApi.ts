@@ -70,3 +70,4 @@ export default function useApi() {
       request<T>({ ...config, method: 'DELETE', url }),
   }
 }
+
