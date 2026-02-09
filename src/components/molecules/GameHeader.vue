@@ -14,9 +14,9 @@ withDefaults(
 </script>
 
 <template>
-  <div class="flex items-center justify-between h-12 w-full">
-    <UiLabel :label="description" name="header-label" />
+  <div class="flex items-center justify-between w-full">
+    <span class="text-md text-blue-700 font-medium">{{ description }}</span>
 
-    <span class="text-base font-semibold"> Time: {{ toTimeMmss(time) }} </span>
+    <span class="text-md text-blue-700 font-medium"> Time: {{ toTimeMmss(time) }} </span>
   </div>
 </template>

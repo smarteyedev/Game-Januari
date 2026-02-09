@@ -33,8 +33,9 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal :modelValue="modelValue" size="md" position="center" :overlay="true" :prevent-close="false"
-    scroll-mode="modal" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
+  <UiModal :content-style="{ 'border': 'solid 6px #006082' }" :modelValue="modelValue" size="md" position="center"
+    :overlay="true" :prevent-close="false" scroll-mode="modal" @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose">
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center w-full">
@@ -57,10 +58,10 @@ const onStart = () => {
 
       <!-- FALLBACK -->
       <div v-else class="w-full">
-        <h2 class="text-[28px] leading-9 font-bold text-[#1E1E1E] mb-4">
+        <h2 class="text-h4 leading-9 font-bold text-[#1E1E1E] mb-4">
           {{ title }}
         </h2>
-        <p class="text-[24px] leading-8 text-[#1E1E1E]">Selesaikan minigame!</p>
+        <p class="text-h5 leading-8 text-[#1E1E1E]">Selesaikan minigame!</p>
       </div>
 
       <!-- START BUTTON -->

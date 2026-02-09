@@ -144,21 +144,26 @@ async function onGameCleared(payload: { game: GameKey; score: number }) {
   const currentIndex = gameOrder.indexOf(payload.game)
   progress.markCleared(payload.game)
 
+  /*
   const before = await getSession()
   console.log('[SESSION BEFORE NEXT]', before)
+  */
 
   await submitScore(payload.score).catch((err) => {
     console.error('Failed to submit score:', err)
   })
-  await apiNextGame().catch((err) => {
-    console.error('Failed to proceed to next game:', err)
-  })
-
-  const after = await getSession()
-  console.log('[SESSION AFTER NEXT]', after)
 
   const nextGame = gameOrder[currentIndex + 1]
   if (nextGame) {
+    await apiNextGame().catch((err) => {
+      console.error('Failed to proceed to next game:', err)
+    })
+
+    /*
+    const after = await getSession()
+    console.log('[SESSION AFTER NEXT]', after)
+    */
+
     closeModal()
   } else {
     activeView.value = { type: 'feedback' }

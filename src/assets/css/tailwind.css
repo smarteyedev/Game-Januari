@@ -232,7 +232,7 @@
 
 @layer components {
   .text-base {
-    @apply font-sans leading-[var(--leading-base)];
+    @apply font-sans leading-(--leading-base);
   }
 
   .text-body-sm { @apply text-base text-body-sm; }

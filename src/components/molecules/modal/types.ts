@@ -41,4 +41,5 @@ export interface IModalProps {
   overlay?: boolean
   scrollMode?: TModalScrollMode
   ui?: IModalUi
+  contentStyle?: Record<string, string>
 }
