@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
-import TaskRow from './TaskRow.vue'
-import SpotZones from './SpotZones.vue'
+import TaskRow from '@/components/organism/AutomationSpotter/TaskRow.vue'
+import SpotZones from '@/components/organism/AutomationSpotter/SpotZones.vue'
 import type { DragCard, Zone } from '@/types/types'
 import useApi from '@/composables/useApi'
 import type { ApiResponse } from '@/types/types'
@@ -151,7 +151,7 @@ watch(isGameOver, (over) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 w-full max-w-full">
+  <div class="flex flex-col items-center gap-4 w-full max-w-full p-8">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>

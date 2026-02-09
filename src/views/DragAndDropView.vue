@@ -2,8 +2,8 @@
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
 import type { ApiResponse, Blank } from '@/types/types'
-import BlankSlot from './BlankSlot.vue'
-import WordItem from './WordItem.vue'
+import BlankSlot from '@/components/organism/DragAndDrop/BlankSlot.vue'
+import WordItem from '@/components/organism/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
 import GameHeader from '@/components/molecules/GameHeader.vue'
@@ -265,7 +265,7 @@ function playClick() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 w-full max-w-full">
+  <div class="flex flex-col items-center gap-4 w-full max-w-full p-8">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>

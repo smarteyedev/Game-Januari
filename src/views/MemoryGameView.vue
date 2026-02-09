@@ -2,7 +2,7 @@
 import { ref, computed, onMounted } from 'vue'
 import useTimer from '@/composables/useTimer'
 import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
-import MemoryBoard from './MemoryBoard.vue'
+import MemoryBoard from '@/components/organism/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
 import GameFooter from '@/components/molecules/GameFooter.vue'
@@ -151,7 +151,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="gap-4 w-full max-w-full">
+  <div class="gap-4 w-full max-w-full p-8">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>

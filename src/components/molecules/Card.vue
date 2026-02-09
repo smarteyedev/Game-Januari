@@ -1,26 +1,12 @@
 <template>
-  <div
-    :draggable="draggable && !disabled"
-    @dragstart="handleDragStart"
-    @click="handleClick"
-    :class="[
-      variant === 'card' ? baseClass : 'w-full h-full flex items-center justify-center',
-      variant === 'card'
-        ? {
-            'cursor-grab': draggable && !disabled,
-            'cursor-default': disabled,
-            'bg-white': !noBackground && (!isInZone || checked === null),
-            'bg-green-500': !noBackground && isInZone && checked === true,
-            'bg-red-500': !noBackground && isInZone && checked === false,
-            'px-3 py-1 border rounded': !inSlot,
-            'bg-transparent p-0 m-0 rounded-none font-medium border-0': inSlot || noBackground, // Add noBackground here
-          }
-        : {
-            'cursor-default': disabled,
-          },
-      noBackground ? 'bg-transparent' : '', // Force transparent background
-    ]"
-  >
+  <div :draggable="draggable && !disabled" @dragstart="handleDragStart" @click="handleClick" :class="[
+    baseClass,
+    customClass,
+    {
+      'cursor-grab': draggable && !disabled,
+      'cursor-default': disabled,
+    }
+  ]">
     <slot>
       {{ label }}
     </slot>
@@ -33,24 +19,17 @@ const props = withDefaults(
     label?: string
     draggable?: boolean
     disabled?: boolean
-    isInZone?: boolean
-    checked?: boolean | null
-    inSlot?: boolean
-    variant?: 'card' | 'content'
-    noBackground?: boolean
+    // Remove styling props
+    customClass?: string // Parent can pass any Tailwind/utility classes
   }>(),
   {
     draggable: false,
     disabled: false,
-    isInZone: false,
-    checked: null,
-    inSlot: false,
-    variant: 'card',
-    noBackground: false,
+    customClass: '',
   },
 )
 
-const { label, draggable, disabled, isInZone, checked, inSlot, variant, noBackground } = props
+const { label, draggable, disabled } = props
 
 const emit = defineEmits<{
   (e: 'dragstart', ev: DragEvent): void
@@ -70,12 +49,5 @@ function handleClick(ev?: MouseEvent) {
   emit('click', ev)
 }
 
-const baseClass =
-  'text-center min-w-[96px] md:min-w-[128px] select-none text-sm rounded-lg break-words flex items-center justify-center'
+const baseClass = 'select-none text-sm rounded-lg break-words flex items-center justify-center'
 </script>
-
-<style scoped>
-.px-3\.py-2 {
-  padding: 0.5rem 0.75rem;
-}
-</style>

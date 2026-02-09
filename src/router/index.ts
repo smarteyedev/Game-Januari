@@ -8,13 +8,11 @@ import type { ApiResponse } from '@/types/types'
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
-    { path: '/', component: () => import('@/views/LoginView.vue') },
-    {
-      path: '/game',
-      component: () => import('@/views/GameMapView.vue'),
-      meta: { requiresPlayer: true },
-    },
-    { path: '/p/:token', component: () => import('@/views/GameMapView.vue') },
+    { path: '/', component: () => import('@/views/GameListView.vue') },
+    { path: '/automation-spotter', component: () => import('@/views/AutomationSpotterView.vue') },
+    { path: '/drag-and-drop', component: () => import('@/views/DragAndDropView.vue') },
+    { path: '/memory-game', component: () => import('@/views/MemoryGameView.vue') },
+    { path: '/p/:token', component: () => import('@/views/GameListView.vue') },
   ],
 })
 
