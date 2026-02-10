@@ -8,7 +8,6 @@ import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
-import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import introData from '@/assets/gameData/intro.json'
@@ -49,19 +48,13 @@ const emit = defineEmits<{
 async function finishGame() {
   const score = isGameOver.value ? 0 : 100
 
-  const answers = Object.entries(slotCorrectness.value).map(
-    ([slotId, correct]) => ({
-      slotId: Number(slotId),
-      correct,
-    })
-  )
+  const answers = Object.entries(slotCorrectness.value).map(([slotId, correct]) => ({
+    slotId: Number(slotId),
+    correct,
+  }))
 
   try {
-    await session.submitScore(
-      score,
-      answers,
-      MAX_TIME - time.value,
-    )
+    await session.submitScore(score, answers, MAX_TIME - time.value)
   } finally {
     emit('cleared', {
       game: 'drag-and-drop',
@@ -69,7 +62,6 @@ async function finishGame() {
     })
   }
 }
-
 
 const { get, loading, error } = useApi()
 const gameData = ref<{
@@ -93,7 +85,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-        ; (err as any).apiError = res
+      ;(err as any).apiError = res
       throw err
     }
 
@@ -102,7 +94,6 @@ async function fetchLevel() {
     console.error('Failed to load level', err)
   }
 }
-
 
 function loadLevel() {
   if (!gameData.value) return
@@ -308,37 +299,75 @@ function playClick() {
       <button @click="fetchLevel">Retry</button>
     </div>
 
-    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[1]"
-      @start="startGame" />
+    <GameIntroModal
+      v-if="!loading"
+      v-model="showIntro"
+      title="Automation Spotter"
+      :introData="introData.data[1]"
+      @start="startGame"
+    />
 
     <template v-if="!showIntro">
-      <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
-        <GameHeader title="Drag and Drop Prompt"
-          description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
+      <div
+        class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl"
+      >
+        <GameHeader
+          title="Drag and Drop Prompt"
+          description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai"
+          :time="time"
+        >
         </GameHeader>
 
         <!-- Sentence -->
         <div class="border rounded-xl p-4 text-base text-justify">
-          <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
+          <template
+            v-for="(part, index) in board"
+            :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
+          >
             <span v-if="part.type === 'text'">
               {{ part.value }}
             </span>
 
-            <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-              :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
+            <BlankSlot
+              v-else
+              :item="slots[part.id]"
+              :slotId="part.id"
+              :onDragStart="onDragStart"
+              :isCorrect="slotCorrectness[part.id]"
+              :disabled="isLocked"
+              @drop="onDrop"
+            />
           </template>
         </div>
 
         <!-- Word pool -->
         <div class="flex flex-wrap gap-3 justify-center">
-          <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-            :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+          <WordItem
+            v-for="(item, index) in items"
+            :key="item.id"
+            :item="item"
+            :slotId="index"
+            :inSlot="false"
+            :disabled="isLocked"
+            @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+          />
         </div>
 
         <!-- Actions -->
-        <GameFooter #footer class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
-          :target="board.filter((part) => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
-          :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
+        <GameFooter
+          #footer
+          class="mt-8"
+          :isGameOver="isGameOver"
+          :current="correctCount ?? 0"
+          :target="board.filter((part) => part.type === 'slot').length"
+          @check="checkAnswers"
+          :show-progress="true"
+          :has-lost="hasLost"
+          :is-checked="isChecked"
+          :is-win="isWin"
+          @cleared="finishGame()"
+          @retry="retryGame"
+        >
         </GameFooter>
       </div>
     </template>

@@ -1,6 +1,11 @@
 <template>
-  <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
-    @dragstart="dragStart" />
+  <Card
+    :label="item.word"
+    :custom-class="customClass"
+    :disabled="disabled"
+    :draggable="!disabled"
+    @dragstart="dragStart"
+  />
 </template>
 
 <script setup lang="ts">
@@ -27,7 +32,9 @@ const customClass = computed(() => {
     classes.push('bg-transparent p-0 m-0 rounded-none font-medium border-0 min-w-0')
   } else {
     // Style when in pool
-    classes.push('font-medium bg-blue-100 px-3 py-1 border border-blue-500 rounded min-w-[96px] md:min-w-[128px] text-center')
+    classes.push(
+      'font-medium bg-blue-100 px-3 py-1 border border-blue-500 rounded min-w-[96px] md:min-w-[128px] text-center',
+    )
   }
 
   return classes.join(' ')

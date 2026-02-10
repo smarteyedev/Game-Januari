@@ -22,7 +22,12 @@ const _ = defineProps<{
 
     <!-- KEY POINTS -->
     <div class="flex flex-col gap-4 w-full text-left">
-      <IconLabel v-for="(point, index) in key_points ?? []" :key="index" :label="point" :bullet="true" />
+      <IconLabel
+        v-for="(point, index) in key_points ?? []"
+        :key="index"
+        :label="point"
+        :bullet="true"
+      />
     </div>
   </div>
 </template>

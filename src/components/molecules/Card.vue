@@ -1,12 +1,17 @@
 <template>
-  <div :draggable="draggable && !disabled" @dragstart="handleDragStart" @click="handleClick" :class="[
-    baseClass,
-    customClass,
-    {
-      'cursor-grab': draggable && !disabled,
-      'cursor-default': disabled,
-    }
-  ]">
+  <div
+    :draggable="draggable && !disabled"
+    @dragstart="handleDragStart"
+    @click="handleClick"
+    :class="[
+      baseClass,
+      customClass,
+      {
+        'cursor-grab': draggable && !disabled,
+        'cursor-default': disabled,
+      },
+    ]"
+  >
     <slot>
       {{ label }}
     </slot>

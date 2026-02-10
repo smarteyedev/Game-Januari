@@ -1,42 +1,58 @@
 <template>
-  <div class="ui-modal" :class="[
-    `ui-modal--${size || 'md'}`,
-    `ui-modal--scroll-${scrollMode || 'root'}`,
-    {
-      'ui-modal--divider': divider,
-    },
-  ]" :style="{
-    '--modal-offset': ui?.offset,
-    '--modal-content-gap': ui?.contentGap,
-    '--modal-content-padding': ui?.padding,
-    '--modal-footer-position': footerActionPosition(footer?.position),
+  <div
+    class="ui-modal"
+    :class="[
+      `ui-modal--${size || 'md'}`,
+      `ui-modal--scroll-${scrollMode || 'root'}`,
+      {
+        'ui-modal--divider': divider,
+      },
+    ]"
+    :style="{
+      '--modal-offset': ui?.offset,
+      '--modal-content-gap': ui?.contentGap,
+      '--modal-content-padding': ui?.padding,
+      '--modal-footer-position': footerActionPosition(footer?.position),
 
-    '--modal-min-height': ui?.minHeight,
-    '--modal-max-height': ui?.maxHeight,
-    '--modal-content-min-height': ui?.contentMinHeight,
-    '--modal-content-max-height': ui?.contentMaxHeight,
-  }">
+      '--modal-min-height': ui?.minHeight,
+      '--modal-max-height': ui?.maxHeight,
+      '--modal-content-min-height': ui?.contentMinHeight,
+      '--modal-content-max-height': ui?.contentMaxHeight,
+    }"
+  >
     <Transition name="overlay-fade">
       <div v-if="model && overlay" class="ui-modal__overlay" />
     </Transition>
 
     <Transition name="modal-fade">
-      <div v-if="model" class="ui-modal__modal-container" :class="[modalPositionClass]"
-        @click="!preventClose && onCancel()">
+      <div
+        v-if="model"
+        class="ui-modal__modal-container"
+        :class="[modalPositionClass]"
+        @click="!preventClose && onCancel()"
+      >
         <div class="ui-modal__content-wrapper">
           <!-- -> Boundary hack for flex positioning issue -->
 
           <!-- Actual modal content -->
           <div class="ui-modal__content" :style="contentStyle" @click.stop>
             <!-- Header Slot -->
-            <header v-if="title || $slots['header-title'] || $slots['header-extra']" class="ui-modal__header">
+            <header
+              v-if="title || $slots['header-title'] || $slots['header-extra']"
+              class="ui-modal__header"
+            >
               <div v-if="title || $slots['header-title']" class="ui-modal__title">
                 <slot name="header-title">
                   <span v-if="title" class="ui-modal__title-text">{{ title }}</span>
                 </slot>
 
                 <slot name="close-btn" v-bind="{ onClick: onCancel }">
-                  <UiAtomsIcon name="uil-times" class="ui-modal__close" size="24" @click="onCancel" />
+                  <UiAtomsIcon
+                    name="uil-times"
+                    class="ui-modal__close"
+                    size="24"
+                    @click="onCancel"
+                  />
                 </slot>
               </div>
               <!-- Extra content for header e.g. stepper -->
@@ -54,14 +70,26 @@
                 <div class="ui-modal__footer">
                   <div class="ui-modal__footer__action">
                     <slot name="footer-left" v-bind="{ onNegativeClick: onCancel }">
-                      <Button v-if="footer?.cancel" color="ghost" size="md" variant="outline"
-                        class="ui-modal__footer__action--cancel" :disabled="footer?.cancelDisabled" @click="onCancel">
+                      <Button
+                        v-if="footer?.cancel"
+                        color="ghost"
+                        size="md"
+                        variant="outline"
+                        class="ui-modal__footer__action--cancel"
+                        :disabled="footer?.cancelDisabled"
+                        @click="onCancel"
+                      >
                         {{ footer?.cancel }}
                       </Button>
                     </slot>
                     <slot name="footer-right" v-bind="{ onPositiveClick: onOK }">
-                      <Button v-if="footer?.ok" size="md" class="ui-modal__footer__action--ok"
-                        :disabled="footer?.okDisabled" @click="onOK">
+                      <Button
+                        v-if="footer?.ok"
+                        size="md"
+                        class="ui-modal__footer__action--ok"
+                        :disabled="footer?.okDisabled"
+                        @click="onOK"
+                      >
                         {{ footer?.ok }}
                       </Button>
                     </slot>

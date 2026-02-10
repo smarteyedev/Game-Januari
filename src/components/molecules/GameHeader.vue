@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { toTimeMmss } from '@/utils/formatter'
-import { UiLabel } from '../atoms/label'
 
 withDefaults(
   defineProps<{
-    title: string,
+    title: string
     description?: string
     time: number
   }>(),
@@ -17,7 +16,7 @@ withDefaults(
 
 <template>
   <div class="flex items-start w-full border-b">
-    <span class=" text-h4 font-bold text-blue-700">{{ title }}</span>
+    <span class="text-h4 font-bold text-blue-700">{{ title }}</span>
   </div>
   <div class="flex items-center justify-between w-full">
     <span class="text-md text-blue-700 font-medium">{{ description }}</span>

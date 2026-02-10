@@ -6,43 +6,70 @@
 
     <div class="p-2">
       <BoxInput :value="userInput" :locked="hints" />
-
     </div>
 
     <div class="p-2 flex gap-2">
-      <span v-for="i in MAX_ATTEMPTS" :key="i" class="w-3 h-3 rounded-full border transition-all" :class="i <= (MAX_ATTEMPTS - attempts)
-        ? 'bg-red-500 border-red-500'
-        : 'border-red-400'
-        " />
+      <span
+        v-for="i in MAX_ATTEMPTS"
+        :key="i"
+        class="w-3 h-3 rounded-full border transition-all"
+        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'"
+      />
     </div>
 
     <div class="p-2 flex flex-col items-center gap-2">
-      <div v-for="(s, i) in submissions" :key="i" class="text-lg font-medium" :class="s.correct
-        ? 'text-green-600'
-        : 'line-through text-gray-400'
-        ">
+      <div
+        v-for="(s, i) in submissions"
+        :key="i"
+        class="text-lg font-medium"
+        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'"
+      >
         {{ s.value }}
       </div>
     </div>
 
     <div class="flex gap-2 p-2">
-      <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
-        :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
+      <CharacterKey
+        v-for="{ c, i } in answerChars"
+        :key="`${c}-${i}`"
+        :char="c"
+        :disabled="isCharDisabled(c) || !isPlaying"
+        @input="onCharInput"
+      />
     </div>
 
     <div class="flex gap-2 p-2">
-      <UiButton class="flex items-center p-4 rounded-sm" color="error" @click="deleteChar" :disabled="!isPlaying">
+      <UiButton
+        class="flex items-center p-4 rounded-sm"
+        color="error"
+        @click="deleteChar"
+        :disabled="!isPlaying"
+      >
         <span>Delete</span>
       </UiButton>
-      <UiButton class="flex items-center p-4 rounded-sm" @click="submitAnswer" :disabled="!isPlaying">
+      <UiButton
+        class="flex items-center p-4 rounded-sm"
+        @click="submitAnswer"
+        :disabled="!isPlaying"
+      >
         <span>Submit</span>
       </UiButton>
 
-      <UiButton v-if="isLose" color="error" class="flex items-center p-4 rounded-sm" @click="restartGame">
+      <UiButton
+        v-if="isLose"
+        color="error"
+        class="flex items-center p-4 rounded-sm"
+        @click="restartGame"
+      >
         <span>Restart</span>
       </UiButton>
 
-      <UiButton v-if="isWin" color="success" class="flex items-center p-4 rounded-sm" @click="continueGame">
+      <UiButton
+        v-if="isWin"
+        color="success"
+        class="flex items-center p-4 rounded-sm"
+        @click="continueGame"
+      >
         <span>Continue</span>
       </UiButton>
     </div>
@@ -89,26 +116,20 @@ onMounted(async () => {
   userInput.value = Array(answer.value.length).fill(null)
 })
 
-
 const displayInput = computed(() =>
-  userInput.value
-    .map((c, i) => hints.value[i] ?? c ?? '')
-    .join('')
+  userInput.value.map((c, i) => hints.value[i] ?? c ?? '').join(''),
 )
 
 const answerChars = computed(() => {
   const realChars = answer.value.split('')
   const exclude = new Set(realChars)
 
-  const junkChars = Array.from({ length: JUNK_LETTERS }, () =>
-    getRandomLetter(exclude)
-  )
+  const junkChars = Array.from({ length: JUNK_LETTERS }, () => getRandomLetter(exclude))
 
   const allChars = shuffle([...realChars, ...junkChars])
 
   return allChars.map((c, i) => ({ c, i }))
 })
-
 
 function onCharInput(char: string) {
   for (let i = 0; i < userInput.value.length; i++) {
@@ -120,11 +141,11 @@ function onCharInput(char: string) {
 }
 
 function countCharInAnswer(char: string) {
-  return answer.value.split('').filter(c => c === char).length
+  return answer.value.split('').filter((c) => c === char).length
 }
 
 function countCharUsed(char: string) {
-  return displayInput.value.split('').filter(c => c === char).length
+  return displayInput.value.split('').filter((c) => c === char).length
 }
 
 function isCharDisabled(char: string) {
@@ -171,7 +192,6 @@ function submitAnswer() {
     submissions.value.push({ value: answer.value, correct: true })
   }
 
-
   // reveal ONE random hint
   const candidates = []
   for (let i = 0; i < answer.value.length; i++) {
@@ -179,7 +199,6 @@ function submitAnswer() {
       candidates.push(i)
     }
   }
-
 
   if (candidates.length) {
     const index = candidates[Math.floor(Math.random() * candidates.length)]
@@ -201,9 +220,7 @@ function submitAnswer() {
 
 function getRandomLetter(exclude: Set<string>): string {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-  const available = alphabet
-    .split('')
-    .filter(c => !exclude.has(c))
+  const available = alphabet.split('').filter((c) => !exclude.has(c))
 
   // safety fallback
   if (available.length === 0) {
@@ -230,5 +247,4 @@ function continueGame() {
   restartGame()
   // optionally refetch data here instead
 }
-
 </script>

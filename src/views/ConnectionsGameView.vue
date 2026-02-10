@@ -4,35 +4,60 @@
       <UiLabel label="Connections game"></UiLabel>
     </div>
     <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
-      <ConnectionsCard v-for="group in solvedGroups" :key="group.id" :label="group.label" state="solved"
-        :color="categoryColorMap[group.id]" :clickable="false" />
+      <ConnectionsCard
+        v-for="group in solvedGroups"
+        :key="group.id"
+        :label="group.label"
+        state="solved"
+        :color="categoryColorMap[group.id]"
+        :clickable="false"
+      />
     </div>
 
     <div class="p-2">
       <UiLabel label="Create a group of four"></UiLabel>
     </div>
     <div class="grid grid-cols-4 gap-2">
-      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
+      <ConnectionsCard
+        v-for="item in items"
+        :key="item.label"
+        :label="item.label"
+        :state="item.state"
+        :color="categoryColorMap[item.category]"
+        :clickable="item.state !== 'solved'"
+        @click="toggleItem(item)"
+      />
     </div>
     <!--Event message for user feedback-->
     <div class="p-2">
-      <UiLabel v-if="wrongCount !== null && !(win || lose)"
-        :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-      <UiLabel v-if="solvedNewGroup !== null && !(win || lose)"
-        :label="`You found a new group: ${solvedNewGroup.label}`" />
+      <UiLabel
+        v-if="wrongCount !== null && !(win || lose)"
+        :label="`Wrong, you are ${wrongCount} away to form a correct group`"
+      />
+      <UiLabel
+        v-if="solvedNewGroup !== null && !(win || lose)"
+        :label="`You found a new group: ${solvedNewGroup.label}`"
+      />
       <UiLabel v-if="win" :label="`You win`" />
       <UiLabel v-if="lose" :label="`you lose`" />
     </div>
     <!-- Control Buttons -->
     <div class="flex p-2 gap-2">
-      <UiButton class="p-4 flex items-center rounded-sm" :disabled="selected.length !== 4 || win || lose"
-        @click="submitSelection">
+      <UiButton
+        class="p-4 flex items-center rounded-sm"
+        :disabled="selected.length !== 4 || win || lose"
+        @click="submitSelection"
+      >
         <span>Submit</span>
       </UiButton>
 
       <!--Hidden, if lose show restart, if win show continue-->
-      <UiButton class="p-4 flex items-center rounded-sm" v-if="lose" @click="restartGame" :color="'error'">
+      <UiButton
+        class="p-4 flex items-center rounded-sm"
+        v-if="lose"
+        @click="restartGame"
+        :color="'error'"
+      >
         <span>Restart</span>
       </UiButton>
       <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
@@ -109,7 +134,7 @@ function shuffle<T>(array: T[]): T[] {
   const result = [...array]
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-      ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
+    ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
   }
   return result
 }
@@ -117,14 +142,13 @@ function shuffle<T>(array: T[]): T[] {
 function countAway(items: Item[]) {
   const freq: Record<string, number> = {}
 
-  items.forEach(item => {
+  items.forEach((item) => {
     freq[item.category] = (freq[item.category] || 0) + 1
   })
 
   const maxSame = Math.max(...Object.values(freq))
   return 4 - maxSame
 }
-
 
 function colorFromCategory(id: string) {
   let hash = 0
@@ -135,31 +159,27 @@ function colorFromCategory(id: string) {
 }
 
 function assignCategoryColors(categories: { id: string }[]) {
-
-  categories.forEach((cat, index) => {
+  categories.forEach((cat, _) => {
     categoryColorMap.value[cat.id] = colorFromCategory(cat.id)
   })
 }
 
-import gameData from "@/assets/gameData/connection_game.json"
+import gameData from '@/assets/gameData/connection_game.json'
 onMounted(async () => {
-  const data = gameData;
+  const data = gameData
 
   categories.value = data.category
 
   assignCategoryColors(data.category)
 
-
-  categoryLabelMap.value = Object.fromEntries(
-    data.category.map((c: any) => [c.id, c.label])
-  )
+  categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
 
   items.value = shuffle(
     data.items.map((item: any) => ({
       label: item.label,
       category: item.category,
-      state: 'idle'
-    }))
+      state: 'idle',
+    })),
   )
 })
 
@@ -169,7 +189,7 @@ function toggleItem(item: Item) {
 
   if (item.state === 'selected') {
     item.state = 'idle'
-    selected.value = selected.value.filter(i => i !== item)
+    selected.value = selected.value.filter((i) => i !== item)
     return
   }
 
@@ -187,16 +207,14 @@ function submitSelection() {
   wrongCount.value = null
 
   const categoryId = selected.value[0]!.category
-  const isMatch = selected.value.every(
-    item => item.category === categoryId
-  )
+  const isMatch = selected.value.every((item) => item.category === categoryId)
 
   if (!isMatch) {
     attemptsLeft.value--
 
     wrongCount.value = countAway(selected.value)
 
-    selected.value.forEach(i => (i.state = 'idle'))
+    selected.value.forEach((i) => (i.state = 'idle'))
     selected.value = []
 
     if (attemptsLeft.value <= 0) {
@@ -208,19 +226,19 @@ function submitSelection() {
   }
 
   // correct group
-  selected.value.forEach(item => {
+  selected.value.forEach((item) => {
     item.state = 'solved'
   })
 
   solvedGroups.value.push({
     id: categoryId,
     label: categoryLabelMap.value[categoryId]!,
-    color: categoryColorMap.value[categoryId]!
+    color: categoryColorMap.value[categoryId]!,
   })
 
   solvedNewGroup.value = {
     id: categoryId,
-    label: categoryLabelMap.value[categoryId]!
+    label: categoryLabelMap.value[categoryId]!,
   }
 
   selected.value = []
@@ -232,22 +250,20 @@ function submitSelection() {
 }
 
 function revealAllGroups() {
-  const solvedCategoryIds = new Set(
-    solvedGroups.value.map(g => g.id)
-  )
+  const solvedCategoryIds = new Set(solvedGroups.value.map((g) => g.id))
 
   // mark all items as solved
-  items.value.forEach(item => {
+  items.value.forEach((item) => {
     item.state = 'solved'
   })
 
   // add missing groups to solvedGroups
-  categories.value.forEach(cat => {
+  categories.value.forEach((cat) => {
     if (!solvedCategoryIds.has(cat.id)) {
       solvedGroups.value.push({
         id: cat.id,
         label: categoryLabelMap.value[cat.id]!,
-        color: categoryColorMap.value[cat.id]!
+        color: categoryColorMap.value[cat.id]!,
       })
     }
   })
@@ -262,8 +278,7 @@ function restartGame() {
   solvedGroups.value = []
   selected.value = []
 
-  items.value.forEach(item => (item.state = 'idle'))
+  items.value.forEach((item) => (item.state = 'idle'))
   items.value = shuffle(items.value)
 }
-
 </script>

@@ -25,16 +25,12 @@ const customClass = computed(() => {
     }
   } else {
     // When in source pool
-    classes.push('bg-gray-50 px-3 py-1 border rounded text-center text-body-sm font-medium  min-w-[96px] md:min-w-[128px]')
+    classes.push(
+      'bg-gray-50 px-3 py-1 border rounded text-center text-body-sm font-medium  min-w-[96px] md:min-w-[128px]',
+    )
   }
 
   return classes.join(' ')
-})
-
-// Normalize checked value
-const normalizedChecked = computed(() => {
-  if (props.checked === undefined) return null
-  return props.checked
 })
 </script>
 

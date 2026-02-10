@@ -15,9 +15,12 @@ export const useSessionStore = defineStore('session', () => {
 
   function persistGuest(session: GuestSession | null) {
     guest.value = session
-    session
-      ? localStorage.setItem('guest_session', JSON.stringify(session))
-      : localStorage.removeItem('guest_session')
+
+    if (session) {
+      localStorage.setItem('guest_session', JSON.stringify(session))
+    } else {
+      localStorage.removeItem('guest_session')
+    }
   }
 
   function ensureAuth() {
@@ -31,10 +34,7 @@ export const useSessionStore = defineStore('session', () => {
 
   function handleApiFailure(res: any) {
     if (!res || res.success === false || res.error) {
-      const msg =
-        res?.message ??
-        res?.error?.details ??
-        'Unexpected API error'
+      const msg = res?.message ?? res?.error?.details ?? 'Unexpected API error'
       const err = new Error(msg)
       ;(err as any).apiError = res
       throw err
@@ -46,11 +46,13 @@ export const useSessionStore = defineStore('session', () => {
    * ----------------------------- */
 
   async function createGuestSession() {
-    const res = await post<ApiResponse<{
-      guestId: string
-      accessToken: string
-      expiresAt: string
-    }>>('/api/v1/guest/session')
+    const res = await post<
+      ApiResponse<{
+        guestId: string
+        accessToken: string
+        expiresAt: string
+      }>
+    >('/api/v1/guest/session')
 
     handleApiFailure(res)
 
@@ -100,11 +102,7 @@ export const useSessionStore = defineStore('session', () => {
     game.value.state = 'playing'
   }
 
-  async function submitScore(
-    score: number,
-    answers: any[] = [],
-    timeMs = 0,
-  ) {
+  async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
     if (!game.value?.sessionId) {
       throw new Error('No active game session')
     }
