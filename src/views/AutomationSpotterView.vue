@@ -12,6 +12,10 @@ import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import introData from '@/assets/gameData/intro.json'
+import { useSessionStore } from '@/stores/session'
+import { MINIGAME_IDS } from '@/utils/constants'
+
+const session = useSessionStore()
 
 const allCards = ref<DragCard[]>([])
 const sourceCards = ref<DragCard[]>([])
@@ -44,7 +48,7 @@ const hasLost = computed(() => {
 })
 
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'automationSpotter'; score: number }): void
+  (e: 'cleared', payload: { game: 'automation-spotter'; score: number }): void
 }>()
 
 function onMoved(ids: number[]) {
@@ -77,14 +81,17 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
-    loadLevel()
   } catch (err) {
     console.error('Failed to load level', err)
   }
 }
 
-function startGame() {
+async function startGame() {
   showIntro.value = false
+
+  await session.launchGame(MINIGAME_IDS.automationSpotter)
+
+  loadLevel()
 }
 
 onMounted(() => {
@@ -145,11 +152,23 @@ function checkAnswers() {
 }
 
 async function finishGame() {
+  const score = isGameOver.value ? 0 : 100
 
-  emit('cleared', {
-    game: 'automationSpotter',
-    score: isGameOver.value ? 0 : 100,
-  })
+  try {
+    await session.submitScore(
+      score,
+      allCards.value.map((c) => ({
+        id: c.id,
+        answer: checkedMap.value[c.id],
+      })),
+      MAX_TIME - time.value,
+    )
+  } finally {
+    emit('cleared', {
+      game: 'automation-spotter',
+      score,
+    })
+  }
 }
 
 watch(isGameOver, (over) => {

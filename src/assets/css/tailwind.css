@@ -266,6 +266,26 @@
   .shadow-flat-lg {
     --tw-shadow: 0 8px 0 var(--tw-shadow-color);
   }
+
+  .text-shadow-flat-sm {
+    text-shadow: 0 2px 0 var(--btn-accent);
+  }
+
+  .text-shadow-flat-md {
+    text-shadow: 0 4px 0 var(--btn-accent);
+  }
+
+  .text-shadow-flat-lg {
+    text-shadow: 0 8px 0 var(--btn-accent);
+  }
+
+    .text-stroke-sm {
+    -webkit-text-stroke: 1px var(--btn-accent);
+  }
+
+  .text-stroke-md {
+    -webkit-text-stroke: 2px var(--btn-accent);
+  }
 }
 
 

@@ -12,6 +12,10 @@ import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import introData from '@/assets/gameData/intro.json'
+import { useSessionStore } from '@/stores/session'
+import { MINIGAME_IDS } from '@/utils/constants'
+
+const session = useSessionStore()
 
 // Timer
 const MAX_TIME = 180 //second
@@ -22,8 +26,12 @@ const isLocked = ref(false)
 
 const showIntro = ref(true)
 
-function startGame() {
+async function startGame() {
   showIntro.value = false
+
+  await session.launchGame(MINIGAME_IDS.dragAndDrop)
+
+  loadLevel()
 }
 
 onMounted(() => {
@@ -35,15 +43,33 @@ onUnmounted(() => {
 })
 
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'dragAndDropPrompt'; score: number }): void
+  (e: 'cleared', payload: { game: 'drag-and-drop'; score: number }): void
 }>()
 
 async function finishGame() {
-  emit('cleared', {
-    game: 'dragAndDropPrompt',
-    score: isGameOver.value ? 0 : 100,
-  })
+  const score = isGameOver.value ? 0 : 100
+
+  const answers = Object.entries(slotCorrectness.value).map(
+    ([slotId, correct]) => ({
+      slotId: Number(slotId),
+      correct,
+    })
+  )
+
+  try {
+    await session.submitScore(
+      score,
+      answers,
+      MAX_TIME - time.value,
+    )
+  } finally {
+    emit('cleared', {
+      game: 'drag-and-drop',
+      score,
+    })
+  }
 }
+
 
 const { get, loading, error } = useApi()
 const gameData = ref<{
@@ -72,7 +98,6 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
-    loadLevel()
   } catch (err) {
     console.error('Failed to load level', err)
   }

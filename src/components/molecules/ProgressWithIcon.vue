@@ -13,7 +13,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
 
 <template>
   <div class="flex flex-col gap-2">
-    <p class="text-[12px] font-medium leading-4 text-[#1E1E1E]">
+    <p class="text-[12px] font-bold leading-4 text-blue-700">
       You got {{ current }} out of {{ target }} points
     </p>
 
@@ -30,8 +30,8 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
       ]" />
 
       <!-- Label -->
-      <span class="text-[12px] leading-4.5 text-black/80 whitespace-nowrap">
-        {{ current }}/{{ target }}
+      <span class="text-body-sm  text-blue-700 font-semibold whitespace-nowrap">
+        {{ current }} / {{ target }}
       </span>
     </div>
   </div>

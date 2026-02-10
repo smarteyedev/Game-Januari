@@ -11,6 +11,10 @@ import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
 import introData from '@/assets/gameData/intro.json'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
+import { useSessionStore } from '@/stores/session'
+import { MINIGAME_IDS } from '@/utils/constants'
+
+const session = useSessionStore()
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
@@ -39,7 +43,7 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
-    cards.value = loadLevel()
+
   } catch (err) {
     console.error('Failed to load level', err)
   }
@@ -118,14 +122,30 @@ function flipCard(card: MemoryCard) {
 }
 
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'memoryGame'; score: number }): void
+  (e: 'cleared', payload: { game: 'memory-game'; score: number }): void
 }>()
 
 async function finishGame() {
-  emit('cleared', {
-    game: 'memoryGame',
-    score: allMatched.value ? 100 : 0,
-  })
+  const score = allMatched.value ? 100 : 0
+
+  const answers = cards.value.map((card) => ({
+    cardId: card.id,
+    pairId: card.pairId,
+    matched: card.matched,
+  }))
+
+  try {
+    await session.submitScore(
+      score,
+      answers,
+      MAX_TIME - time.value,
+    )
+  } finally {
+    emit('cleared', {
+      game: 'memory-game',
+      score,
+    })
+  }
 }
 
 const audio = new Audio(clickSound)
@@ -149,8 +169,11 @@ function retryGame() {
 
 const showIntro = ref(true)
 
-function startGame() {
+async function startGame() {
   showIntro.value = false
+  await session.launchGame(MINIGAME_IDS.memory)
+
+  cards.value = loadLevel()
 }
 
 onMounted(() => {

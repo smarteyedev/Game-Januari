@@ -59,9 +59,25 @@ export interface GameIntroMapping {
   memoryGame: IntroData
 }
 
+export type GameState =
+  | 'idle'
+  | 'launching'
+  | 'playing'
+  | 'submitting'
+  | 'finished'
+  | 'error'
+
+export interface GameSession {
+  gameId: string
+  sessionId?: string
+  minigameId?: string
+  state: GameState
+}
+
 export interface GuestSession {
   guestId: string
   accessToken: string
   expiresAt: string
   gameId: string
+  sessionId?: string
 }
