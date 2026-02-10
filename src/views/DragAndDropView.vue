@@ -10,6 +10,8 @@ import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
+import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
+import introData from '@/assets/gameData/intro.json'
 
 // Timer
 const MAX_TIME = 180 //second
@@ -17,6 +19,12 @@ const { time, isGameOver, start, stop } = useTimer(MAX_TIME)
 const slotCorrectness = ref<Record<number, boolean | null>>({})
 const isLocked = ref(false)
 //  Words and blanks
+
+const showIntro = ref(true)
+
+function startGame() {
+  showIntro.value = false
+}
 
 onMounted(() => {
   fetchLevel()
@@ -265,7 +273,7 @@ function playClick() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 w-full max-w-full p-8">
+  <div class="flex flex-col items-center gap-4 w-full h-full p-2">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>
@@ -275,34 +283,39 @@ function playClick() {
       <button @click="fetchLevel">Retry</button>
     </div>
 
-    <template v-else>
-      <GameHeader title="Drag and Drop Prompt"
-        description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
-      </GameHeader>
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[1]"
+      @start="startGame" />
 
-      <!-- Sentence -->
-      <div class="border rounded-xl p-4 text-base text-justify">
-        <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
-          <span v-if="part.type === 'text'">
-            {{ part.value }}
-          </span>
+    <template v-if="!showIntro">
+      <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+        <GameHeader title="Drag and Drop Prompt"
+          description="Isilah bagian kosong prompt dibawah ini dengan kata yang sesuai" :time="time">
+        </GameHeader>
 
-          <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-            :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
-        </template>
+        <!-- Sentence -->
+        <div class="border rounded-xl p-4 text-base text-justify">
+          <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
+            <span v-if="part.type === 'text'">
+              {{ part.value }}
+            </span>
+
+            <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+              :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
+          </template>
+        </div>
+
+        <!-- Word pool -->
+        <div class="flex flex-wrap gap-3 justify-center">
+          <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
+            :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+        </div>
+
+        <!-- Actions -->
+        <GameFooter #footer class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
+          :target="board.filter((part) => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
+          :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
+        </GameFooter>
       </div>
-
-      <!-- Word pool -->
-      <div class="flex flex-wrap gap-3 justify-center">
-        <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-          :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
-      </div>
-
-      <!-- Actions -->
-      <GameFooter #footer class="mt-8" :isGameOver="isGameOver" :current="correctCount ?? 0"
-        :target="board.filter((part) => part.type === 'slot').length" @check="checkAnswers" :show-progress="true"
-        :has-lost="hasLost" :is-checked="isChecked" :is-win="isWin" @cleared="finishGame()" @retry="retryGame">
-      </GameFooter>
     </template>
   </div>
 </template>

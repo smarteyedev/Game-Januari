@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const base =
-    'inline-flex items-center justify-center font-black tracking-[-0.01em] transition-all duration-150 select-none rounded-3xl shadow-xl'
+    'inline-flex items-center justify-center font-black tracking-[-0.01em] transition-all duration-150 select-none rounded-3xl shadow-xl cursor-pointer'
 
 const baseHoverEffects =
     'hover:-translate-y-[2px] hover:shadow-flat-md active:translate-y-[6px] active:shadow-none'

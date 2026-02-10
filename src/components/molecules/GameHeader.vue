@@ -16,7 +16,7 @@ withDefaults(
 </script>
 
 <template>
-  <div class="flex items-start w-full">
+  <div class="flex items-start w-full border-b">
     <span class=" text-h4 font-bold text-blue-700">{{ title }}</span>
   </div>
   <div class="flex items-center justify-between w-full">

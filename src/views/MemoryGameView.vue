@@ -9,6 +9,8 @@ import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import useGameSession from '@/composables/useGameSession'
 import { UiLoading } from '@/components/atoms/loading'
+import introData from '@/assets/gameData/intro.json'
+import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
@@ -145,13 +147,19 @@ function retryGame() {
   stop()
 }
 
+const showIntro = ref(true)
+
+function startGame() {
+  showIntro.value = false
+}
+
 onMounted(() => {
   fetchLevel()
 })
 </script>
 
 <template>
-  <div class="gap-4 w-full max-w-full p-8">
+  <div class="gap-4 w-full h-full p-2">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>
@@ -161,16 +169,21 @@ onMounted(() => {
       <button @click="fetchLevel">Retry</button>
     </div>
 
-    <template v-else>
-      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[2]"
+      @start="startGame" />
 
-      <div class="flex justify-center">
+    <template v-if="!showIntro">
+      <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+        <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+
+
         <MemoryBoard :cards="cards" @flip="flipCard" />
-      </div>
 
-      <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
-      </GameFooter>
+
+        <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+          :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
+        </GameFooter>
+      </div>
     </template>
   </div>
 </template>
