@@ -17,10 +17,15 @@ export interface DragCard {
   matched?: boolean
 }
 
+export interface Keypoint {
+    icon_name?: string,
+    description: string
+}
+
 export interface IntroData {
   title: string
   description: string
-  key_points: string[]
+  key_points: Keypoint[]
 }
 
 // zone id is boolean because there is only two zone, its save memory.

@@ -1,17 +1,12 @@
 <template>
-  <div
-    :draggable="draggable && !disabled"
-    @dragstart="handleDragStart"
-    @click="handleClick"
-    :class="[
-      baseClass,
-      customClass,
-      {
-        'cursor-grab': draggable && !disabled,
-        'cursor-default': disabled,
-      },
-    ]"
-  >
+  <div :draggable="draggable && !disabled" @dragstart="handleDragStart" @click="handleClick" :class="[
+    baseClass,
+    customClass,
+    {
+      'cursor-grab': draggable && !disabled,
+      'cursor-default': disabled,
+    },
+  ]">
     <slot>
       {{ label }}
     </slot>
@@ -24,7 +19,6 @@ const props = withDefaults(
     label?: string
     draggable?: boolean
     disabled?: boolean
-    // Remove styling props
     customClass?: string // Parent can pass any Tailwind/utility classes
   }>(),
   {
