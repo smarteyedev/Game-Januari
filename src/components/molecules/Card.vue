@@ -1,10 +1,15 @@
 <template>
-  <div :draggable="draggable && !disabled" @dragstart="handleDragStart" @click="handleClick" :class="[
+  <div
+:draggable="draggable && !disabled"
+@dragstart="handleDragStart"
+@click="handleClick"
+:class="[
     baseClass,
     customClass,
     {
       'cursor-grab': draggable && !disabled,
       'cursor-default': disabled,
+      'w-full h-full flex items-center justify-center': centered,
     },
   ]">
     <slot>
@@ -20,11 +25,13 @@ const props = withDefaults(
     draggable?: boolean
     disabled?: boolean
     customClass?: string // Parent can pass any Tailwind/utility classes
+    centered?: boolean // When true, centers content (for ContentCard use case)
   }>(),
   {
     draggable: false,
     disabled: false,
     customClass: '',
+    centered: false,
   },
 )
 

@@ -75,7 +75,10 @@ const textEffects = computed(() => {
 </script>
 
 <template>
-  <button :class="classes" :disabled="props.disabled" :aria-disabled="props.disabled">
+  <button
+:class="classes"
+:disabled="props.disabled"
+:aria-disabled="props.disabled">
     <span :class="textEffects">
       {{ props.text || 'Button Label' }}
     </span>

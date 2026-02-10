@@ -18,7 +18,9 @@
       @change="handleChange"
     />
 
-    <slot name="label" v-bind="{ label }">
+    <slot
+name="label"
+v-bind="{ label }">
       <span class="ui-radio__label">{{ label }}</span>
     </slot>
   </label>

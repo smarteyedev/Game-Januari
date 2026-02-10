@@ -30,13 +30,18 @@
         filterUnits="userSpaceOnUse"
         color-interpolation-filters="sRGB"
       >
-        <feFlood flood-opacity="0" result="BackgroundImageFix" />
+        <feFlood
+flood-opacity="0"
+result="BackgroundImageFix" />
 
         <feColorMatrix
           type="matrix"
           values="0 0 0 0 0 0 0 0 0 0.376471 0 0 0 0 0.509804 0 0 0 1 0"
         />
-        <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_4301_18935" />
+        <feBlend
+mode="normal"
+in2="BackgroundImageFix"
+result="effect1_dropShadow_4301_18935" />
         <feBlend
           mode="normal"
           in="SourceGraphic"

@@ -6,19 +6,28 @@
       <thead>
         <tr>
           <th class="p-3"></th>
-          <th v-for="o in survey?.options" :key="o.value" class="p-3 text-center">
+          <th
+v-for="o in survey?.options"
+:key="o.value"
+class="p-3 text-center">
             <UiLabel :label="o.label" />
           </th>
         </tr>
       </thead>
 
       <tbody>
-        <tr v-for="q in survey?.questions" :key="q.id" class="border-t">
+        <tr
+v-for="q in survey?.questions"
+:key="q.id"
+class="border-t">
           <td class="p-3 text-left whitespace-nowrap">
             <UiLabel :label="q.label" />
           </td>
 
-          <td v-for="o in survey?.options" :key="o.value" class="p-3 text-center">
+          <td
+v-for="o in survey?.options"
+:key="o.value"
+class="p-3 text-center">
             <UiRadio
               v-model="answers[q.id]"
               :value="o.value"
@@ -31,7 +40,9 @@
     </table>
 
     <div class="flex gap-2 p-4">
-      <UiButton @click="submit" class="flex items-center p-2 rounded-sm">Submit</UiButton>
+      <UiButton
+@click="submit"
+class="flex items-center p-2 rounded-sm">Submit</UiButton>
       <UiButton
         @click="restart"
         class="flex items-center p-2 rounded-sm"

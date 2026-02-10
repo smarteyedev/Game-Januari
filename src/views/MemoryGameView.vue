@@ -7,7 +7,7 @@ import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
-import { UiLoading } from '@/components/atoms/loading'
+import GameState from '@/components/molecules/GameState.vue'
 import introData from '@/assets/gameData/intro.json'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import { useSessionStore } from '@/stores/session'
@@ -175,29 +175,41 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="gap-4 w-full h-full p-2">
-    <div v-if="loading">
-      <UiLoading class="grid place-items-center" />
-    </div>
-
-    <div v-else-if="error">
-      <p>Failed to load game</p>
-      <button @click="fetchLevel">Retry</button>
-    </div>
-
-    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[2]"
+  <GameState
+:loading="loading"
+:error="error"
+:retryFn="fetchLevel">
+    <GameIntroModal
+v-if="!loading"
+v-model="showIntro"
+title="Automation Spotter"
+:introData="introData.data[2]"
       @start="startGame" />
 
     <template v-if="!showIntro">
-      <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
-        <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+      <div class="p-6">
+        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+          <GameHeader
+title="Memory Game"
+description="Pasangkan kartu dengan deskripsi yang benar!"
+:time="time" />
 
-        <MemoryBoard :cards="cards" @flip="flipCard" />
+          <MemoryBoard
+:cards="cards"
+@flip="flipCard" />
 
-        <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-          :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
-        </GameFooter>
+          <GameFooter
+#footer
+:hide-submit="true"
+:is-win="allMatched"
+:has-lost="gameOver && !allMatched"
+            :is-checked="allMatched"
+@cleared="finishGame"
+@retry="retryGame"
+class="mt-8">
+          </GameFooter>
+        </div>
       </div>
     </template>
-  </div>
+  </GameState>
 </template>

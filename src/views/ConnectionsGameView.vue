@@ -38,8 +38,12 @@
         v-if="solvedNewGroup !== null && !(win || lose)"
         :label="`You found a new group: ${solvedNewGroup.label}`"
       />
-      <UiLabel v-if="win" :label="`You win`" />
-      <UiLabel v-if="lose" :label="`you lose`" />
+      <UiLabel
+v-if="win"
+:label="`You win`" />
+      <UiLabel
+v-if="lose"
+:label="`you lose`" />
     </div>
     <!-- Control Buttons -->
     <div class="flex p-2 gap-2">
@@ -60,7 +64,10 @@
       >
         <span>Restart</span>
       </UiButton>
-      <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
+      <UiButton
+class="p-4 flex items-center rounded-sm"
+v-if="win"
+:color="'success'">
         <span>Continue</span>
       </UiButton>
     </div>

@@ -23,18 +23,28 @@ const showIcon = computed(() => !!props.iconName || hasIconSlot)
     <!-- prepend icon -->
     <template v-if="showIcon && props.iconPosition === 'start'">
       <slot name="icon">
-        <UiIcon v-if="props.iconName" :name="props.iconName" :width="props.iconWidth" :height="props.iconHeight"
+        <UiIcon
+v-if="props.iconName"
+:name="props.iconName"
+:width="props.iconWidth"
+:height="props.iconHeight"
           :color="props.iconColor" />
       </slot>
     </template>
 
-    <span v-if="!showIcon && props.bullet" class="bullet-list-item">{{ props.label }}</span>
+    <span
+v-if="!showIcon && props.bullet"
+class="bullet-list-item">{{ props.label }}</span>
     <span v-else>{{ props.label }}</span>
 
     <!-- append icon -->
     <template v-if="showIcon && props.iconPosition === 'end'">
       <slot name="icon">
-        <UiIcon v-if="props.iconName" :name="props.iconName" :width="props.iconWidth" :height="props.iconHeight"
+        <UiIcon
+v-if="props.iconName"
+:name="props.iconName"
+:width="props.iconWidth"
+:height="props.iconHeight"
           :color="props.iconColor" />
       </slot>
     </template>

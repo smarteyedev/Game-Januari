@@ -8,11 +8,11 @@ import useApi from '@/composables/useApi'
 import type { ApiResponse } from '@/types/types'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
-import { UiLoading } from '@/components/atoms/loading'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import introData from '@/assets/gameData/intro.json'
 import { useSessionStore } from '@/stores/session'
 import { MINIGAME_IDS } from '@/utils/constants'
+import GameState from '@/components/molecules/GameState.vue'
 
 const session = useSessionStore()
 
@@ -75,7 +75,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-      ;(err as any).apiError = res
+        ; (err as any).apiError = res
       throw err
     }
 
@@ -177,57 +177,24 @@ watch(isGameOver, (over) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 w-full h-full p-2">
-    <div v-if="loading">
-      <UiLoading class="grid place-items-center" />
-    </div>
-
-    <div v-else-if="error">
-      <p>Failed to load game</p>
-      <button @click="fetchLevel">Retry</button>
-    </div>
-
-    <GameIntroModal
-      v-if="!loading"
-      v-model="showIntro"
-      title="Automation Spotter"
-      :introData="introData.data[0]"
-      @start="startGame"
-    />
+  <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[0]"
+      @start="startGame" />
 
     <template v-if="!showIntro">
-      <div
-        class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl"
-      >
-        <GameHeader title="Automation Spotter" :description="question" :time="time" />
+      <div class="p-6">
+        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+          <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-        <TaskRow
-          v-model="sourceCards"
-          :checked-map="checkedMap"
-          :is-checked="isChecked"
-          :disabled="isChecked"
-          @moved="onMoved"
-        />
+          <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+            @moved="onMoved" />
 
-        <SpotZones
-          :zones="zones"
-          :checked-map="checkedMap"
-          :is-checked="isChecked"
-          @moved="onMoved"
-        />
+          <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-        <GameFooter
-          :current="matchedCount"
-          :target="allCards.length"
-          :is-checked="isChecked"
-          :has-lost="hasLost"
-          :is-win="isLevelWin"
-          :show-progress="true"
-          @check="checkAnswers"
-          @retry="loadLevel"
-          @cleared="finishGame"
-        />
+          <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+            :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
+        </div>
       </div>
     </template>
-  </div>
+  </GameState>
 </template>

@@ -1,9 +1,20 @@
 <template>
-  <div class="w-full h-full flex items-center justify-center">
+  <Card
+:centered="true"
+:customClass="customClass">
     <slot></slot>
-  </div>
+  </Card>
 </template>
 
 <script setup lang="ts">
-// This is a simple wrapper for content-only cards
+import Card from './Card.vue'
+
+withDefaults(
+  defineProps<{
+    customClass?: string
+  }>(),
+  {
+    customClass: '',
+  },
+)
 </script>

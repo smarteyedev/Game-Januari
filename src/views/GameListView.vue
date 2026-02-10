@@ -9,21 +9,33 @@
         <span class="text-h2">2026 - Febuari</span>
       </div>
       <div class="flex gap-4">
-        <RouterLink class="border px-8 text-h5" to="connections-game">
+        <RouterLink
+class="border px-8 text-h5"
+to="connections-game">
           Connections Game
         </RouterLink>
-        <RouterLink class="border px-8 text-h5" to="scrambles-game"> Scrambles Game </RouterLink>
-        <RouterLink class="border px-8 text-h5" to="matrix-game"> Matrix Game </RouterLink>
+        <RouterLink
+class="border px-8 text-h5"
+to="scrambles-game"> Scrambles Game </RouterLink>
+        <RouterLink
+class="border px-8 text-h5"
+to="matrix-game"> Matrix Game </RouterLink>
       </div>
       <div>
         <span class="text-h2">2026 - Januari</span>
       </div>
       <div class="flex gap-4">
-        <RouterLink class="border px-8 text-h5" to="automation-spotter">
+        <RouterLink
+class="border px-8 text-h5"
+to="automation-spotter">
           Automation Spotter
         </RouterLink>
-        <RouterLink class="border px-8 text-h5" to="drag-and-drop"> Drag and Drop </RouterLink>
-        <RouterLink class="border px-8 text-h5" to="memory-game"> Memory Game </RouterLink>
+        <RouterLink
+class="border px-8 text-h5"
+to="drag-and-drop"> Drag and Drop </RouterLink>
+        <RouterLink
+class="border px-8 text-h5"
+to="memory-game"> Memory Game </RouterLink>
       </div>
     </div>
   </div>
