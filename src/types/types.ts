@@ -56,8 +56,6 @@ export type ApiResponse<T> = {
 
 export type LevelButtonState = 'unlocked' | 'cleared' | 'locked'
 
-export type GameKey = 'automationSpotter' | 'dragAndDropPrompt' | 'memoryGame'
-
 export interface GameIntroMapping {
   automationSpotter: IntroData
   dragAndDropPrompt: IntroData

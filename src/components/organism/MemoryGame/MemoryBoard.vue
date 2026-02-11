@@ -9,18 +9,14 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div
-class="grid gap-4 p-4 justify-center"
-style="grid-template-columns: repeat(5, 160px)">
-    <MemoryCardItem
-      v-for="card in props.cards"
-      :key="card.id"
-      :content-type="card.contentType"
+  <div class="grid gap-4 p-4 justify-center
+         grid-cols-2
+         sm:grid-cols-3
+         md:grid-cols-4
+         lg:grid-cols-5">
+    <MemoryCardItem v-for="card in props.cards" :key="card.id" :content-type="card.contentType"
       :logo="card.contentType === 'svg' ? card.value : undefined"
-      :text="card.contentType === 'text' ? card.value : undefined"
-      :flipped="card.flipped || false"
-      :matched="card.matched || false"
-      @flip="() => emit('flip', card)"
-    />
+      :text="card.contentType === 'text' ? card.value : undefined" :flipped="card.flipped || false"
+      :matched="card.matched || false" @flip="() => emit('flip', card)" />
   </div>
 </template>

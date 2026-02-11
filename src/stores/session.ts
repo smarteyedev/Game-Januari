@@ -9,10 +9,8 @@ export const useSessionStore = defineStore('session', () => {
 
   const { post } = useApi()
 
-  /* -----------------------------
-   * Helpers
-   * ----------------------------- */
-
+  
+   // Helpers
   function persistGuest(session: GuestSession | null) {
     guest.value = session
 
@@ -41,10 +39,7 @@ export const useSessionStore = defineStore('session', () => {
     }
   }
 
-  /* -----------------------------
-   * Guest session
-   * ----------------------------- */
-
+  // Guest session
   async function createGuestSession() {
     const res = await post<
       ApiResponse<{
@@ -74,10 +69,7 @@ export const useSessionStore = defineStore('session', () => {
     game.value = null
   }
 
-  /* -----------------------------
-   * Game lifecycle
-   * ----------------------------- */
-
+  // Game lifecycle
   async function launchGame(minigameId: string) {
     if (!guest.value) throw new Error('No guest session')
 
@@ -121,10 +113,7 @@ export const useSessionStore = defineStore('session', () => {
     return res
   }
 
-  /* -----------------------------
-   * Derived state
-   * ----------------------------- */
-
+  // Derived state
   const isPlaying = computed(() => game.value?.state === 'playing')
 
   return {

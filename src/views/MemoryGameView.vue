@@ -175,38 +175,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <GameState
-:loading="loading"
-:error="error"
-:retryFn="fetchLevel">
-    <GameIntroModal
-v-if="!loading"
-v-model="showIntro"
-title="Automation Spotter"
-:introData="introData.data[2]"
+  <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[2]"
       @start="startGame" />
 
     <template v-if="!showIntro">
       <div class="p-6">
         <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
-          <GameHeader
-title="Memory Game"
-description="Pasangkan kartu dengan deskripsi yang benar!"
-:time="time" />
+          <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
-          <MemoryBoard
-:cards="cards"
-@flip="flipCard" />
+          <MemoryBoard :cards="cards" @flip="flipCard" />
 
-          <GameFooter
-#footer
-:hide-submit="true"
-:is-win="allMatched"
-:has-lost="gameOver && !allMatched"
-            :is-checked="allMatched"
-@cleared="finishGame"
-@retry="retryGame"
-class="mt-8">
+          <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
+            :is-checked="allMatched" @cleared="finishGame" @retry="retryGame">
           </GameFooter>
         </div>
       </div>
