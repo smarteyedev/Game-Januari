@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import useTimer from '@/composables/useTimer'
-import TaskRow from './TaskRow.vue'
-import SpotZones from './SpotZones.vue'
+import TaskRow from '@/components/organism/AutomationSpotter/TaskRow.vue'
+import SpotZones from '@/components/organism/AutomationSpotter/SpotZones.vue'
 import type { DragCard, Zone } from '@/types/types'
 import useApi from '@/composables/useApi'
 import type { ApiResponse } from '@/types/types'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
-import useGameSession from '@/composables/useGameSession'
-import { UiLoading } from '@/components/atoms/loading'
+import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
+import introData from '@/assets/gameData/intro.json'
+import { useSessionStore } from '@/stores/session'
+import { MINIGAME_IDS } from '@/utils/constants'
+import GameState from '@/components/molecules/GameState.vue'
+
+const session = useSessionStore()
 
 const allCards = ref<DragCard[]>([])
 const sourceCards = ref<DragCard[]>([])
@@ -32,6 +37,7 @@ const zones = ref<Zone[]>([
 const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
 const question = ref('')
+const showIntro = ref(true)
 
 const MAX_TIME = 180 //second
 const { time, isGameOver, start, stop } = useTimer(MAX_TIME, {})
@@ -41,7 +47,7 @@ const hasLost = computed(() => {
 })
 
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'automationSpotter'; score: number }): void
+  (e: 'cleared', payload: { game: 'automation-spotter'; score: number }): void
 }>()
 
 function onMoved(ids: number[]) {
@@ -74,15 +80,23 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
-    loadLevel()
   } catch (err) {
     console.error('Failed to load level', err)
   }
 }
 
+async function startGame() {
+  showIntro.value = false
+
+  await session.launchGame(MINIGAME_IDS.automationSpotter)
+
+  loadLevel()
+}
+
 onMounted(() => {
   fetchLevel()
 })
+
 onUnmounted(stop)
 
 function shuffle<T>(array: T[]): T[] {
@@ -137,11 +151,23 @@ function checkAnswers() {
 }
 
 async function finishGame() {
+  const score = isGameOver.value ? 0 : 100
 
-  emit('cleared', {
-    game: 'automationSpotter',
-    score: isGameOver.value ? 0 : 100,
-  })
+  try {
+    await session.submitScore(
+      score,
+      allCards.value.map((c) => ({
+        id: c.id,
+        answer: checkedMap.value[c.id],
+      })),
+      MAX_TIME - time.value,
+    )
+  } finally {
+    emit('cleared', {
+      game: 'automation-spotter',
+      score,
+    })
+  }
 }
 
 watch(isGameOver, (over) => {
@@ -151,26 +177,24 @@ watch(isGameOver, (over) => {
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4 w-full max-w-full">
-    <div v-if="loading">
-      <UiLoading class="grid place-items-center" />
-    </div>
+  <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[0]"
+      @start="startGame" />
 
-    <div v-else-if="error">
-      <p>Failed to load game</p>
-      <button @click="fetchLevel">Retry</button>
-    </div>
+    <template v-if="!showIntro">
+      <div class="p-6">
+        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+          <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-    <template v-else>
-      <GameHeader title="Automation Spotter" :description="question" :time="time" />
+          <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+            @moved="onMoved" />
 
-      <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
-        @moved="onMoved" />
+          <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-      <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
-
-      <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
-        :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
+          <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+            :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
+        </div>
+      </div>
     </template>
-  </div>
+  </GameState>
 </template>

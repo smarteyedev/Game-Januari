@@ -1,0 +1,32 @@
+{
+  "title": "Service Feedback Quiz",
+  "options": [
+    { "value": 5, "label": "Excellent" },
+    { "value": 4, "label": "Good" },
+    { "value": 3, "label": "Average" },
+    { "value": 2, "label": "Poor" },
+    { "value": 1, "label": "Very Poor" }
+  ],
+  "questions": [
+    {
+      "id": "staff",
+      "label": "Your interaction with our staff",
+      "correctAnswer": 5
+    },
+    {
+      "id": "cost",
+      "label": "The cost of delivery",
+      "correctAnswer": 4
+    },
+    {
+      "id": "options",
+      "label": "The delivery options offered",
+      "correctAnswer": 3
+    },
+    {
+      "id": "condition",
+      "label": "The condition of your package",
+      "correctAnswer": 5
+    }
+  ]
+}

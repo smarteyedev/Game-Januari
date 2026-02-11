@@ -4,7 +4,7 @@ import type { IIconProps } from '@/components/atoms/icon/types.ts'
 import { computed, toRefs } from 'vue'
 const props = defineProps<IIconProps>()
 
-const { width, height, size } = toRefs(props)
+const { width, height, size, color } = toRefs(props)
 
 const normalizedWidth = computed(() => {
   return width?.value ?? size?.value
@@ -21,5 +21,10 @@ defineExpose({
 </script>
 
 <template>
-  <Icon :icon="name" :width="normalizedWidth" :height="normalizedHeight" />
+  <Icon
+:icon="name"
+:width="normalizedWidth"
+:height="normalizedHeight"
+:color="color" />
+
 </template>

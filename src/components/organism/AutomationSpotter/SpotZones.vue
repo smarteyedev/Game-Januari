@@ -31,7 +31,7 @@ const emit = defineEmits<{
       :is-checked="isChecked"
       :disabled="isChecked"
       :className="
-        zone.id ? 'bg-green-100 flex-1 text-[#00A3B5]' : 'bg-red-100  flex-1 text-[#DA4A4A]'
+        zone.id ? 'bg-green-100 flex-1 text-blue-500' : 'bg-red-100  flex-1 text-[#DA4A4A]'
       "
       @moved="emit('moved', $event)"
     />

@@ -42,7 +42,7 @@ function updateModel(newVal: DragCard[]) {
     ]"
   >
     <p
-      class="text-xl md:text-3xl absolute inset-0 flex items-center justify-center font-bold pointer-events-none text-inherit px-2 text-center"
+      class="font-semibold text-[20px] absolute inset-0 flex items-center justify-center pointer-events-none px-2 text-center"
     >
       {{ text }}
     </p>

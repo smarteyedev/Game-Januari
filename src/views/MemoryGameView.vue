@@ -2,13 +2,18 @@
 import { ref, computed, onMounted } from 'vue'
 import useTimer from '@/composables/useTimer'
 import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
-import MemoryBoard from './MemoryBoard.vue'
+import MemoryBoard from '@/components/organism/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
-import useGameSession from '@/composables/useGameSession'
-import { UiLoading } from '@/components/atoms/loading'
+import GameState from '@/components/molecules/GameState.vue'
+import introData from '@/assets/gameData/intro.json'
+import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
+import { useSessionStore } from '@/stores/session'
+import { MINIGAME_IDS } from '@/utils/constants'
+
+const session = useSessionStore()
 
 function shuffle<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5)
@@ -37,7 +42,6 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
-    cards.value = loadLevel()
   } catch (err) {
     console.error('Failed to load level', err)
   }
@@ -58,7 +62,6 @@ function loadLevel(): MemoryCard[] {
 
 const cards = ref<MemoryCard[]>([])
 
-// GAME STATE
 let firstCard: MemoryCard | null = null
 let lock = false
 
@@ -116,14 +119,26 @@ function flipCard(card: MemoryCard) {
 }
 
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'memoryGame'; score: number }): void
+  (e: 'cleared', payload: { game: 'memory-game'; score: number }): void
 }>()
 
 async function finishGame() {
-  emit('cleared', {
-    game: 'memoryGame',
-    score: allMatched.value ? 100 : 0,
-  })
+  const score = allMatched.value ? 100 : 0
+
+  const answers = cards.value.map((card) => ({
+    cardId: card.id,
+    pairId: card.pairId,
+    matched: card.matched,
+  }))
+
+  try {
+    await session.submitScore(score, answers, MAX_TIME - time.value)
+  } finally {
+    emit('cleared', {
+      game: 'memory-game',
+      score,
+    })
+  }
 }
 
 const audio = new Audio(clickSound)
@@ -145,32 +160,56 @@ function retryGame() {
   stop()
 }
 
+const showIntro = ref(true)
+
+async function startGame() {
+  showIntro.value = false
+  await session.launchGame(MINIGAME_IDS.memory)
+
+  cards.value = loadLevel()
+}
+
 onMounted(() => {
   fetchLevel()
 })
 </script>
 
 <template>
-  <div class="gap-4 w-full max-w-full">
-    <div v-if="loading">
-      <UiLoading class="grid place-items-center" />
-    </div>
+  <GameState
+:loading="loading"
+:error="error"
+:retryFn="fetchLevel">
+    <GameIntroModal
+v-if="!loading"
+v-model="showIntro"
+title="Automation Spotter"
+:introData="introData.data[2]"
+      @start="startGame" />
 
-    <div v-else-if="error">
-      <p>Failed to load game</p>
-      <button @click="fetchLevel">Retry</button>
-    </div>
+    <template v-if="!showIntro">
+      <div class="p-6">
+        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+          <GameHeader
+title="Memory Game"
+description="Pasangkan kartu dengan deskripsi yang benar!"
+:time="time" />
 
-    <template v-else>
-      <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+          <MemoryBoard
+:cards="cards"
+@flip="flipCard" />
 
-      <div class="flex justify-center">
-        <MemoryBoard :cards="cards" @flip="flipCard" />
+          <GameFooter
+#footer
+:hide-submit="true"
+:is-win="allMatched"
+:has-lost="gameOver && !allMatched"
+            :is-checked="allMatched"
+@cleared="finishGame"
+@retry="retryGame"
+class="mt-8">
+          </GameFooter>
+        </div>
       </div>
-
-      <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-        :is-checked="allMatched" @cleared="finishGame" @retry="retryGame" class="mt-8">
-      </GameFooter>
     </template>
-  </div>
+  </GameState>
 </template>

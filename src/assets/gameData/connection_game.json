@@ -1,0 +1,26 @@
+{
+  "category": [
+    { "id": "ai_platform", "label": "AI Platform" },
+    { "id": "hewan_darat", "label": "Hewan Darat" },
+    { "id": "hewan_laut", "label": "Hewan Laut" },
+    { "id": "algoritma", "label": "Algoritma" }
+  ],
+  "items": [
+    { "category": "ai_platform", "label": "Chat GPT" },
+    { "category": "ai_platform", "label": "Gemini" },
+    { "category": "ai_platform", "label": "CoPilot" },
+    { "category": "ai_platform", "label": "Claude" },
+    { "category": "hewan_darat", "label": "Sapi" },
+    { "category": "hewan_darat", "label": "Kuda" },
+    { "category": "hewan_darat", "label": "Domba" },
+    { "category": "hewan_darat", "label": "Kucing" },
+    { "category": "hewan_laut", "label": "Ikan" },
+    { "category": "hewan_laut", "label": "Gurita" },
+    { "category": "hewan_laut", "label": "Cumi-cumi" },
+    { "category": "hewan_laut", "label": "Udang" },
+    { "category": "algoritma", "label": "Bubble search" },
+    { "category": "algoritma", "label": "FFT" },
+    { "category": "algoritma", "label": "A* Search" },
+    { "category": "algoritma", "label": "DFS" }
+  ]
+}

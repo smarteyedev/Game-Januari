@@ -2,7 +2,6 @@
 import UiModal from '@/components/molecules/modal/index.vue'
 import GameIntro from '../molecules/GameIntro.vue'
 import type { IntroData } from '@/types/types'
-import { UiButton } from '../atoms/button'
 import UnknownIcon from '../atoms/iconComponent/UnknownIcon.vue'
 import ButtonText from '../atoms/ButtonText.vue'
 
@@ -33,44 +32,56 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal :content-style="{ 'border': 'solid 6px #006082' }" :modelValue="modelValue" size="md" position="center"
-    :overlay="true" :prevent-close="false" scroll-mode="modal" @update:modelValue="emit('update:modelValue', $event)"
-    @cancel="onClose">
+  <UiModal
+    :prevent-close="true"
+    :modelValue="modelValue"
+    size="md"
+    position="center"
+    scroll-mode="content"
+    :content-style="{
+      border: '6px solid #006082',
+      boxShadow: '0px 8px 0px #006082',
+      borderRadius: '40px',
+      background: '#FFFCF6',
+    }"
+    @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose"
+  >
     <!-- HEADER ICON -->
     <template #header-title>
-      <div class="flex justify-center w-full">
-        <div class="w-33 h-33 flex items-center justify-center">
+      <div class="flex justify-center items-center w-full">
+        <div class="w-33.25 h-35.75 drop-shadow-[0_8px_0_#006082]">
           <UnknownIcon />
         </div>
       </div>
     </template>
 
-    <!-- HIDE CLOSE BUTTON -->
     <template #close-btn>
-      <span class="hidden"></span>
+      <span class="hidden" />
     </template>
 
-    <!-- MAIN CONTENT -->
-    <div class="flex flex-col items-center p-10 gap-12 w-169.25 bg-white rounded-[40px] text-center">
-      <!-- INTRO CONTENT -->
-      <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
-        :key_points="introData.key_points" class="w-full" />
-
-      <!-- FALLBACK -->
-      <div v-else class="w-full">
-        <h2 class="text-h4 leading-9 font-bold text-[#1E1E1E] mb-4">
-          {{ title }}
-        </h2>
-        <p class="text-h5 leading-8 text-[#1E1E1E]">Selesaikan minigame!</p>
-      </div>
-
-      <!-- START BUTTON -->
-      <ButtonText text="Mulai Game" @click="onStart" variant="primary" size="md">
-
-      </ButtonText>
+    <!-- BODY -->
+    <div class="px-10 pt-10 flex justify-center">
+      <GameIntro
+        v-if="introData"
+        :title="introData.title"
+        :description="introData.description"
+        :key_points="introData.key_points"
+        class="w-full max-w-149.25"
+      />
     </div>
 
-    <!-- EMPTY FOOTER -->
-    <template #footer />
+    <!-- FOOTER -->
+    <template #footer>
+      <div class="flex justify-center pb-10">
+        <ButtonText
+          text="Mulai Game"
+          variant="primary"
+          size="lg"
+          class="w-40.5 h-11"
+          @click="onStart"
+        />
+      </div>
+    </template>
   </UiModal>
 </template>
