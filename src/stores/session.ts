@@ -9,8 +9,7 @@ export const useSessionStore = defineStore('session', () => {
 
   const { post } = useApi()
 
-  
-   // Helpers
+  // Helpers
   function persistGuest(session: GuestSession | null) {
     guest.value = session
 

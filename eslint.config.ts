@@ -12,6 +12,13 @@ export default defineConfigWithVueTs(
   {
     name: 'app/files-to-lint',
     files: ['**/*.{vue,ts,mts,tsx}'],
+        ignores: [
+      "**/node_modules/**",
+      "**/dist/**",
+      "**/.output/**",
+      "**/.nuxt/**",
+      "**/coverage/**"
+    ]
   },
 
   globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),

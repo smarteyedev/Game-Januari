@@ -5,66 +5,71 @@
     </div>
 
     <div class="p-2">
-      <BoxInput
-:value="userInput"
-:locked="hints" />
+      <BoxInput :value="userInput" :locked="hints" />
     </div>
 
     <div class="p-2 flex gap-2">
       <span
-v-for="i in MAX_ATTEMPTS"
-:key="i"
-class="w-3 h-3 rounded-full border transition-all"
-        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'" />
+        v-for="i in MAX_ATTEMPTS"
+        :key="i"
+        class="w-3 h-3 rounded-full border transition-all"
+        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'"
+      />
     </div>
 
     <div class="p-2 flex flex-col items-center gap-2">
       <div
-v-for="(s, i) in submissions"
-:key="i"
-class="text-lg font-medium"
-        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'">
+        v-for="(s, i) in submissions"
+        :key="i"
+        class="text-lg font-medium"
+        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'"
+      >
         {{ s.value }}
       </div>
     </div>
 
     <div class="flex gap-2 p-2">
       <CharacterKey
-v-for="{ c, i } in answerChars"
-:key="`${c}-${i}`"
-:char="c"
+        v-for="{ c, i } in answerChars"
+        :key="`${c}-${i}`"
+        :char="c"
         :disabled="isCharDisabled(c) || !isPlaying"
-@input="onCharInput" />
+        @input="onCharInput"
+      />
     </div>
 
     <div class="flex gap-2 p-2">
       <UiButton
-class="flex items-center p-4 rounded-sm"
-color="error"
-@click="deleteChar"
-:disabled="!isPlaying">
+        class="flex items-center p-4 rounded-sm"
+        color="error"
+        @click="deleteChar"
+        :disabled="!isPlaying"
+      >
         <span>Delete</span>
       </UiButton>
       <UiButton
-class="flex items-center p-4 rounded-sm"
-@click="submitAnswer"
-:disabled="!isPlaying">
+        class="flex items-center p-4 rounded-sm"
+        @click="submitAnswer"
+        :disabled="!isPlaying"
+      >
         <span>Submit</span>
       </UiButton>
 
       <UiButton
-v-if="isLose"
-color="error"
-class="flex items-center p-4 rounded-sm"
-@click="restartGame">
+        v-if="isLose"
+        color="error"
+        class="flex items-center p-4 rounded-sm"
+        @click="restartGame"
+      >
         <span>Restart</span>
       </UiButton>
 
       <UiButton
-v-if="isWin"
-color="success"
-class="flex items-center p-4 rounded-sm"
-@click="continueGame">
+        v-if="isWin"
+        color="success"
+        class="flex items-center p-4 rounded-sm"
+        @click="continueGame"
+      >
         <span>Continue</span>
       </UiButton>
     </div>

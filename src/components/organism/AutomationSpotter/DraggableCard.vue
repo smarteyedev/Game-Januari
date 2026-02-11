@@ -35,8 +35,5 @@ const customClass = computed(() => {
 </script>
 
 <template>
-  <Card
-:label="card.label"
-:custom-class="customClass"
-:draggable="true" />
+  <Card :label="card.label" :custom-class="customClass" :draggable="true" />
 </template>

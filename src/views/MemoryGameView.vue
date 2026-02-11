@@ -37,7 +37,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-        ; (err as any).apiError = res
+      ;(err as any).apiError = res
       throw err
     }
 
@@ -176,18 +176,36 @@ onMounted(() => {
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
-    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[2]"
-      @start="startGame" />
+    <GameIntroModal
+      v-if="!loading"
+      v-model="showIntro"
+      title="Automation Spotter"
+      :introData="introData.data[2]"
+      @start="startGame"
+    />
 
     <template v-if="!showIntro">
       <div class="p-6">
-        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
-          <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
+        <div
+          class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl"
+        >
+          <GameHeader
+            title="Memory Game"
+            description="Pasangkan kartu dengan deskripsi yang benar!"
+            :time="time"
+          />
 
           <MemoryBoard :cards="cards" @flip="flipCard" />
 
-          <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-            :is-checked="allMatched" @cleared="finishGame" @retry="retryGame">
+          <GameFooter
+            #footer
+            :hide-submit="true"
+            :is-win="allMatched"
+            :has-lost="gameOver && !allMatched"
+            :is-checked="allMatched"
+            @cleared="finishGame"
+            @retry="retryGame"
+          >
           </GameFooter>
         </div>
       </div>

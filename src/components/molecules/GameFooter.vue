@@ -46,12 +46,7 @@ const emit = defineEmits<{
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4">
       <!-- RETRY -->
-      <ButtonText
-v-if="hasLost"
-text="Retry"
-variant="danger"
-size="md"
-@click="emit('retry')">
+      <ButtonText v-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
       </ButtonText>
 
       <!-- CONTINUE -->

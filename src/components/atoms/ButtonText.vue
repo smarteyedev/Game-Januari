@@ -9,7 +9,7 @@ const props = defineProps<{
 }>()
 
 const base =
-  'inline-flex items-center justify-center font-black tracking-[0.01em] ' +
+  'inline-flex items-center justify-center font-black ' +
   'transition-all duration-150 select-none rounded-3xl shadow-xl'
 
 const baseHoverEffects =
@@ -70,15 +70,12 @@ const classes = computed(() => [
 const textEffects = computed(() => {
   if (props.disabled) return ''
   if (props.variant === 'secondary') return ''
-  return 'text-shadow-flat-sm text-stroke-sm'
+  return 'text-cartoon text-cartoon-sm'
 })
 </script>
 
 <template>
-  <button
-:class="classes"
-:disabled="props.disabled"
-:aria-disabled="props.disabled">
+  <button :class="classes" :disabled="props.disabled" :aria-disabled="props.disabled">
     <span :class="textEffects">
       {{ props.text || 'Button Label' }}
     </span>

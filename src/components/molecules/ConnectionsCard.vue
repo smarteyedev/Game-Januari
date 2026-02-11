@@ -7,9 +7,7 @@
       clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
     ]"
   >
-    <UiLabel
-:label="label"
-:ui="{ color: 'white' }" />
+    <UiLabel :label="label" :ui="{ color: 'white' }" />
   </button>
 </template>
 

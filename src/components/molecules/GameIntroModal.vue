@@ -32,25 +32,17 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal
-    :prevent-close="true"
-    :modelValue="modelValue"
-    size="md"
-    position="center"
-    scroll-mode="content"
+  <UiModal :prevent-close="true" :modelValue="modelValue" size="md" position="center" scroll-mode="content"
     :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
       background: '#FFFCF6',
-    }"
-    @update:modelValue="emit('update:modelValue', $event)"
-    @cancel="onClose"
-  >
+    }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center items-center w-full">
-        <div class="w-33.25 h-35.75 drop-shadow-[0_8px_0_#006082]">
+        <div class="w-24 h-25.5 drop-shadow-[0_8px_0_#006082]">
           <UnknownIcon />
         </div>
       </div>
@@ -61,26 +53,15 @@ const onStart = () => {
     </template>
 
     <!-- BODY -->
-    <div class="px-10 pt-10 flex justify-center">
-      <GameIntro
-        v-if="introData"
-        :title="introData.title"
-        :description="introData.description"
-        :key_points="introData.key_points"
-        class="w-full max-w-149.25"
-      />
+    <div class="px-10 pt-[24px] flex justify-center">
+      <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
+        :key_points="introData.key_points" class="w-full max-w-149.25" />
     </div>
 
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center pb-10">
-        <ButtonText
-          text="Mulai Game"
-          variant="primary"
-          size="lg"
-          class="w-40.5 h-11"
-          @click="onStart"
-        />
+        <ButtonText text="Mulai Game" variant="primary" size="lg" class="w-40.5 h-11" @click="onStart" />
       </div>
     </template>
   </UiModal>

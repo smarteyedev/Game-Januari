@@ -1,8 +1,5 @@
 <template>
-  <div
-class="flex justify-center gap-3 mt-6"
-role="radiogroup"
-:aria-label="ariaLabel">
+  <div class="flex justify-center gap-3 mt-6" role="radiogroup" :aria-label="ariaLabel">
     <button
       v-for="s in max"
       :key="s"

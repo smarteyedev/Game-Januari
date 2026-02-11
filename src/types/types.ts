@@ -18,8 +18,8 @@ export interface DragCard {
 }
 
 export interface Keypoint {
-    icon_name?: string,
-    description: string
+  icon_name?: string
+  description: string
 }
 
 export interface IntroData {
