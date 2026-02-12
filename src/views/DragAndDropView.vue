@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { ApiResponse, Blank } from '@/types/types'
 import BlankSlot from '@/components/organism/DragAndDrop/BlankSlot.vue'
 import WordItem from '@/components/organism/DragAndDrop/WordItem.vue'
@@ -44,19 +44,12 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 }
 
 // useGame composable
-const {
-  time,
-  isWon,
-  isLost,
-  startGame,
-  finish,
-  reset,
-} = useGame({
+const { time, isWon, startGame, finish, reset } = useGame({
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
   onWin: () => {
@@ -86,7 +79,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-        ; (err as any).apiError = res
+      ;(err as any).apiError = res
       throw err
     }
 
@@ -231,27 +224,59 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong prompt dessous ini dengan kata yang sesuai'" :time="time" :maxTime="180"
-    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]"
-    :isWin="isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0"
-    :targetProgress="totalSlots" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
-    @cleared="handleContinue">
+  <BaseGame
+    :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong prompt dessous ini dengan kata yang sesuai'"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[1]"
+    :isWin="isWon"
+    :hasLost="hasLost"
+    :isChecked="isChecked"
+    :currentProgress="correctCount ?? 0"
+    :targetProgress="totalSlots"
+    :showProgress="true"
+    @start="start"
+    @retry="retryGame"
+    @check="checkAnswers"
+    @cleared="handleContinue"
+  >
     <!-- Sentence Board -->
     <div class="border rounded-xl p-4 text-base text-justify">
-      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
+      <template
+        v-for="(part, index) in board"
+        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
+      >
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
+        <BlankSlot
+          v-else
+          :item="slots[part.id]"
+          :slotId="part.id"
+          :onDragStart="onDragStart"
+          :isCorrect="slotCorrectness[part.id]"
+          :disabled="isLocked"
+          @drop="onDrop"
+        />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-        :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
+      <WordItem
+        v-for="(item, index) in items"
+        :key="item.id"
+        :item="item"
+        :slotId="index"
+        :inSlot="false"
+        :disabled="isLocked"
+        @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+      />
     </div>
   </BaseGame>
 </template>

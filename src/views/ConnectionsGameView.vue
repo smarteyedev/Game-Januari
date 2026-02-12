@@ -4,35 +4,60 @@
       <UiLabel label="Connections game"></UiLabel>
     </div>
     <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
-      <ConnectionsCard v-for="group in solvedGroups" :key="group.id" :label="group.label" state="solved"
-        :color="categoryColorMap[group.id]" :clickable="false" />
+      <ConnectionsCard
+        v-for="group in solvedGroups"
+        :key="group.id"
+        :label="group.label"
+        state="solved"
+        :color="categoryColorMap[group.id]"
+        :clickable="false"
+      />
     </div>
 
     <div class="p-2">
       <UiLabel label="Create a group of four"></UiLabel>
     </div>
     <div class="grid grid-cols-4 gap-2">
-      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
+      <ConnectionsCard
+        v-for="item in items"
+        :key="item.label"
+        :label="item.label"
+        :state="item.state"
+        :color="categoryColorMap[item.category]"
+        :clickable="item.state !== 'solved'"
+        @click="toggleItem(item)"
+      />
     </div>
     <!--Event message for user feedback-->
     <div class="p-2">
-      <UiLabel v-if="wrongCount !== null && !(win || lose)"
-        :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-      <UiLabel v-if="solvedNewGroup !== null && !(win || lose)"
-        :label="`You found a new group: ${solvedNewGroup.label}`" />
+      <UiLabel
+        v-if="wrongCount !== null && !(win || lose)"
+        :label="`Wrong, you are ${wrongCount} away to form a correct group`"
+      />
+      <UiLabel
+        v-if="solvedNewGroup !== null && !(win || lose)"
+        :label="`You found a new group: ${solvedNewGroup.label}`"
+      />
       <UiLabel v-if="win" :label="`You win`" />
       <UiLabel v-if="lose" :label="`you lose`" />
     </div>
     <!-- Control Buttons -->
     <div class="flex p-2 gap-2">
-      <UiButton class="p-4 flex items-center rounded-sm" :disabled="selected.length !== 4 || win || lose"
-        @click="submitSelection">
+      <UiButton
+        class="p-4 flex items-center rounded-sm"
+        :disabled="selected.length !== 4 || win || lose"
+        @click="submitSelection"
+      >
         <span>Submit</span>
       </UiButton>
 
       <!--Hidden, if lose show restart, if win show continue-->
-      <UiButton class="p-4 flex items-center rounded-sm" v-if="lose" @click="restartGame" :color="'error'">
+      <UiButton
+        class="p-4 flex items-center rounded-sm"
+        v-if="lose"
+        @click="restartGame"
+        :color="'error'"
+      >
         <span>Restart</span>
       </UiButton>
       <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
@@ -110,7 +135,7 @@ function shuffle<T>(array: T[]): T[] {
   const result = [...array]
   for (let i = result.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-      ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
+    ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
   }
   return result
 }
@@ -139,7 +164,6 @@ function assignCategoryColors(categories: { id: string }[]) {
     categoryColorMap.value[cat.id] = colorFromCategory(cat.id)
   })
 }
-
 
 onMounted(async () => {
   const data = gameData

@@ -32,7 +32,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 }
 
@@ -49,7 +49,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-        ; (err as any).apiError = res
+      ;(err as any).apiError = res
       throw err
     }
 
@@ -111,16 +111,7 @@ async function flipCard(card: MemoryCard) {
 const showIntro = ref(true)
 
 // useGame composable
-const {
-  time,
-  gameState,
-  isPlaying,
-  isWon,
-  isLost,
-  startGame,
-  finish,
-  reset,
-} = useGame({
+const { time, isWon, isLost, startGame, finish, reset } = useGame({
   maxTime: 180,
   minigameId: MINIGAME_IDS.memory,
   onWin: () => {
@@ -129,7 +120,9 @@ const {
 })
 
 // Computed states
-const allMatched = computed(() => cards.value.length > 0 && cards.value.every((card) => card.matched))
+const allMatched = computed(
+  () => cards.value.length > 0 && cards.value.every((card) => card.matched),
+)
 const gameOver = computed(() => isLost.value || (isWon.value && allMatched.value))
 
 // Emit for session tracking
@@ -163,10 +156,24 @@ onMounted(() => {
 </script>
 
 <template>
-  <BaseGame :title="'Memory Game'" :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time"
-    :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
-    :introData="introData.data[2]" :isWin="isWon" :hasLost="isLost" :hideSubmit="true" :isChecked="allMatched"
-    @start="start" @retry="retryGame" @cleared="handleContinue">
+  <BaseGame
+    :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[2]"
+    :isWin="isWon"
+    :hasLost="isLost"
+    :hideSubmit="true"
+    :isChecked="allMatched"
+    @start="start"
+    @retry="retryGame"
+    @cleared="handleContinue"
+  >
     <MemoryBoard :cards="cards" @flip="flipCard" />
   </BaseGame>
 </template>

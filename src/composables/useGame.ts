@@ -27,21 +27,21 @@ export type UseGameReturn = {
   isWon: ComputedRef<boolean>
   isLost: ComputedRef<boolean>
   canSubmit: ComputedRef<boolean>
-  
+
   // Timer
   time: Ref<number>
   isTimeOver: Ref<boolean>
   startTimer: () => void
   stopTimer: () => void
   resetTimer: () => void
-  
+
   // Game actions
   startGame: () => Promise<void>
   submitScore: (score: number, answers?: unknown[]) => Promise<void>
   finish: (won: boolean) => Promise<void>
   reset: () => void
   retry: () => Promise<void>
-  
+
   // Session
   session: ReturnType<typeof useSessionStore>
 }
@@ -57,12 +57,12 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
   } = options
 
   const session = useSessionStore()
-  
+
   // Game state
   const gameState = ref<GameState>('idle')
   const score = ref(0)
   const answers = ref<unknown[]>([])
-  
+
   // Timer
   const {
     time,
@@ -89,21 +89,21 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
   async function handleGameOver(won: boolean, finalAnswers?: unknown[]) {
     stopTimer()
     gameState.value = 'submitting'
-    
+
     // Calculate score (can be overridden by game-specific logic)
     score.value = won ? calculateScore() : 0
-    
+
     if (finalAnswers) {
       answers.value = finalAnswers
     }
-    
+
     // Auto submit if enabled
     if (autoSubmit) {
       await submitScore(score.value, answers.value)
     }
-    
+
     gameState.value = 'finished'
-    
+
     // Call callbacks
     const result: GameResult = {
       score: score.value,
@@ -111,13 +111,13 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
       timeMs: (maxTime - time.value) * 1000,
       answers: answers.value,
     }
-    
+
     if (won) {
       onWin?.(result)
     } else {
       onLose?.()
     }
-    
+
     onSubmit?.(result)
   }
 
@@ -135,7 +135,7 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
    */
   async function startGame() {
     gameState.value = 'launching'
-    
+
     try {
       await session.launchGame(minigameId)
       gameState.value = 'playing'
@@ -155,7 +155,7 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
       console.warn('No active game session to submit')
       return
     }
-    
+
     try {
       await session.submitScore(
         finalScore,
@@ -207,25 +207,24 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
     isWon,
     isLost,
     canSubmit,
-    
+
     // Timer
     time,
     isTimeOver,
     startTimer,
     stopTimer,
     resetTimer,
-    
+
     // Game actions
     startGame,
     submitScore,
     finish,
     reset,
     retry,
-    
+
     // Session
     session,
   }
 }
 
 export default useGame
-

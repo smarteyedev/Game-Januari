@@ -45,4 +45,3 @@ export interface GameEventPayload {
   timestamp: number
   data?: unknown
 }
-

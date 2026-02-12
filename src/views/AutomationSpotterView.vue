@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import TaskRow from '@/components/organism/AutomationSpotter/TaskRow.vue'
 import SpotZones from '@/components/organism/AutomationSpotter/SpotZones.vue'
 import type { DragCard, Zone } from '@/types/types'
@@ -34,14 +34,7 @@ const question = ref('')
 const showIntro = ref(true)
 
 // useGame composable
-const {
-  time,
-  isWon,
-  isLost,
-  startGame,
-  finish,
-  reset,
-} = useGame({
+const { time, isWon, startGame, finish, reset } = useGame({
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
   onWin: () => {
@@ -73,7 +66,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-        ; (err as any).apiError = res
+      ;(err as any).apiError = res
       throw err
     }
 
@@ -118,17 +111,17 @@ async function checkAnswers() {
   checkedMap.value = result
   isChecked.value = true
 
-  if (Object.values(result).every(Boolean) &&
-    Object.keys(result).length === allCards.value.length) {
+  if (
+    Object.values(result).every(Boolean) &&
+    Object.keys(result).length === allCards.value.length
+  ) {
     await finish(true)
   }
 }
 
-
 function handleContinue() {
   emit('cleared', { game: 'automation-spotter', score: 100 })
 }
-
 
 // Retry game
 function retryGame() {
@@ -157,12 +150,34 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame :title="'Automation Spotter'" :description="question" :time="time" :maxTime="180" :loading="loading"
-    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]" :isWin="isWon"
-    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount" :targetProgress="allCards.length"
-    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
-    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
-      @moved="onMoved" />
+  <BaseGame
+    :title="'Automation Spotter'"
+    :description="question"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[0]"
+    :isWin="isWon"
+    :hasLost="hasLost"
+    :isChecked="isChecked"
+    :currentProgress="matchedCount"
+    :targetProgress="allCards.length"
+    :showProgress="true"
+    @start="start"
+    @retry="retryGame"
+    @check="checkAnswers"
+    @cleared="handleContinue"
+  >
+    <TaskRow
+      v-model="sourceCards"
+      :checked-map="checkedMap"
+      :is-checked="isChecked"
+      :disabled="isChecked"
+      @moved="onMoved"
+    />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
   </BaseGame>
 </template>
