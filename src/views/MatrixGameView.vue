@@ -19,12 +19,7 @@
           </td>
 
           <td v-for="o in survey?.options" :key="o.value" class="p-3 text-center">
-            <UiRadio
-              v-model="answers[q.id]"
-              :value="o.value"
-              :class="radioClass(q, o)"
-              :disabled="score !== null"
-            />
+            <UiRadio v-model="answers[q.id]" :value="o.value" :class="radioClass(q, o)" :disabled="score !== null" />
           </td>
         </tr>
       </tbody>
@@ -32,21 +27,10 @@
 
     <div class="flex gap-2 p-4">
       <UiButton @click="submit" class="flex items-center p-2 rounded-sm">Submit</UiButton>
-      <UiButton
-        @click="restart"
-        class="flex items-center p-2 rounded-sm"
-        color="error"
-        :disabled="!finished"
-        >Restart
+      <UiButton @click="restart" class="flex items-center p-2 rounded-sm" color="error" :disabled="!finished">Restart
       </UiButton>
-      <UiButton
-        @click="continueQuiz"
-        class="flex items-center p-2 rounded-sm"
-        color="success"
-        :disabled="!finished"
-      >
-        Continue</UiButton
-      >
+      <UiButton @click="continueQuiz" class="flex items-center p-2 rounded-sm" color="success" :disabled="!finished">
+        Continue</UiButton>
     </div>
   </div>
 </template>
@@ -56,6 +40,8 @@ import { onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import { UiRadio } from '@/components/atoms/radio'
 import { UiButton } from '@/components/atoms/button'
+import gameData from '@/assets/gameData/matrix_game.json'
+
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }
@@ -65,8 +51,6 @@ const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
 const finished = ref(false)
-
-import gameData from '@/assets/gameData/matrix_game.json'
 
 onMounted(async () => {
   survey.value = gameData

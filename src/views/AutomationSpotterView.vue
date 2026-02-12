@@ -13,6 +13,7 @@ import introData from '@/assets/gameData/intro.json'
 import { useSessionStore } from '@/stores/session'
 import { MINIGAME_IDS } from '@/utils/constants'
 import GameState from '@/components/molecules/GameState.vue'
+import { shuffle } from '@/utils/shuffle'
 
 const session = useSessionStore()
 
@@ -75,7 +76,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-      ;(err as any).apiError = res
+        ; (err as any).apiError = res
       throw err
     }
 
@@ -98,10 +99,6 @@ onMounted(() => {
 })
 
 onUnmounted(stop)
-
-function shuffle<T>(array: T[]): T[] {
-  return [...array].sort(() => Math.random() - 0.5)
-}
 
 async function loadLevel() {
   if (!gameData.value) return
@@ -178,47 +175,21 @@ watch(isGameOver, (over) => {
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
-    <GameIntroModal
-      v-if="!loading"
-      v-model="showIntro"
-      title="Automation Spotter"
-      :introData="introData.data[0]"
-      @start="startGame"
-    />
+    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[0]"
+      @start="startGame" />
 
     <template v-if="!showIntro">
       <div class="p-6">
-        <div
-          class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl"
-        >
+        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
           <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
-          <TaskRow
-            v-model="sourceCards"
-            :checked-map="checkedMap"
-            :is-checked="isChecked"
-            :disabled="isChecked"
-            @moved="onMoved"
-          />
+          <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+            @moved="onMoved" />
 
-          <SpotZones
-            :zones="zones"
-            :checked-map="checkedMap"
-            :is-checked="isChecked"
-            @moved="onMoved"
-          />
+          <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
 
-          <GameFooter
-            :current="matchedCount"
-            :target="allCards.length"
-            :is-checked="isChecked"
-            :has-lost="hasLost"
-            :is-win="isLevelWin"
-            :show-progress="true"
-            @check="checkAnswers"
-            @retry="loadLevel"
-            @cleared="finishGame"
-          />
+          <GameFooter :current="matchedCount" :target="allCards.length" :is-checked="isChecked" :has-lost="hasLost"
+            :is-win="isLevelWin" :show-progress="true" @check="checkAnswers" @retry="loadLevel" @cleared="finishGame" />
         </div>
       </div>
     </template>

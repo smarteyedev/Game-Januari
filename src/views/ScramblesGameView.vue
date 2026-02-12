@@ -9,67 +9,35 @@
     </div>
 
     <div class="p-2 flex gap-2">
-      <span
-        v-for="i in MAX_ATTEMPTS"
-        :key="i"
-        class="w-3 h-3 rounded-full border transition-all"
-        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'"
-      />
+      <span v-for="i in MAX_ATTEMPTS" :key="i" class="w-3 h-3 rounded-full border transition-all"
+        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'" />
     </div>
 
     <div class="p-2 flex flex-col items-center gap-2">
-      <div
-        v-for="(s, i) in submissions"
-        :key="i"
-        class="text-lg font-medium"
-        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'"
-      >
+      <div v-for="(s, i) in submissions" :key="i" class="text-lg font-medium"
+        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'">
         {{ s.value }}
       </div>
     </div>
 
     <div class="flex gap-2 p-2">
-      <CharacterKey
-        v-for="{ c, i } in answerChars"
-        :key="`${c}-${i}`"
-        :char="c"
-        :disabled="isCharDisabled(c) || !isPlaying"
-        @input="onCharInput"
-      />
+      <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
+        :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
     </div>
 
     <div class="flex gap-2 p-2">
-      <UiButton
-        class="flex items-center p-4 rounded-sm"
-        color="error"
-        @click="deleteChar"
-        :disabled="!isPlaying"
-      >
+      <UiButton class="flex items-center p-4 rounded-sm" color="error" @click="deleteChar" :disabled="!isPlaying">
         <span>Delete</span>
       </UiButton>
-      <UiButton
-        class="flex items-center p-4 rounded-sm"
-        @click="submitAnswer"
-        :disabled="!isPlaying"
-      >
+      <UiButton class="flex items-center p-4 rounded-sm" @click="submitAnswer" :disabled="!isPlaying">
         <span>Submit</span>
       </UiButton>
 
-      <UiButton
-        v-if="isLose"
-        color="error"
-        class="flex items-center p-4 rounded-sm"
-        @click="restartGame"
-      >
+      <UiButton v-if="isLose" color="error" class="flex items-center p-4 rounded-sm" @click="restartGame">
         <span>Restart</span>
       </UiButton>
 
-      <UiButton
-        v-if="isWin"
-        color="success"
-        class="flex items-center p-4 rounded-sm"
-        @click="continueGame"
-      >
+      <UiButton v-if="isWin" color="success" class="flex items-center p-4 rounded-sm" @click="continueGame">
         <span>Continue</span>
       </UiButton>
     </div>
@@ -82,6 +50,8 @@ import { UiLabel } from '@/components/atoms/label'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
 import { UiButton } from '@/components/atoms/button'
+import gameData from '@/assets/gameData/scrambles.json'
+import { shuffle } from '@/utils/shuffle'
 
 type Submission = {
   value: string
@@ -104,8 +74,6 @@ const hints = ref<(string | null)[]>([])
 const isWin = computed(() => gameResult.value === 'win')
 const isLose = computed(() => gameResult.value === 'lose')
 const isPlaying = computed(() => gameResult.value === 'playing')
-
-import gameData from '@/assets/gameData/scrambles.json'
 
 onMounted(async () => {
   const data = gameData
@@ -228,10 +196,6 @@ function getRandomLetter(exclude: Set<string>): string {
   }
 
   return available[Math.floor(Math.random() * available.length)]!
-}
-
-function shuffle<T>(arr: T[]) {
-  return [...arr].sort(() => Math.random() - 0.5)
 }
 
 function restartGame() {

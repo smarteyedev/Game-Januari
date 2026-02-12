@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toTimeMmss } from '@/utils/formatter'
+import { toTimeMmss } from '@/utils/string'
 
 withDefaults(
   defineProps<{
