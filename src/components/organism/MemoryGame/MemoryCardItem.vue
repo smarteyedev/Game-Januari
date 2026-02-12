@@ -75,31 +75,21 @@ const backStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div
-    class="w-full min-w-40 aspect-4/5 perspective cursor-pointer"
-    @click="!flipped && !matched && emit('flip')"
-  >
-    <div
-      class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
-      :class="{ 'rotate-y-180': flipped || matched }"
-    >
+  <div class="w-full min-w-40 aspect-4/5 perspective cursor-pointer" @click="!flipped && !matched && emit('flip')">
+    <div class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
+      :class="{ 'rotate-y-180': flipped || matched }">
       <!-- BACK SIDE -->
       <div class="absolute inset-0 backface-hidden" :style="backStyle">
         <div class="w-full h-full flex items-center justify-center">
-          <span class="text-blue-500 text-5xl font-bold">?</span>
+          <span class="text-primary-500 text-5xl font-bold">?</span>
         </div>
       </div>
 
       <!-- FRONT SIDE -->
       <div class="absolute inset-0 backface-hidden rotate-y-180" :style="frontStyle">
         <!-- TEXT CARD -->
-        <div
-          v-if="contentType === 'text'"
-          class="w-full h-full flex items-center justify-center p-4"
-        >
-          <p
-            class="font-inter font-medium text-xs leading-4.5 text-center text-black"
-            style="
+        <div v-if="contentType === 'text'" class="w-full h-full flex items-center justify-center p-4">
+          <p class="font-inter font-medium text-xs leading-4.5 text-center text-black" style="
               font-family: 'Inter', sans-serif;
               font-style: normal;
               font-weight: 500;
@@ -107,31 +97,19 @@ const backStyle = computed<CSSProperties>(() => {
               line-height: 18px;
               text-align: center;
               color: #000000;
-            "
-          >
+            ">
             {{ text }}
           </p>
         </div>
 
         <!-- LOGO CARD -->
-        <div
-          v-else-if="contentType === 'svg'"
-          class="w-full h-full flex items-center justify-center"
-        >
+        <div v-else-if="contentType === 'svg'" class="w-full h-full flex items-center justify-center">
           <component :is="LogoComponent" class="w-20 h-auto" />
         </div>
 
         <!-- IMAGE CARD -->
-        <div
-          v-else-if="contentType === 'img'"
-          class="w-full h-full flex items-center justify-center p-4"
-        >
-          <img
-            v-if="text"
-            :src="text"
-            alt="Card image"
-            class="max-w-full max-h-full object-contain"
-          />
+        <div v-else-if="contentType === 'img'" class="w-full h-full flex items-center justify-center p-4">
+          <img v-if="text" :src="text" alt="Card image" class="max-w-full max-h-full object-contain" />
         </div>
       </div>
     </div>

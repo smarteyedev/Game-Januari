@@ -13,7 +13,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
 
 <template>
   <div class="flex flex-col gap-2">
-    <p class="text-[12px] font-bold leading-4 text-blue-700">
+    <p class="text-[12px] font-bold leading-4 text-primary-700">
       You got {{ current }} out of {{ target }} points
     </p>
 
@@ -24,17 +24,13 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
       </div>
 
       <!-- Star -->
-      <UiIcon
-        name="mdi:star"
-        size="16"
-        :class="[
-          'shrink-0 transition-all duration-300',
-          isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
-        ]"
-      />
+      <UiIcon name="mdi:star" size="16" :class="[
+        'shrink-0 transition-all duration-300',
+        isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
+      ]" />
 
       <!-- Label -->
-      <span class="text-body-sm text-blue-700 font-semibold whitespace-nowrap">
+      <span class="text-body-sm text-primary-700 font-semibold whitespace-nowrap">
         {{ current }} / {{ target }}
       </span>
     </div>

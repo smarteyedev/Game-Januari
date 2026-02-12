@@ -16,7 +16,7 @@ const baseHoverEffects =
   'hover:-translate-y-[2px] hover:shadow-flat-md active:translate-y-[6px] active:shadow-none'
 
 const plainHoverEffects =
-  'hover:border-[3px] hover:shadow-flat-lg hover:shadow-blue-700 hover:border-blue-700'
+  'hover:border-[3px] hover:shadow-flat-lg hover:shadow-primary-700 hover:border-primary-700'
 
 const sizes = {
   xl: 'min-w-[180px] min-h-[48px] text-[16px] hover:text-[18px]',
@@ -28,8 +28,8 @@ const sizes = {
 const variants = {
   primary:
     'bg-blue-500 border-[3px] text-white shadow-flat-lg ' +
-    '[--btn-accent:var(--color-blue-700)] ' +
-    'border-blue-700 shadow-blue-700',
+    '[--btn-accent:var(--color-primary-700)] ' +
+    'border-primary-700 shadow-primary-700',
 
   danger:
     'bg-[#DA4A4A] border-[3px] text-white shadow-flat-lg ' +
@@ -37,11 +37,11 @@ const variants = {
     'border-[#742828] shadow-[#742828]',
 
   secondary:
-    'bg-cream-10 border-[3px] text-blue-700 shadow-flat-lg ' +
-    '[--btn-accent:var(--color-blue-700)] ' +
-    'border-blue-700 shadow-blue-700',
+    'bg-cream-10 border-[3px] text-primary-700 shadow-flat-lg ' +
+    '[--btn-accent:var(--color-primary-700)] ' +
+    'border-primary-700 shadow-primary-700',
 
-  plain: 'bg-cream-10 border-0 text-white ' + '[--btn-accent:var(--color-blue-700)]',
+  plain: 'bg-cream-10 border-0 text-white ' + '[--btn-accent:var(--color-primary-700)]',
 }
 
 const disabledStyles = {

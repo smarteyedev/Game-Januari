@@ -180,7 +180,7 @@ watch(isGameOver, (over) => {
 
     <template v-if="!showIntro">
       <div class="p-6">
-        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+        <div class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
           <GameHeader title="Automation Spotter" :description="question" :time="time" />
 
           <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"

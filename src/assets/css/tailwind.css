@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 /*
-  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  The default border color has changed to 'currentcolor' in Tailwind CSS v4,
   so we've added these compatibility styles to make sure everything still
   looks the same as it did with Tailwind CSS v3.
 
@@ -10,7 +10,12 @@
 */
 
 @theme {
-  /* Assign tailwind color to CSS variable */
+  /* White & Black */
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-base: var(--color-gray-950);
+
+  /* Akhlak/Light Blue - Primary */
   --color-primary-25: #f0fffb;
   --color-primary-50: #e2fef7;
   --color-primary-100: #d4fcf3;
@@ -26,21 +31,23 @@
   --color-primary-default: var(--color-primary-500);
   --color-primary: var(--color-primary-default);
 
-  --color-secondary-25: #f6f9fe;
-  --color-secondary-50: #e9f1fc;
-  --color-secondary-100: #d3e3f7;
-  --color-secondary-200: #aac6ef;
-  --color-secondary-300: #7698d0;
-  --color-secondary-400: #4a68a1;
-  --color-secondary-500: #1c3263;
-  --color-secondary-600: #142655;
-  --color-secondary-700: #0e1c47;
-  --color-secondary-800: #081339;
-  --color-secondary-900: #050d2f;
-  --color-secondary-950: #001524;
+  /* Akhlak/Dark Blue - Secondary */
+  --color-secondary-25: #f6f8fe;
+  --color-secondary-50: #e9eefb;
+  --color-secondary-100: #d6def6;
+  --color-secondary-200: #b0bfee;
+  --color-secondary-300: #7c8ecc;
+  --color-secondary-400: #4e5d99;
+  --color-secondary-500: #1e2855;
+  --color-secondary-600: #151e49;
+  --color-secondary-700: #0f153d;
+  --color-secondary-800: #090e31;
+  --color-secondary-900: #050928;
+  --color-secondary-950: #04071a;
   --color-secondary-default: var(--color-secondary-500);
   --color-secondary: var(--color-secondary-default);
 
+  /* Gray Light */
   --color-gray-25: #f7f7f7;
   --color-gray-50: #eaeaea;
   --color-gray-100: #d4d4d4;
@@ -56,21 +63,23 @@
   --color-gray-default: var(--color-gray-500);
   --color-gray: var(--color-gray-default);
 
-  --color-success-25: #f1fef8;
-  --color-success-50: #ecfdf5;
-  --color-success-100: #d1fae5;
-  --color-success-200: #a7f3d0;
-  --color-success-300: #6ee7b7;
-  --color-success-400: #34d399;
-  --color-success-500: #10b981;
-  --color-success-600: #059669;
-  --color-success-700: #047857;
-  --color-success-800: #065f46;
-  --color-success-900: #064e3b;
-  --color-success-950: #083d2f;
-  --color-success-default: var(--color-success-500);
-  --color-success: var(--color-success-default);
+  /* Red */
+  --color-error-25: #fef6f6;
+  --color-error-50: #fdf2f2;
+  --color-error-100: #fbe5e5;
+  --color-error-200: #f8d0d0;
+  --color-error-300: #f3aeae;
+  --color-error-400: #e98080;
+  --color-error-500: #da4a4a;
+  --color-error-600: #c83a3a;
+  --color-error-700: #a82d2d;
+  --color-error-800: #8b2929;
+  --color-error-900: #742828;
+  --color-error-950: #3f1010;
+  --color-error-default: var(--color-error-500);
+  --color-error: var(--color-error-default);
 
+  /* Orange - Warning */
   --color-warning-25: #fffef0;
   --color-warning-50: #fffcea;
   --color-warning-100: #fff3c5;
@@ -86,21 +95,23 @@
   --color-warning-default: var(--color-warning-500);
   --color-warning: var(--color-warning-default);
 
-  --color-error-25: #fef1f1;
-  --color-error-50: #fbe9e9;
-  --color-error-100: #fbe5e5;
-  --color-error-200: #f8d0d0;
-  --color-error-300: #f3aeae;
-  --color-error-400: #e98080;
-  --color-error-500: #da4a4a;
-  --color-error-600: #c83a3a;
-  --color-error-700: #a82d2d;
-  --color-error-800: #8b2929;
-  --color-error-900: #742828;
-  --color-error-950: #3f1010;
-  --color-error-default: var(--color-error-500);
-  --color-error: var(--color-error-default);
+  /* Green - Success */
+  --color-success-25: #f1fef8;
+  --color-success-50: #ecfdf5;
+  --color-success-100: #d1fae5;
+  --color-success-200: #a7f3d0;
+  --color-success-300: #6ee7b7;
+  --color-success-400: #34d399;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-success-700: #047857;
+  --color-success-800: #065f46;
+  --color-success-900: #064e3b;
+  --color-success-950: #083d2f;
+  --color-success-default: var(--color-success-500);
+  --color-success: var(--color-success-default);
 
+  /* Blue - Info */
   --color-info-25: #f5f9ff;
   --color-info-50: #f0f5fe;
   --color-info-100: #dee8fb;
@@ -116,80 +127,68 @@
   --color-info-default: var(--color-info-500);
   --color-info: var(--color-info-default);
 
-  --color-white: #fff;
-  --color-base: var(--color-gray-950, #1c1c1c);
+  /* Tosca */
+  --color-tosca-25: #f5fffc;
+  --color-tosca-50: #e8fdf6;
+  --color-tosca-100: #cdfef1;
+  --color-tosca-200: #b8fbea;
+  --color-tosca-300: #93f3e3;
+  --color-tosca-400: #75e8de;
+  --color-tosca-500: #4adada;
+  --color-tosca-600: #36afbb;
+  --color-tosca-700: #25889c;
+  --color-tosca-800: #17637e;
+  --color-tosca-900: #0e4968;
+  --color-tosca-950: #0b3951;
+  --color-tosca-default: var(--color-tosca-500);
+  --color-tosca: var(--color-tosca-default);
 
+  /* Purple */
+  --color-purple-25: #fcfaff;
+  --color-purple-50: #f9f5ff;
+  --color-purple-100: #f4ebff;
+  --color-purple-200: #e9d7fe;
+  --color-purple-300: #d6bbfb;
+  --color-purple-400: #b692f6;
+  --color-purple-500: #9e77ed;
+  --color-purple-600: #7f56d9;
+  --color-purple-700: #6941c6;
+  --color-purple-800: #53389e;
+  --color-purple-900: #42307d;
+  --color-purple-950: #2c1c5f;
+  --color-purple-default: var(--color-purple-500);
+  --color-purple: var(--color-purple-default);
+
+  /* Brand */
+  --color-brand-primary: #e2fef7;
   --color-shadow: #0000000d;
 
-  --color-brand-primary: #e2fef7;
-}
-
-@theme {
-  --color-white: #ffffff;
-  --color-black: #000000;
-
-  --color-gray-25: #eaeaea;
-  --color-gray-50: #dcdcdd;
-  --color-gray-100: #d4d4d4;
-  --color-gray-200: #bfbfbf;
-  --color-gray-300: #a9a9a9;
-  --color-gray-400: #949494;
-  --color-gray-500: #7e7e7e;
-  --color-gray-600: #696969;
-  --color-gray-700: #535353;
-  --color-gray-800: #3e3e3e;
-  --color-gray-900: #282828;
-  --color-gray-950: #1c1c1c;
-
-  --color-blue-25: #f0fffb;
-  --color-blue-50: #e2fef7;
-  --color-blue-100: #d4fcf3;
-  --color-blue-200: #94f7e9;
-  --color-blue-300: #5de830;
-  --color-blue-400: #34cfd2;
-  --color-blue-500: #00a3b5;
-  --color-blue-600: #007f9b;
-  --color-blue-700: #006082;
-  --color-blue-800: #00456b;
-  --color-blue-900: #003256;
-  --color-blue-950: #00243d;
-
-  --color-cream-base: #ffeed0;
-  --color-cream-10: #fffcf6;
-  --color-cream-20: #fff9ef;
-  --color-cream-30: #fff6e7;
-  --color-cream-40: #fff4e0;
-  --color-cream-50: #ffe1db;
-  --color-cream-60: #d4c6ad;
-  --color-cream-70: #aa9fbb;
-  --color-cream-80: #807768;
-  --color-cream-90: #554f45;
-  --color-cream-100: #33302a;
-
+  /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
 
   /* Body */
-  --text-body-sm: 0.875rem; /* 14px */
-  --text-body-md: 1rem; /* 16px */
-  --text-body-lg: 1.125rem; /* 18px */
+  --text-body-sm: 0.875rem;
+  --text-body-md: 1rem;
+  --text-body-lg: 1.125rem;
 
   /* Headings */
-  --text-h5: 1.5rem; /* 24px */
-  --text-h4: 1.75rem; /* 28px */
-  --text-h3: 2.125rem; /* 34px */
-  --text-h2: 2.5rem; /* 40px */
-  --text-h1: 3rem; /* 48px */
+  --text-h5: 1.5rem;
+  --text-h4: 1.75rem;
+  --text-h3: 2.125rem;
+  --text-h2: 2.5rem;
+  --text-h1: 3rem;
 
   /* Display */
-  --text-display-sm: 3.5rem; /* 56px */
-  --text-display-md: 4.5rem; /* 72px */
-  --text-display-lg: 5.625rem; /* 90px */
-  --text-display-xl: 7rem; /* 112px */
-  --text-display-xxl: 8.75rem; /* 140px */
+  --text-display-sm: 3.5rem;
+  --text-display-md: 4.5rem;
+  --text-display-lg: 5.625rem;
+  --text-display-xl: 7rem;
+  --text-display-xxl: 8.75rem;
 
   /* Global typography rules */
   --leading-base: 1.5;
 
+  /* Spacing */
   --spacing-0: 0px;
   --spacing-2xs: 2px;
   --spacing-xs: 4px;
@@ -209,6 +208,7 @@
   --spacing-11xl: 72px;
   --spacing-12xl: 80px;
 
+  /* Shadows */
   --shadow-0: 0 0px 0px var(--shadow-color);
   --shadow-2xs: 0 1px 0px var(--shadow-color);
   --shadow-xs: 0 2px 0px var(--shadow-color);
@@ -219,6 +219,7 @@
   --shadow-2xl: 0 10px 0px var(--shadow-color);
   --shadow-3xl: 0 12px 0px var(--shadow-color);
 
+  /* Border Radius */
   --radius-0: 0;
   --radius-2xs: 1px;
   --radius-xs: 2px;
@@ -245,7 +246,6 @@
     @apply text-base text-body-lg;
   }
 
-  /* Headings */
   .text-h5 {
     @apply text-base text-h5;
   }
@@ -262,7 +262,6 @@
     @apply text-base text-h1;
   }
 
-  /* Display */
   .text-display-sm {
     @apply text-base text-display-sm;
   }
@@ -313,24 +312,19 @@
     -webkit-text-stroke: 2px var(--btn-accent);
   }
 
-    .text-cartoon {
+  .text-cartoon {
     font-weight: 900;
     line-height: 1;
     word-spacing: -1px;
-
     color: var(--color-white);
-
     -webkit-text-stroke: var(--text-stroke, 5px) var(--btn-accent);
     -webkit-text-stroke-linejoin: round;
-
     paint-order: stroke fill;
-
     filter: drop-shadow(
       0px var(--text-shadow, 4px) 0 var(--btn-accent)
     );
   }
 
-  /* Size presets */
   .text-cartoon-sm {
     --text-stroke: 4px;
     --text-shadow: 3px;

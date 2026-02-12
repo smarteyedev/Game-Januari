@@ -178,7 +178,7 @@ onMounted(() => {
 
     <template v-if="!showIntro">
       <div class="p-6">
-        <div class="border-[6px] border-blue-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+        <div class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
           <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
 
           <MemoryBoard :cards="cards" @flip="flipCard" />
