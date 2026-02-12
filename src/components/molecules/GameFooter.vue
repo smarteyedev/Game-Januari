@@ -20,26 +20,15 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div
-    class="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-3 sm:gap-0 min-h-10.5"
-  >
+  <div class="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-end gap-3 sm:gap-0 min-h-10.5">
     <!-- LEFT -->
     <div class="flex gap-[36px]">
       <div class="w-full sm:w-71.25">
-        <ProgressWithIcon
-          v-if="showProgress && current !== undefined && target !== undefined"
-          :current="current"
-          :target="target"
-        />
+        <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
+          :target="target" />
       </div>
       <!-- SUBMIT -->
-      <ButtonText
-        v-if="!hideSubmit && !isChecked"
-        variant="secondary"
-        size="md"
-        @click="emit('check')"
-        text="Check"
-      >
+      <ButtonText v-if="!hideSubmit && !isChecked" variant="secondary" size="md" @click="emit('check')" text="Check">
       </ButtonText>
     </div>
 
@@ -50,13 +39,7 @@ const emit = defineEmits<{
       </ButtonText>
 
       <!-- CONTINUE -->
-      <ButtonText
-        v-else-if="isWin"
-        text="Continue"
-        variant="primary"
-        size="md"
-        @click="emit('cleared')"
-      >
+      <ButtonText v-else-if="isWin" text="Continue" variant="primary" size="md" @click="emit('cleared')">
       </ButtonText>
     </div>
   </div>

@@ -1,27 +1,42 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import useTimer from '@/composables/useTimer'
+import { ref, onMounted, computed } from 'vue'
 import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
 import MemoryBoard from '@/components/organism/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import useApi from '@/composables/useApi'
-import GameFooter from '@/components/molecules/GameFooter.vue'
-import GameHeader from '@/components/molecules/GameHeader.vue'
-import GameState from '@/components/molecules/GameState.vue'
+import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
-import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
-import { useSessionStore } from '@/stores/session'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
-
-const session = useSessionStore()
+import { useGame } from '@/composables/useGame'
 
 const { get, loading, error } = useApi()
+
+// Game data
 const gameData = ref<{
   id: number
   card: MemoryCard[]
 } | null>(null)
 
+const cards = ref<MemoryCard[]>([])
+
+// Card matching state
+let firstCard: MemoryCard | null = null
+let lock = false
+const turns = ref(0)
+
+// Audio
+const audio = new Audio(clickSound)
+
+function playClick() {
+  if (audio) {
+    audio.currentTime = 0
+    audio.volume = 1
+    audio.play().catch(() => { })
+  }
+}
+
+// Fetch level from API
 async function fetchLevel() {
   try {
     const res = await get<
@@ -39,11 +54,13 @@ async function fetchLevel() {
     }
 
     gameData.value = res.data
+    cards.value = loadLevel()
   } catch (err) {
     console.error('Failed to load level', err)
   }
 }
 
+// Load and shuffle cards
 function loadLevel(): MemoryCard[] {
   if (!gameData.value) return []
 
@@ -57,35 +74,11 @@ function loadLevel(): MemoryCard[] {
   )
 }
 
-const cards = ref<MemoryCard[]>([])
+// Card flip logic
+async function flipCard(card: MemoryCard) {
+  if (gameOver.value || lock || card.flipped || card.matched) return
 
-let firstCard: MemoryCard | null = null
-let lock = false
-
-const turns = ref(0)
-const gameStarted = ref(false)
-const MAX_TIME = 180 //second
-const gameOver = ref(false)
-
-const { time, start, stop } = useTimer(MAX_TIME, {
-  onFinish: () => {
-    lock = true
-    gameOver.value = true
-  },
-})
-
-const allMatched = computed(() => cards.value.every((card) => card.matched))
-
-function flipCard(card: MemoryCard) {
-  if (gameOver.value) return
   playClick()
-  if (lock || card.flipped || card.matched) return
-
-  if (!gameStarted.value) {
-    gameStarted.value = true
-    start()
-  }
-
   card.flipped = true
   turns.value++
 
@@ -94,15 +87,14 @@ function flipCard(card: MemoryCard) {
     return
   }
 
-  // Compare cards based on pairId
+  // Check match
   if (firstCard.pairId === card.pairId) {
     firstCard.matched = true
     card.matched = true
     firstCard = null
 
-    // Check immediately after a successful match
     if (allMatched.value) {
-      stop()
+      await finish(true)
     }
   } else {
     lock = true
@@ -115,79 +107,66 @@ function flipCard(card: MemoryCard) {
   }
 }
 
+// Game state
+const showIntro = ref(true)
+
+// useGame composable
+const {
+  time,
+  gameState,
+  isPlaying,
+  isWon,
+  isLost,
+  startGame,
+  finish,
+  reset,
+} = useGame({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.memory,
+  onWin: () => {
+    emit('cleared', { game: 'memory-game', score: 100 })
+  },
+})
+
+// Computed states
+const allMatched = computed(() => cards.value.length > 0 && cards.value.every((card) => card.matched))
+const gameOver = computed(() => isLost.value || (isWon.value && allMatched.value))
+
+// Emit for session tracking
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'memory-game'; score: number }): void
+  (e: 'cleared', payload: { game: string; score: number }): void
 }>()
 
-async function finishGame() {
-  const score = allMatched.value ? 100 : 0
-
-  const answers = cards.value.map((card) => ({
-    cardId: card.id,
-    pairId: card.pairId,
-    matched: card.matched,
-  }))
-
-  try {
-    await session.submitScore(score, answers, MAX_TIME - time.value)
-  } finally {
-    emit('cleared', {
-      game: 'memory-game',
-      score,
-    })
-  }
+function handleContinue() {
+  emit('cleared', { game: 'memory-game', score: 100 })
 }
 
-const audio = new Audio(clickSound)
-
-function playClick() {
-  if (audio) {
-    audio.currentTime = 0
-    audio.volume = 1
-    audio.play()
-  }
+// Start game
+async function start() {
+  showIntro.value = false
+  await startGame()
 }
 
+// Reset game
 function retryGame() {
   cards.value = loadLevel()
   firstCard = null
   lock = false
-  gameStarted.value = false
-  gameOver.value = false
-  stop()
+  turns.value = 0
+  reset()
 }
 
-const showIntro = ref(true)
-
-async function startGame() {
-  showIntro.value = false
-  await session.launchGame(MINIGAME_IDS.memory)
-
-  cards.value = loadLevel()
-}
-
+// Lifecycle
 onMounted(() => {
   fetchLevel()
 })
 </script>
 
 <template>
-  <GameState :loading="loading" :error="error" :retryFn="fetchLevel">
-    <GameIntroModal v-if="!loading" v-model="showIntro" title="Automation Spotter" :introData="introData.data[2]"
-      @start="startGame" />
-
-    <template v-if="!showIntro">
-      <div class="p-6">
-        <div class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
-          <GameHeader title="Memory Game" description="Pasangkan kartu dengan deskripsi yang benar!" :time="time" />
-
-          <MemoryBoard :cards="cards" @flip="flipCard" />
-
-          <GameFooter #footer :hide-submit="true" :is-win="allMatched" :has-lost="gameOver && !allMatched"
-            :is-checked="allMatched" @cleared="finishGame" @retry="retryGame">
-          </GameFooter>
-        </div>
-      </div>
-    </template>
-  </GameState>
+  <BaseGame :title="'Memory Game'" :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time"
+    :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
+    :introData="introData.data[2]" :isWin="isWon" :hasLost="isLost" :hideSubmit="true" :isChecked="allMatched"
+    @start="start" @retry="retryGame" @cleared="handleContinue">
+    <MemoryBoard :cards="cards" @flip="flipCard" />
+  </BaseGame>
 </template>

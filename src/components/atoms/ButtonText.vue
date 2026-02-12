@@ -27,7 +27,7 @@ const sizes = {
 
 const variants = {
   primary:
-    'bg-blue-500 border-[3px] text-white shadow-flat-lg ' +
+    'bg-primary-500 border-[3px] text-white shadow-flat-lg ' +
     '[--btn-accent:var(--color-primary-700)] ' +
     'border-primary-700 shadow-primary-700',
 
