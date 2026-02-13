@@ -79,9 +79,14 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
   // Computed states
   const isPlaying = computed(() => gameState.value === 'playing')
   const isFinished = computed(() => gameState.value === 'finished')
-  const isWon = computed(() => gameState.value === 'finished' && score.value > 0)
-  const isLost = computed(() => isTimeOver.value && !isWon.value)
+  const isWon = computed(() =>
+  gameState.value === 'finished' && didWin.value
+)
+const isLost = computed(() =>
+  gameState.value === 'finished' && !didWin.value
+)
   const canSubmit = computed(() => isPlaying.value || isFinished.value)
+  const didWin = ref(false)
 
   /**
    * Handle game over - win or lose
@@ -91,7 +96,9 @@ export function useGame(options: UseGameOptions = {}): UseGameReturn {
     gameState.value = 'submitting'
 
     // Calculate score (can be overridden by game-specific logic)
-    score.value = won ? calculateScore() : 0
+    
+  didWin.value = won
+  score.value = won ? calculateScore() : 0
 
     if (finalAnswers) {
       answers.value = finalAnswers

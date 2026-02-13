@@ -37,9 +37,6 @@ const showIntro = ref(true)
 const { time, isWon, startGame, finish, reset } = useGame({
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
-  onWin: () => {
-    emit('cleared', { game: 'automation-spotter', score: 100 })
-  },
 })
 
 // Computed
@@ -66,7 +63,7 @@ async function fetchLevel() {
     if (res && (res.success === false || (res as any).error)) {
       const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
       const err = new Error(msg)
-      ;(err as any).apiError = res
+        ; (err as any).apiError = res
       throw err
     }
 
@@ -120,7 +117,8 @@ async function checkAnswers() {
 }
 
 function handleContinue() {
-  emit('cleared', { game: 'automation-spotter', score: 100 })
+  const score = isWon.value ? 100 : 0
+  emit('cleared', { game: 'automation-spotter', score })
 }
 
 // Retry game
@@ -150,34 +148,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    :title="'Automation Spotter'"
-    :description="question"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[0]"
-    :isWin="isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="matchedCount"
-    :targetProgress="allCards.length"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
-    <TaskRow
-      v-model="sourceCards"
-      :checked-map="checkedMap"
-      :is-checked="isChecked"
-      :disabled="isChecked"
-      @moved="onMoved"
-    />
+  <BaseGame :title="'Automation Spotter'" :description="question" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]" :isWin="isWon"
+    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount" :targetProgress="allCards.length"
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
+    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+      @moved="onMoved" />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
   </BaseGame>
 </template>
