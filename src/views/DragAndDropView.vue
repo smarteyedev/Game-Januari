@@ -9,7 +9,7 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
-import { useGame } from '@/composables/useGame'
+import { useGameService } from '@/application/services/GameService'
 
 // Level fetching
 const loading = ref(false)
@@ -50,8 +50,13 @@ function playClick() {
   }
 }
 
-// useGame composable
-const { time, isWon, startGame, finish, reset } = useGame({
+const {
+  time,
+  isWon,
+  startGame,
+  finish,
+  reset
+} = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
 })
@@ -62,7 +67,7 @@ const totalSlots = computed(() => board.value.filter((part: any) => part.type ==
 
 // Emit
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'drag-and-drop'; score: number }): void
+  (e: 'cleared'): void
 }>()
 
 // Fetch level
@@ -195,8 +200,7 @@ async function checkAnswers() {
 }
 
 function handleContinue() {
-  const score = isWon.value ? 100 : 0
-  emit('cleared', { game: 'drag-and-drop', score: score })
+  emit('cleared')
 }
 
 // Retry game
@@ -216,7 +220,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  // Cleanup handled by useGame
+  // Cleanup handled by useGameService
 })
 </script>
 

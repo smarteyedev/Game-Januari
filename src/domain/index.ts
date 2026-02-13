@@ -4,7 +4,6 @@
  */
 
 // Entities
-export { Session, type SessionData } from './entities/Session'
 export { Game, type GameData } from './entities/Game'
 
 // Types

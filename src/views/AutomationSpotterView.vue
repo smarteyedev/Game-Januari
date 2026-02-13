@@ -8,13 +8,13 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
-import { useGame } from '@/composables/useGame'
+import { useGameService } from '@/application/services/GameService'
 
 // Level fetching
 const loading = ref(false)
 const error = ref<unknown>(null)
 
-// useGame composable
+// Game data
 const gameData = ref<{
   question: string
   card: DragCard[]
@@ -34,8 +34,13 @@ const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
 
-// useGame composable
-const { time, isWon, startGame, finish, reset } = useGame({
+const {
+  time,
+  isWon,
+  startGame,
+  finish,
+  reset
+} = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
 })
@@ -115,8 +120,7 @@ async function checkAnswers() {
 }
 
 function handleContinue() {
-  const score = isWon.value ? 100 : 0
-  emit('cleared', { game: 'automation-spotter', score })
+  emit('cleared')
 }
 
 // Retry game
@@ -132,7 +136,7 @@ async function start() {
 
 // Emit
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: 'automation-spotter'; score: number }): void
+  (e: 'cleared'): void
 }>()
 
 // Lifecycle
@@ -141,7 +145,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  // Cleanup handled by useGame
+  // Cleanup handled by useGameService
 })
 </script>
 

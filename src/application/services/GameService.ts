@@ -102,7 +102,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     game.value.setSubmitting()
 
     didWin.value = won
-    const score = won ? calculateScore() : 0
+    const score = won ? 100 : 0
 
     if (finalAnswers) {
       game.value.answers.push(...finalAnswers)
@@ -134,7 +134,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   }
 
   /**
-   * Calculate score based on time remaining
+   * Calculate score based on time remaining TODO
    */
   function calculateScore(): number {
     const timeBonus = Math.floor(time.value / 10)

@@ -8,7 +8,7 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
-import { useGame } from '@/composables/useGame'
+import { useGameService } from '@/application/services/GameService'
 
 // Level fetching
 const loading = ref(false)
@@ -37,6 +37,18 @@ function playClick() {
     audio.play().catch(() => { })
   }
 }
+
+const {
+  time,
+  isWon,
+  isLost,
+  startGame,
+  finish,
+  reset
+} = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.memory,
+})
 
 // Fetch level from API
 async function fetchLevel() {
@@ -109,12 +121,6 @@ async function flipCard(card: MemoryCard) {
 // Game state
 const showIntro = ref(true)
 
-// useGame composable
-const { time, isWon, isLost, startGame, finish, reset } = useGame({
-  maxTime: 180,
-  minigameId: MINIGAME_IDS.memory,
-})
-
 // Computed states
 const allMatched = computed(
   () => cards.value.length > 0 && cards.value.every((card) => card.matched),
@@ -123,12 +129,11 @@ const gameOver = computed(() => isLost.value || (isWon.value && allMatched.value
 
 // Emit for session tracking
 const emit = defineEmits<{
-  (e: 'cleared', payload: { game: string; score: number }): void
+  (e: 'cleared'): void
 }>()
 
 function handleContinue() {
-  const score = isWon.value ? 100 : 0
-  emit('cleared', { game: 'memory-game', score: score })
+  emit('cleared')
 }
 
 // Start game
