@@ -2,7 +2,7 @@
 import { VueDraggable } from 'vue-draggable-plus'
 import { ref } from 'vue'
 import DraggableCard from './DraggableCard.vue'
-import type { DragCard } from '@/types/types'
+import type { DragCard } from '@/domain/types'
 import { computed } from 'vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 
@@ -52,25 +52,11 @@ function playClick() {
 </script>
 
 <template>
-  <VueDraggable
-    v-model="local"
-    :group="{ name: 'cards', pull: true, put: true }"
-    item-key="id"
-    :disabled="disabled"
-    @start="playClick"
-    @end="playClick"
-    class="flex flex-wrap max-w-full justify-center items-center gap-2 w-full"
-  >
-    <DraggableCard
-      v-for="c in local"
-      :key="c.id"
-      :card="c"
-      :is-in-zone="false"
-      :checked="getChecked(c.id)"
-      :class="{
-        'cursor-grab active:cursor-grabbing': !disabled,
-        'cursor-default': disabled,
-      }"
-    />
+  <VueDraggable v-model="local" :group="{ name: 'cards', pull: true, put: true }" item-key="id" :disabled="disabled"
+    @start="playClick" @end="playClick" class="flex flex-wrap max-w-full justify-center items-center gap-2 w-full">
+    <DraggableCard v-for="c in local" :key="c.id" :card="c" :is-in-zone="false" :checked="getChecked(c.id)" :class="{
+      'cursor-grab active:cursor-grabbing': !disabled,
+      'cursor-default': disabled,
+    }" />
   </VueDraggable>
 </template>

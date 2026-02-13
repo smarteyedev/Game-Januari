@@ -1,15 +1,10 @@
 <template>
-  <Card
-    :label="item.word"
-    :custom-class="customClass"
-    :disabled="disabled"
-    :draggable="!disabled"
-    @dragstart="dragStart"
-  />
+  <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
+    @dragstart="dragStart" />
 </template>
 
 <script setup lang="ts">
-import type { Blank } from '@/types/types'
+import type { Blank } from '@/domain/types'
 import Card from '@/components/molecules/Card.vue'
 import { computed } from 'vue'
 

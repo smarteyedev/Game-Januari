@@ -1,17 +1,19 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import type { ApiResponse, Blank } from '@/types/types'
-import BlankSlot from '@/components/organism/DragAndDrop/BlankSlot.vue'
-import WordItem from '@/components/organism/DragAndDrop/WordItem.vue'
+import type { Blank } from '@/domain/types'
+import { levelRepository } from '@/infrastructure'
+import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
+import WordItem from '@/components/games/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
-import useApi from '@/composables/useApi'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
-import { MINIGAME_IDS } from '@/utils/constants'
+import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGame } from '@/composables/useGame'
 
-const { get, loading, error } = useApi()
+// Level fetching
+const loading = ref(false)
+const error = ref<unknown>(null)
 
 // Game data
 const gameData = ref<{
@@ -65,25 +67,22 @@ const emit = defineEmits<{
 
 // Fetch level
 async function fetchLevel() {
+  loading.value = true
+  error.value = null
+
   try {
-    const res = await get<
-      ApiResponse<{
-        sentence: string
-        blanks: Blank[]
-      }>
-    >('/api/v1/minigames/drag-and-drop/levels/1')
+    const data = await levelRepository.getLevel<{
+      sentence: string
+      blanks: Blank[]
+    }>(MinigameId.DragAndDrop, 1)
 
-    if (res && (res.success === false || (res as any).error)) {
-      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
-      const err = new Error(msg)
-        ; (err as any).apiError = res
-      throw err
-    }
-
-    gameData.value = res.data
+    gameData.value = data
     loadLevel()
   } catch (err) {
+    error.value = err
     console.error('Failed to load level', err)
+  } finally {
+    loading.value = false
   }
 }
 

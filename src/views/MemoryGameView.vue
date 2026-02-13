@@ -1,16 +1,18 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import type { MemoryCard, ContentType, ApiResponse } from '@/types/types'
-import MemoryBoard from '@/components/organism/MemoryGame/MemoryBoard.vue'
+import type { MemoryCard, ContentType } from '@/domain/types'
+import { levelRepository } from '@/infrastructure'
+import MemoryBoard from '@/components/games/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
-import useApi from '@/composables/useApi'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
-import { MINIGAME_IDS } from '@/utils/constants'
+import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGame } from '@/composables/useGame'
 
-const { get, loading, error } = useApi()
+// Level fetching
+const loading = ref(false)
+const error = ref<unknown>(null)
 
 // Game data
 const gameData = ref<{
@@ -38,25 +40,22 @@ function playClick() {
 
 // Fetch level from API
 async function fetchLevel() {
+  loading.value = true
+  error.value = null
+
   try {
-    const res = await get<
-      ApiResponse<{
-        id: number
-        card: MemoryCard[]
-      }>
-    >('/api/v1/minigames/memory-game/levels/1')
+    const data = await levelRepository.getLevel<{
+      id: number
+      card: MemoryCard[]
+    }>(MinigameId.Memory, 1)
 
-    if (res && (res.success === false || (res as any).error)) {
-      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
-      const err = new Error(msg)
-        ; (err as any).apiError = res
-      throw err
-    }
-
-    gameData.value = res.data
+    gameData.value = data
     cards.value = loadLevel()
   } catch (err) {
+    error.value = err
     console.error('Failed to load level', err)
+  } finally {
+    loading.value = false
   }
 }
 

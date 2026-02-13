@@ -1,19 +1,20 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
-import TaskRow from '@/components/organism/AutomationSpotter/TaskRow.vue'
-import SpotZones from '@/components/organism/AutomationSpotter/SpotZones.vue'
-import type { DragCard, Zone } from '@/types/types'
-import useApi from '@/composables/useApi'
-import type { ApiResponse } from '@/types/types'
+import TaskRow from '@/components/games/AutomationSpotter/TaskRow.vue'
+import SpotZones from '@/components/games/AutomationSpotter/SpotZones.vue'
+import type { DragCard, Zone } from '@/domain/types'
+import { levelRepository } from '@/infrastructure'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import introData from '@/assets/gameData/intro.json'
-import { MINIGAME_IDS } from '@/utils/constants'
+import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGame } from '@/composables/useGame'
 
-const { get, loading, error } = useApi()
+// Level fetching
+const loading = ref(false)
+const error = ref<unknown>(null)
 
-// Game data
+// useGame composable
 const gameData = ref<{
   question: string
   card: DragCard[]
@@ -52,25 +53,22 @@ const hasLost = computed(() => isChecked.value && !isLevelWin.value)
 
 // Fetch level
 async function fetchLevel() {
+  loading.value = true
+  error.value = null
+
   try {
-    const res = await get<
-      ApiResponse<{
-        question: string
-        card: DragCard[]
-      }>
-    >('/api/v1/minigames/automation-spotter/levels/1')
+    const data = await levelRepository.getLevel<{
+      question: string
+      card: DragCard[]
+    }>(MinigameId.AutomationSpotter, 1)
 
-    if (res && (res.success === false || (res as any).error)) {
-      const msg = res.message ?? (res as any).error?.details ?? 'API returned an error'
-      const err = new Error(msg)
-        ; (err as any).apiError = res
-      throw err
-    }
-
-    gameData.value = res.data
+    gameData.value = data
     loadLevel()
   } catch (err) {
+    error.value = err
     console.error('Failed to load level', err)
+  } finally {
+    loading.value = false
   }
 }
 

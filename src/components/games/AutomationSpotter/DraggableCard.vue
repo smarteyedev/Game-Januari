@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { DragCard } from '@/types/types'
+import type { DragCard } from '@/domain/types'
 import Card from '@/components/molecules/Card.vue'
 import { computed } from 'vue'
 
