@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4">
+  <BaseGame title="Matrix Game" :time="time" v-model:showIntro="showIntro" :introData="introData.data[5]">
     <UiLabel :label="survey?.title" />
 
     <table class="w-full border-collapse">
@@ -19,12 +19,7 @@
           </td>
 
           <td v-for="o in survey?.options" :key="o.value" class="p-3 text-center">
-            <UiRadio
-              v-model="answers[q.id]"
-              :value="o.value"
-              :class="radioClass(q, o)"
-              :disabled="score !== null"
-            />
+            <UiRadio v-model="answers[q.id]" :value="o.value" :class="radioClass(q, o)" :disabled="score !== null" />
           </td>
         </tr>
       </tbody>
@@ -32,23 +27,16 @@
 
     <div class="flex gap-2 p-4">
       <UiButton @click="submit" class="flex items-center p-2 rounded-sm">Submit</UiButton>
-      <UiButton
-        @click="restart"
-        class="flex items-center p-2 rounded-sm"
-        color="error"
-        :disabled="!finished"
-        >Restart
+      <UiButton @click="restart" class="flex items-center p-2 rounded-sm" color="error" :disabled="!finished">Restart
       </UiButton>
-      <UiButton
-        @click="continueQuiz"
-        class="flex items-center p-2 rounded-sm"
-        color="success"
-        :disabled="!finished"
-      >
-        Continue</UiButton
-      >
+      <UiButton @click="continueQuiz" class="flex items-center p-2 rounded-sm" color="success" :disabled="!finished">
+        Continue</UiButton>
     </div>
-  </div>
+
+    <template #footer>
+      <span></span>
+    </template>
+  </BaseGame>
 </template>
 
 <script setup lang="ts">
@@ -57,6 +45,11 @@ import { UiLabel } from '@/components/atoms/label'
 import { UiRadio } from '@/components/atoms/radio'
 import gameData from '@/assets/gameData/matrix_game.json'
 import { UiButton } from '@/components/atoms/button'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameService } from '@/application'
+import introData from '@/assets/gameData/intro.json'
+
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }
@@ -66,6 +59,15 @@ const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
 const finished = ref(false)
+
+const { time, isWon, startGame, finish, reset } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.matrix,
+})
+
+const loading = ref(false)
+const error = ref<unknown>(null)
+const showIntro = ref(true)
 
 onMounted(async () => {
   survey.value = gameData

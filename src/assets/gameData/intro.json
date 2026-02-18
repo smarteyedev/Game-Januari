@@ -40,6 +40,34 @@
           "description": "Untuk keperluan visual, Canva AI hadir dengan fitur seperti Magic Write dan Magic Design. Dengan satu kalimat deskripsi, pengguna bisa membuat presentasi, poster, atau konten media sosial dalam hitungan menit."
         }
       ]
+    },
+    {
+      "title": "Connenctions Game",
+      "description": "Make a group of four",
+      "key_points": [
+        {
+          "description": "Square, Circle, Triangle, Hexagon"
+        }
+      ]
+    },
+        {
+      "title": "Scrambles Game",
+      "description": "Reorganize the scrambled word",
+      "key_points": [
+        {
+          "description": "OWRD -> WORD"
+        }
+               
+      ]
+    },
+     {
+      "title": "Matrix Game",
+      "description": "Answer the right question",
+      "key_points": [
+        {
+          "description": "ABCD"
+        }
+      ]
     }
   ]
 }
