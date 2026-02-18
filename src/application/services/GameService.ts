@@ -5,7 +5,7 @@
 
 import { ref, computed } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
-import { Game, type GameData } from '@/domain/entities/Game'
+import { Game } from '@/domain/entities/Game'
 import { GameState, type MinigameId, type GameResult } from '@/domain/types'
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
@@ -54,14 +54,7 @@ export type GameServiceReturn = {
 }
 
 export function useGameService(options: GameServiceOptions): GameServiceReturn {
-  const {
-    maxTime = 180,
-    minigameId,
-    onWin,
-    onLose,
-    onSubmit,
-    autoSubmit = true,
-  } = options
+  const { maxTime = 180, minigameId, onWin, onLose, onSubmit, autoSubmit = true } = options
 
   // Game entity
   const game = ref<Game>(
@@ -135,11 +128,12 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
   /**
    * Calculate score based on time remaining TODO
-   */
+   
   function calculateScore(): number {
     const timeBonus = Math.floor(time.value / 10)
     return Math.min(100, 50 + timeBonus)
   }
+    */
 
   /**
    * Start a new game
@@ -253,4 +247,3 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 }
 
 export default useGameService
-

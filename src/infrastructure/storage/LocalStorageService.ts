@@ -63,4 +63,3 @@ export class LocalStorageService implements IStorageService {
 export const storage = new LocalStorageService()
 
 export default LocalStorageService
-

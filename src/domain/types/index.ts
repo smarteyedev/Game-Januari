@@ -160,4 +160,3 @@ export interface MemoryCard {
   flipped?: boolean
   matched?: boolean
 }
-

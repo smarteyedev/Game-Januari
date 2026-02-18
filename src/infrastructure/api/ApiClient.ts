@@ -59,9 +59,7 @@ apiClient.interceptors.response.use(
 )
 
 // Request maker function
-export async function request<T = unknown>(
-  config: AxiosRequestConfig,
-): Promise<ApiResponse<T>> {
+export async function request<T = unknown>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
   const response: AxiosResponse<ApiResponse<T>> = await apiClient.request<ApiResponse<T>>(config)
   return response.data
 }
@@ -125,4 +123,3 @@ export function useApiClient() {
 }
 
 export default apiClient
-

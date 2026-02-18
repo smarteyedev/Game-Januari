@@ -21,7 +21,13 @@ const isDisabled = computed(() => state !== 'unlocked')
 </script>
 
 <template>
-  <UiButton class="cursor-pointer" variant="ghost" square :disabled="isDisabled" @click="handleClick">
+  <UiButton
+    class="cursor-pointer"
+    variant="ghost"
+    square
+    :disabled="isDisabled"
+    @click="handleClick"
+  >
     <template #prepend>
       <slot :state="state" />
     </template>

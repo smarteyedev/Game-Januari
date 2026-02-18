@@ -4,5 +4,8 @@
  */
 
 // Services
-export { useGameService, type GameServiceOptions, type GameServiceReturn } from './services/GameService'
-
+export {
+  useGameService,
+  type GameServiceOptions,
+  type GameServiceReturn,
+} from './services/GameService'

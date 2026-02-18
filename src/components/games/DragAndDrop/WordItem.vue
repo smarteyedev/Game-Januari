@@ -1,6 +1,11 @@
 <template>
-  <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
-    @dragstart="dragStart" />
+  <Card
+    :label="item.word"
+    :custom-class="customClass"
+    :disabled="disabled"
+    :draggable="!disabled"
+    @dragstart="dragStart"
+  />
 </template>
 
 <script setup lang="ts">

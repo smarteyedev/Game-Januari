@@ -1,6 +1,6 @@
 /**
  * Session Store - Pinia Store
- * Manages guest session state using clean architecture
+ * Manages guest session
  */
 
 import { defineStore } from 'pinia'

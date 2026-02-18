@@ -7,6 +7,7 @@ import type { ISessionRepository } from '@/domain/interfaces'
 import type { GuestSession } from '@/domain/types'
 import { httpClient } from '../api/ApiClient'
 import { storage } from '../storage/LocalStorageService'
+import { API_ENDPOINTS } from '@/utils/constants'
 
 const STORAGE_KEY = 'guest_session'
 
@@ -14,9 +15,9 @@ export class SessionRepository implements ISessionRepository {
   private currentSession: GuestSession | null = null
 
   async createGuestSession(): Promise<GuestSession> {
-    const response = await httpClient.post<
-      GuestSession & { expiresAt: string }
-    >('/api/v1/guest/session')
+    const response = await httpClient.post<GuestSession & { expiresAt: string }>(
+      API_ENDPOINTS.GUEST_SESSION,
+    )
 
     const session: GuestSession = {
       guestId: response.data.guestId,
@@ -56,7 +57,7 @@ export class SessionRepository implements ISessionRepository {
 
   isSessionValid(): boolean {
     if (!this.currentSession) return false
-    
+
     const expiresAt = new Date(this.currentSession.expiresAt)
     return new Date() < expiresAt
   }
@@ -66,4 +67,3 @@ export class SessionRepository implements ISessionRepository {
 export const sessionRepository = new SessionRepository()
 
 export default SessionRepository
-

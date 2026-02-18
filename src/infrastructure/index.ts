@@ -8,8 +8,12 @@ export { httpClient, useApiClient, request, default as apiClient } from './api/A
 
 // Repositories
 export { SessionRepository, sessionRepository } from './repositories/SessionRepository'
-export { GameRepository, LevelRepository, gameRepository, levelRepository } from './repositories/GameRepository'
+export {
+  GameRepository,
+  LevelRepository,
+  gameRepository,
+  levelRepository,
+} from './repositories/GameRepository'
 
 // Storage
 export { LocalStorageService, storage } from './storage/LocalStorageService'
-

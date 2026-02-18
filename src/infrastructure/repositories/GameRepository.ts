@@ -6,6 +6,7 @@
 import type { IGameRepository, LevelData } from '@/domain/interfaces'
 import { type GameSession, type MinigameId, MinigameId as MinigameIdEnum } from '@/domain/types'
 import { httpClient } from '../api/ApiClient'
+import { API_ENDPOINTS } from '@/utils/constants'
 
 export class GameRepository implements IGameRepository {
   async launchGame(
@@ -14,7 +15,7 @@ export class GameRepository implements IGameRepository {
     authToken: string,
   ): Promise<{ sessionId: string }> {
     const response = await httpClient.post<{ sessionId: string }>(
-      '/api/v1/hpl/game/launch',
+      API_ENDPOINTS.GAME_LAUNCH,
       { gameId, minigameId },
       { headers: { Authorization: `Bearer ${authToken}` } },
     )
@@ -30,17 +31,16 @@ export class GameRepository implements IGameRepository {
     authToken: string,
   ): Promise<void> {
     await httpClient.post(
-      `/api/v1/hpl/session/${sessionId}/submit`,
+      API_ENDPOINTS.SCORE_SUBMIT(sessionId),
       { score, answers, timeMs },
       { headers: { Authorization: `Bearer ${authToken}` } },
     )
   }
 
   async getGameSession(sessionId: string, authToken: string): Promise<GameSession> {
-    const response = await httpClient.get<GameSession>(
-      `/api/v1/hpl/session/${sessionId}`,
-      { headers: { Authorization: `Bearer ${authToken}` } },
-    )
+    const response = await httpClient.get<GameSession>(`/api/v1/hpl/session/${sessionId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    })
 
     return response.data
   }
@@ -48,20 +48,19 @@ export class GameRepository implements IGameRepository {
 
 // Level Repository Implementation
 export class LevelRepository {
-  async getLevel<T extends LevelData>(
-    minigameId: MinigameId,
-    level: number,
-  ): Promise<T> {
+  async getLevel<T extends LevelData>(minigameId: MinigameId, level: number): Promise<T> {
     const endpoint = this.getEndpoint(minigameId)
-    const response = await httpClient.get<T>(`/api/v1/minigames/${endpoint}/levels/${level}`)
+    const response = await httpClient.get<T>(API_ENDPOINTS.MINIGAME_LEVELS(endpoint, level))
     return response.data
   }
 
+  /* TODO
   async getAvailableLevels(minigameId: MinigameId): Promise<number[]> {
     const endpoint = this.getEndpoint(minigameId)
     const response = await httpClient.get<number[]>(`/api/v1/minigames/${endpoint}/levels`)
     return response.data
   }
+    */
 
   private getEndpoint(minigameId: MinigameId): string {
     const endpoints: Record<MinigameId, string> = {
@@ -81,4 +80,3 @@ export const gameRepository = new GameRepository()
 export const levelRepository = new LevelRepository()
 
 export default GameRepository
-

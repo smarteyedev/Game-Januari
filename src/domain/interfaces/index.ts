@@ -3,7 +3,7 @@
  * These define the data operations required by the domain layer
  */
 
-import type { GuestSession, GameSession, GameState, GameResult, MinigameId } from '../types'
+import type { GuestSession, GameSession, MinigameId } from '../types'
 
 // ============================================================================
 // Session Repository Interface
@@ -49,7 +49,11 @@ export interface IGameRepository {
   /**
    * Launch a game session
    */
-  launchGame(gameId: string, minigameId: MinigameId, authToken: string): Promise<{ sessionId: string }>
+  launchGame(
+    gameId: string,
+    minigameId: MinigameId,
+    authToken: string,
+  ): Promise<{ sessionId: string }>
 
   /**
    * Submit game score
@@ -99,4 +103,3 @@ export interface IStorageService {
   remove(key: string): void
   clear(): void
 }
-

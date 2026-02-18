@@ -1,6 +1,5 @@
 /**
  * Constants - Application Constants
- * Consolidated constants for the game application
  */
 
 import { MinigameId } from '@/domain/types'
@@ -22,7 +21,7 @@ export const API_ENDPOINTS = {
   GUEST_SESSION: '/api/v1/guest/session',
   GAME_LAUNCH: '/api/v1/hpl/game/launch',
   SCORE_SUBMIT: (sessionId: string) => `/api/v1/hpl/session/${sessionId}/submit`,
-  MINIGAME_LEVELS: (minigameId: string, level: number) => 
+  MINIGAME_LEVELS: (minigameId: string, level: number) =>
     `/api/v1/minigames/${minigameId}/levels/${level}`,
 }
 

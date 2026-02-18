@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, type Slot } from 'vue'
+import { type Slot } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
@@ -50,7 +50,7 @@ interface BaseGameProps {
   }
 }
 
-const props = withDefaults(defineProps<BaseGameProps>(), {
+withDefaults(defineProps<BaseGameProps>(), {
   description: '',
   maxTime: 180,
   loading: false,
@@ -80,15 +80,22 @@ function handleStart() {
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
     <!-- Intro Modal -->
-    <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
-      @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
-      @start="handleStart" />
+    <GameIntroModal
+      v-if="showIntro && introData"
+      :modelValue="showIntro"
+      @update:modelValue="emit('update:showIntro', $event)"
+      :title="title"
+      :introData="introData"
+      @start="handleStart"
+    />
 
     <!-- Game Content -->
     <template v-if="!showIntro">
       <div class="p-6">
         <!-- Game Container -->
-        <div class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl">
+        <div
+          class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl"
+        >
           <!-- Header Slot (custom or default) -->
           <slot name="header">
             <GameHeader :title="title" :description="description" :time="time" />
@@ -101,9 +108,18 @@ function handleStart() {
 
           <!-- Footer Slot (custom or default) -->
           <slot name="footer">
-            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
-              @retry="emit('retry')" @cleared="emit('cleared')" />
+            <GameFooter
+              :current="currentProgress"
+              :target="targetProgress"
+              :showProgress="showProgress"
+              :isChecked="isChecked"
+              :isWin="isWin"
+              :hasLost="hasLost"
+              :hideSubmit="hideSubmit"
+              @check="emit('check')"
+              @retry="emit('retry')"
+              @cleared="emit('cleared')"
+            />
           </slot>
         </div>
       </div>
