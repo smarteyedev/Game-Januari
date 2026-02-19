@@ -4,11 +4,13 @@ import GameIntro from '../molecules/GameIntro.vue'
 import type { IntroData } from '@/domain/types'
 import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
 import ButtonText from '../atoms/ButtonText.vue'
+import type { TContainerPosition } from './modal'
 
 interface Props {
   title: string
   introData?: IntroData
   modelValue: boolean
+  containerPosition: TContainerPosition
 }
 
 interface Emits {
@@ -17,7 +19,9 @@ interface Emits {
   (e: 'close'): void
 }
 
-defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  containerPosition: 'fixed',
+})
 const emit = defineEmits<Emits>()
 
 const onClose = () => {
@@ -32,8 +36,8 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal :prevent-close="true" :modelValue="modelValue" size="md" position="center" scroll-mode="content"
-    :content-style="{
+  <UiModal :container-position="props.containerPosition" :prevent-close="true" :modelValue="modelValue" size="md"
+    position="center" scroll-mode="content" :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',

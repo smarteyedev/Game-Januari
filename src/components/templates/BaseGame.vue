@@ -6,7 +6,8 @@ import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData } from '@/domain/types'
 import { toTimeMmss } from '@/utils/string'
-import Background from '../atoms/svg/background.vue'
+import DisplayLabel from '../atoms/DisplayLabel.vue'
+import Background from '@/assets/img/bg.jpg'
 
 interface BaseGameProps {
   /** Game title */
@@ -82,47 +83,42 @@ function handleStart() {
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <Background class="absolute inset-0 w-full h-full -z-10" />
-    <div class="min-h-screen flex flex-col p-6 gap-4">
-      <!-- Topbar -->
-      <div
-        class="w-fit text-h6 font-black text-primary-700 border-[3px] border-primary-700 rounded-md bg-white px-4 py-2 ">
-        <span>
-          Explore Artificial Intelligence (AI) Tools
-        </span>
-      </div>
+    <div class="min-h-screen flex flex-col p-6 gap-4 w-full" :style="{
+      backgroundImage: `url(${Background})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat'
+    }">
 
-      <!-- Main content -->
-      <div class="flex-1 relative">
+      <!-- Topbar (always visible) -->
+      <DisplayLabel text="Explore Artificial Intelligence (AI) Tools" class="z-60" />
+
+      <!-- Content Area -->
+      <div class="flex-1 flex flex-col relative">
 
         <!-- Intro Modal -->
         <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
           @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
-          @start="handleStart" />
+          @start="handleStart" containerPosition="relative" />
 
         <!-- Game Content -->
-        <template v-if="!showIntro">
+        <div v-else
+          class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl bg-white">
+          <slot name="header">
+            <GameHeader :title="title" :description="description" :question="question" :time="time" />
+          </slot>
 
-          <div
-            class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl bg-white">
+          <slot />
 
-            <slot name="header">
-              <GameHeader :title="title" :description="description" :question="question" :time="time" />
-            </slot>
-
-            <slot />
-
-            <slot name="footer">
-              <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-                :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
-                @retry="emit('retry')" @cleared="emit('cleared')" />
-            </slot>
-
-          </div>
-        </template>
+          <slot name="footer">
+            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
+              @retry="emit('retry')" @cleared="emit('cleared')" />
+          </slot>
+        </div>
 
       </div>
-
     </div>
   </GameState>
+
 </template>

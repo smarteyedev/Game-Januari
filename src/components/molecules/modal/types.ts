@@ -30,6 +30,7 @@ export interface IModalUi {
 }
 
 export type TModalScrollMode = 'root' | 'modal' | 'content'
+export type TContainerPosition = 'fixed' | 'absolute' | 'relative'
 
 export interface IModalProps {
   title?: string
@@ -42,4 +43,5 @@ export interface IModalProps {
   scrollMode?: TModalScrollMode
   ui?: IModalUi
   contentStyle?: Record<string, string>
+  containerPosition?: TContainerPosition
 }
