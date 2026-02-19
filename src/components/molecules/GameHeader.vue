@@ -5,6 +5,7 @@ withDefaults(
   defineProps<{
     title: string
     description?: string
+    question?: string
     time: number
   }>(),
   {
@@ -22,5 +23,8 @@ withDefaults(
     <span class="text-md text-primary-700 font-medium">{{ description }}</span>
 
     <span class="text-md text-primary-700 font-medium"> Time: {{ toTimeMmss(time) }} </span>
+  </div>
+  <div class="flex w-full">
+    <span class="text-md text-primary-700 font-medium">{{ question }}</span>
   </div>
 </template>
