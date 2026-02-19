@@ -2,10 +2,8 @@
   <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
     :introData="introData.data[3]">
     <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
-      <ConnectionsCard v-for="index in 4" :key="index" :label="solvedGroups[index - 1]?.label || ''"
-        :state="solvedGroups[index - 1] ? 'solved' : 'idle'" :color="solvedGroups[index - 1]
-          ? categoryColorMap[solvedGroups[index - 1].id]
-          : 'bg-gray-200'" :clickable="false" />
+      <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
+        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
     </div>
 
     <div class="p-2">
@@ -240,6 +238,17 @@ function submitSelection() {
   if (solvedGroups.value.length === categories.value.length) {
     win.value = true
   }
+}
+
+function getSolvedGroup(index: number) {
+  return solvedGroups.value[index]
+}
+
+function getSolvedColor(index: number) {
+  const group = solvedGroups.value[index]
+  return group
+    ? categoryColorMap.value[group.id] ?? 'bg-gray-200'
+    : 'bg-gray-200'
 }
 
 function revealAllGroups() {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { VueDraggable } from 'vue-draggable-plus'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import DraggableCard from './DraggableCard.vue'
 import type { DragCard } from '@/domain/types'
 
@@ -19,6 +19,13 @@ const emit = defineEmits<{
 }>()
 
 const prevIds = ref<number[]>(props.modelValue?.map((c) => c.id) ?? [])
+
+// Extract text color classes from className prop
+const textColorClass = computed(() => {
+  if (!props.className) return ''
+  const colorMatch = props.className.match(/text-\[#[0-9A-Fa-f]+\]|text-(?:primary|error|warning|success|info|secondary|gray)-?\d*/)
+  return colorMatch ? colorMatch[0] : ''
+})
 
 function updateModel(newVal: DragCard[]) {
   emit('update:modelValue', newVal)
@@ -39,8 +46,10 @@ function updateModel(newVal: DragCard[]) {
     'relative rounded-lg min-w-0 w-full p-2 min-h-45 sm:min-h-55 md:min-h-60.75',
     className,
   ]">
-    <p
-      class="font-semibold text-h6 absolute inset-0 flex items-center justify-center pointer-events-none px-2 text-center">
+    <p :class="[
+      'font-semibold text-h6 absolute inset-0 flex items-center justify-center pointer-events-none px-2 text-center',
+      textColorClass
+    ]">
       {{ text }}
     </p>
 

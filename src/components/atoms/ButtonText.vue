@@ -68,9 +68,13 @@ const classes = computed(() => [
 ])
 
 const textEffects = computed(() => {
-  if (props.disabled) return ''
   if (props.variant === 'secondary') return ''
-  return 'text-cartoon text-cartoon-sm'
+
+  return [
+    'text-cartoon',
+    'text-cartoon-sm',
+    props.disabled ? 'text-gray-300' : '',
+  ]
 })
 </script>
 
