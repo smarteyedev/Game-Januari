@@ -172,6 +172,7 @@
   --text-body-lg: 1.125rem;
 
   /* Headings */
+  --text-h6: 1.25rem;
   --text-h5: 1.5rem;
   --text-h4: 1.75rem;
   --text-h3: 2.125rem;
@@ -246,6 +247,9 @@
     @apply text-base text-body-lg;
   }
 
+  .text-h6 {
+    @apply text-base text-h6;
+  }
   .text-h5 {
     @apply text-base text-h5;
   }
@@ -280,17 +284,6 @@
 }
 
 @layer utilities {
-  .shadow-flat-sm {
-    --tw-shadow: 0 2px 0 var(--tw-shadow-color);
-  }
-
-  .shadow-flat-md {
-    --tw-shadow: 0 4px 0 var(--tw-shadow-color);
-  }
-
-  .shadow-flat-lg {
-    --tw-shadow: 0 8px 0 var(--tw-shadow-color);
-  }
 
   .text-shadow-flat-sm {
     text-shadow: 0 3px 0 var(--btn-accent);

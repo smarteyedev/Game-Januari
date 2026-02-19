@@ -1,17 +1,17 @@
 <template>
-  <BaseGame title="Connections Game" :time="time" v-model:showIntro="showIntro" :introData="introData.data[3]">
-    <div class="p-2">
-      <UiLabel label="Connections game"></UiLabel>
-    </div>
+  <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
+    :introData="introData.data[3]">
     <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
-      <ConnectionsCard v-for="group in solvedGroups" :key="group.id" :label="group.label" state="solved"
-        :color="categoryColorMap[group.id]" :clickable="false" />
+      <ConnectionsCard v-for="index in 4" :key="index" :label="solvedGroups[index - 1]?.label || ''"
+        :state="solvedGroups[index - 1] ? 'solved' : 'idle'" :color="solvedGroups[index - 1]
+          ? categoryColorMap[solvedGroups[index - 1].id]
+          : 'bg-gray-200'" :clickable="false" />
     </div>
 
     <div class="p-2">
-      <UiLabel label="Create a group of four"></UiLabel>
+      <span class="text-h6 font-bold text-primary-700">Create a group of four</span>
     </div>
-    <div class="grid grid-cols-4 gap-2">
+    <div class="grid grid-cols-8 gap-2">
       <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
         :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
@@ -25,25 +25,26 @@
       <UiLabel v-if="lose" :label="`you lose`" />
     </div>
     <!-- Control Buttons -->
-    <div class="flex p-2 gap-2">
-      <UiButton class="p-4 flex items-center rounded-sm" :disabled="selected.length !== 4 || win || lose"
-        @click="submitSelection">
-        <span>Submit</span>
-      </UiButton>
 
-      <!--Hidden, if lose show restart, if win show continue-->
-      <UiButton class="p-4 flex items-center rounded-sm" v-if="lose" @click="restartGame" :color="'error'">
-        <span>Restart</span>
-      </UiButton>
-      <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
-        <span>Continue</span>
-      </UiButton>
-    </div>
-    <div class="p-2">
-      <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
-    </div>
     <template #footer>
-      <span></span>
+      <div class="flex flex-col items-center">
+        <div class="flex p-2 gap-2">
+          <ButtonText text="Submit" variant="primary" :disabled="selected.length !== 4 || win || lose"
+            @click="submitSelection">
+          </ButtonText>
+
+          <!--Hidden, if lose show restart, if win show continue-->
+          <UiButton class="p-4 flex items-center rounded-sm" v-if="lose" @click="restartGame" :color="'error'">
+            <span>Restart</span>
+          </UiButton>
+          <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
+            <span>Continue</span>
+          </UiButton>
+        </div>
+        <div class="p-2">
+          <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
+        </div>
+      </div>
     </template>
   </BaseGame>
 </template>
@@ -58,6 +59,7 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
+import ButtonText from '@/components/atoms/ButtonText.vue'
 
 type Category = {
   id: string
