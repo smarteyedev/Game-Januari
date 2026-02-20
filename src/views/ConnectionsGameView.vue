@@ -37,7 +37,7 @@
           <ButtonText text="Continue" v-if="isWon" :color="'success'">
           </ButtonText>
         </div>
-        <div class="p-2 text-primary font-semibold text-body-lg">
+        <div class="p-2 text-primary-700 font-semibold text-body-lg">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>
@@ -49,7 +49,6 @@
 import { onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
-import { UiButton } from '@/components/atoms/button'
 import gameData from '@/assets/gameData/connection_game.json'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'

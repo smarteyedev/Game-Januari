@@ -1,22 +1,31 @@
 <template>
-  <BaseGame title="Scrambles Game" :time="time" v-model:showIntro="showIntro" :introData="introData.data[4]">
-    <div class="p-2">
-      <UiLabel :label="question" />
-    </div>
+  <BaseGame title="Scrambles Game" :description="question" :time="time" v-model:showIntro="showIntro"
+    :introData="introData.data[4]">
 
     <div class="p-2">
       <BoxInput :value="userInput" :locked="hints" />
     </div>
 
     <div class="p-2 flex gap-2">
-      <span v-for="i in MAX_ATTEMPTS" :key="i" class="w-3 h-3 rounded-full border transition-all"
-        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'" />
+      <UiLabel :label="`You have ${attempts} attempts left`" class="text-primary-700 font-semibold text-body-lg" />
     </div>
 
-    <div class="p-2 flex flex-col items-center gap-2">
-      <div v-for="(s, i) in submissions" :key="i" class="text-lg font-medium"
-        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'">
-        {{ s.value }}
+    <div class="p-2 flex flex-col items-center gap-3">
+      <div v-for="(s, i) in submissions" :key="i" class="flex gap-2">
+        <div v-for="(char, j) in s.value.split('')" :key="j" class="aspect-square min-w-[80px] min-h-[80px]
+             grid place-items-center
+             border-[3px] rounded-xl
+             shadow-xl
+             text-[32px] font-bold
+             select-none transition" :class="{
+              // Correct guess (green styled)
+              'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
+
+              // Wrong guess (muted + strike feeling)
+              'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct
+            }">
+          {{ char }}
+        </div>
       </div>
     </div>
 
@@ -26,20 +35,18 @@
     </div>
 
     <div class="flex gap-2 p-2">
-      <UiButton class="flex items-center p-4 rounded-sm" color="error" @click="deleteChar" :disabled="!isPlaying">
-        <span>Delete</span>
-      </UiButton>
-      <UiButton class="flex items-center p-4 rounded-sm" @click="submitAnswer" :disabled="!isPlaying">
-        <span>Submit</span>
-      </UiButton>
+      <ButtonText text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+      </ButtonText>
+      <ButtonText text="Submit" @click="submitAnswer" :disabled="!isPlaying">
 
-      <UiButton v-if="isLose" color="error" class="flex items-center p-4 rounded-sm" @click="restartGame">
-        <span>Restart</span>
-      </UiButton>
+      </ButtonText>
 
-      <UiButton v-if="isWin" color="success" class="flex items-center p-4 rounded-sm" @click="continueGame">
-        <span>Continue</span>
-      </UiButton>
+      <ButtonText text="Restart" v-if="isLose" variant="danger" @click="restartGame">
+
+      </ButtonText>
+
+      <ButtonText text="Continue" v-if="isWin" @click="continueGame">
+      </ButtonText>
     </div>
 
     <template #footer>
@@ -50,16 +57,16 @@
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { UiLabel } from '@/components/atoms/label'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
-import { UiButton } from '@/components/atoms/button'
+import ButtonText from '@/components/atoms/ButtonText.vue'
 import gameData from '@/assets/gameData/scrambles.json'
 import { shuffle } from '@/utils/shuffle'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
+import { UiLabel } from '@/components/atoms/label'
 
 type Submission = {
   value: string
