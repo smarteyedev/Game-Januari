@@ -42,11 +42,14 @@ const onStart = () => {
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
       background: '#FFFCF6',
+      maxHeight: '90vh',
+      display: 'flex',
+      flexDirection: 'column',
     }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center items-center w-full">
-        <div class="w-24 h-25.5">
+        <div>
           <UnknownIcon />
         </div>
       </div>
@@ -57,14 +60,14 @@ const onStart = () => {
     </template>
 
     <!-- BODY -->
-    <div class="px-10 pt-[24px] flex justify-center">
+    <div class="flex-1 overflow-y-auto px-10 pt-[24px] flex justify-center">
       <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
         :key_points="introData.key_points" class="w-full max-w-149.25" />
     </div>
 
     <!-- FOOTER -->
     <template #footer>
-      <div class="flex justify-center pb-10">
+      <div class="flex justify-center pb-10 shrink-0">
         <ButtonText text="Mulai Game" variant="primary" size="lg" class="w-40.5 h-11" @click="onStart" />
       </div>
     </template>
