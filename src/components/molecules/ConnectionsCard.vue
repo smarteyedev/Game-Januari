@@ -1,13 +1,10 @@
 <template>
-  <button
-    @click="clickable && $emit('click')"
-    :class="[
-      'p-4 rounded-sm font-bold transition',
-      stateClass,
-      clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
-    ]"
-  >
-    <UiLabel :label="label" :ui="{ color: 'white' }" />
+  <button @click="clickable && $emit('click')" :class="[
+    'p-4 font-bold transition border-gray-500 border rounded-lg aspect-video',
+    stateClass,
+    clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
+  ]">
+    <UiLabel :label="label" class="font-semibold text-h6" />
   </button>
 </template>
 
@@ -25,8 +22,8 @@ const props = defineProps<{
 defineEmits(['click'])
 
 const stateClass = computed(() => {
-  if (props.state === 'selected') return 'bg-green-600'
+  if (props.state === 'selected') return 'bg-primary-100'
   if (props.state === 'solved') return props.color
-  return 'bg-gray-700'
+  return 'bg-gray-50'
 })
 </script>

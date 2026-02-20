@@ -9,13 +9,7 @@
     <Tooltip v-if="tooltip" placement="right" trigger="hover" v-bind="floatingVueConfig">
       <template #default="slotProps">
         <slot name="tooltip-icon" v-bind="slotProps">
-          <UiAtomsIcon
-            name="mdi-information-outline"
-            width="17"
-            height="17"
-            mode="svg"
-            class="text-gray-400"
-          />
+          <UiAtomsIcon name="mdi-information-outline" width="17" height="17" mode="svg" class="text-gray-400" />
         </slot>
       </template>
 
@@ -77,9 +71,7 @@ const genStyle = computed(() => {
 }
 
 .ui-label {
-  @apply flex items-center gap-2;
-
-  color: var(--label-color);
+  @apply flex items-center gap-2 text-gray-900;
 }
 
 .ui-label__text {

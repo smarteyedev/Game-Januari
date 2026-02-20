@@ -11,6 +11,8 @@ import Background from '@/assets/img/bg.jpg'
 
 interface BaseGameProps {
   /** Game title */
+  moduleTitle?: string
+  /** Game title */
   title: string
   /** Game description */
   description?: string
@@ -91,7 +93,7 @@ function handleStart() {
     }">
 
       <!-- Topbar (always visible) -->
-      <DisplayLabel text="Explore Artificial Intelligence (AI) Tools" class="z-60" />
+      <DisplayLabel v-if="moduleTitle" :text="moduleTitle" class="z-60" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">

@@ -1,7 +1,7 @@
 <template>
   <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
     :introData="introData.data[3]">
-    <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
+    <div class="grid grid-cols-4 gap-2 p-2 min-w-40 min-h-22.5">
       <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
         :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
     </div>
@@ -14,32 +14,30 @@
         :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
     <!--Event message for user feedback-->
-    <div class="p-2">
-      <UiLabel v-if="wrongCount !== null && !(win || lose)"
+    <div class="p-2 text-primary-700 text-h6 font-bold">
+      <UiLabel v-if="wrongCount !== null && !(isWon || isLost)"
         :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-      <UiLabel v-if="solvedNewGroup !== null && !(win || lose)"
+      <UiLabel v-if="solvedNewGroup !== null && !(isWon || isLost)"
         :label="`You found a new group: ${solvedNewGroup.label}`" />
-      <UiLabel v-if="win" :label="`You win`" />
-      <UiLabel v-if="lose" :label="`you lose`" />
+      <UiLabel v-if="isWon" :label="`You win`" />
+      <UiLabel v-if="isLost" :label="`you lose`" />
     </div>
     <!-- Control Buttons -->
 
     <template #footer>
       <div class="flex flex-col items-center">
         <div class="flex p-2 gap-2">
-          <ButtonText text="Submit" variant="primary" :disabled="selected.length !== 4 || win || lose"
+          <ButtonText text="Submit" variant="primary" :disabled="selected.length !== 4 || isWon || isLost"
             @click="submitSelection">
           </ButtonText>
 
           <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton class="p-4 flex items-center rounded-sm" v-if="lose" @click="restartGame" :color="'error'">
-            <span>Restart</span>
-          </UiButton>
-          <UiButton class="p-4 flex items-center rounded-sm" v-if="win" :color="'success'">
-            <span>Continue</span>
-          </UiButton>
+          <ButtonText text="Restart" variant="danger" v-if="isLost" @click="restartGame" :color="'error'">
+          </ButtonText>
+          <ButtonText text="Continue" v-if="isWon" :color="'success'">
+          </ButtonText>
         </div>
-        <div class="p-2">
+        <div class="p-2 text-primary font-semibold text-body-lg">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>
@@ -58,6 +56,7 @@ import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import ButtonText from '@/components/atoms/ButtonText.vue'
+import { shuffle } from '@/utils/shuffle'
 
 type Category = {
   id: string
@@ -79,28 +78,37 @@ type SolvedGroup = {
 }
 
 const COLOR_POOL = [
-  'bg-red-500',
-  'bg-orange-500',
-  'bg-amber-500',
-  'bg-yellow-500',
-  'bg-lime-500',
-  'bg-green-500',
-  'bg-emerald-500',
-  'bg-teal-500',
-  'bg-cyan-500',
-  'bg-sky-500',
-  'bg-blue-500',
-  'bg-indigo-500',
-  'bg-violet-500',
-  'bg-purple-500',
-  'bg-fuchsia-500',
-  'bg-pink-500',
-  'bg-rose-500',
+  'bg-red-200',
+  'bg-orange-200',
+  'bg-amber-200',
+  'bg-yellow-200',
+  'bg-lime-200',
+  'bg-green-200',
+  'bg-emerald-200',
+  'bg-teal-200',
+  'bg-cyan-200',
+  'bg-sky-200',
+  'bg-blue-200',
+  'bg-indigo-200',
+  'bg-violet-200',
+  'bg-purple-200',
+  'bg-fuchsia-200',
+  'bg-pink-200',
+  'bg-rose-200',
 ]
 
-const { time, isWon, startGame, finish, reset } = useGameService({
+const {
+  time,
+  isWon,
+  isLost,
+  isTimeOver,
+  startGame,
+  finish,
+  retry,
+} = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.connections,
+  offline: true,
 })
 
 const loading = ref(false)
@@ -118,18 +126,6 @@ const attemptsLeft = ref(maxAttempts)
 
 const wrongCount = ref<number | null>(null)
 const solvedNewGroup = ref<{ id: string; label: string } | null>(null)
-
-const win = ref(false)
-const lose = ref(false)
-
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array]
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-      ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
-  }
-  return result
-}
 
 function countAway(items: Item[]) {
   const freq: Record<string, number> = {}
@@ -157,13 +153,16 @@ function assignCategoryColors(categories: { id: string }[]) {
 }
 
 onMounted(async () => {
+  await startGame()
+
   const data = gameData
 
   categories.value = data.category
-
   assignCategoryColors(data.category)
 
-  categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
+  categoryLabelMap.value = Object.fromEntries(
+    data.category.map((c: any) => [c.id, c.label])
+  )
 
   items.value = shuffle(
     data.items.map((item: any) => ({
@@ -176,7 +175,7 @@ onMounted(async () => {
 
 function toggleItem(item: Item) {
   if (item.state === 'solved') return
-  if (win.value || lose.value) return
+  if (isWon.value || isLost.value) return
 
   if (item.state === 'selected') {
     item.state = 'idle'
@@ -190,9 +189,9 @@ function toggleItem(item: Item) {
   }
 }
 
-function submitSelection() {
+async function submitSelection() {
   if (selected.value.length !== 4) return
-  if (win.value || lose.value) return
+  if (isWon.value || isLost.value) return
 
   solvedNewGroup.value = null
   wrongCount.value = null
@@ -209,8 +208,8 @@ function submitSelection() {
     selected.value = []
 
     if (attemptsLeft.value <= 0) {
-      lose.value = true
       revealAllGroups()
+      await finish(false)
     }
 
     return
@@ -236,7 +235,7 @@ function submitSelection() {
 
   // win condition
   if (solvedGroups.value.length === categories.value.length) {
-    win.value = true
+    await finish(true)
   }
 }
 
@@ -247,8 +246,8 @@ function getSolvedGroup(index: number) {
 function getSolvedColor(index: number) {
   const group = solvedGroups.value[index]
   return group
-    ? categoryColorMap.value[group.id] ?? 'bg-gray-200'
-    : 'bg-gray-200'
+    ? categoryColorMap.value[group.id] ?? 'bg-gray-50'
+    : 'bg-gray-50'
 }
 
 function revealAllGroups() {
@@ -271,10 +270,13 @@ function revealAllGroups() {
   })
 }
 
-function restartGame() {
+async function restartGame() {
+  await retry()
+  resetLocalState()
+}
+
+function resetLocalState() {
   attemptsLeft.value = maxAttempts
-  win.value = false
-  lose.value = false
   wrongCount.value = null
   solvedNewGroup.value = null
   solvedGroups.value = []

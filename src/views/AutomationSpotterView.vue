@@ -144,11 +144,12 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame :title="'Automation Spotter'" description="Masukkan kata ke dalam tempat yang benar!" :question="question"
-    :time="time" :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
-    :introData="introData.data[0]" :isWin="isWon" :hasLost="hasLost" :isChecked="isChecked"
-    :currentProgress="matchedCount" :targetProgress="allCards.length" :showProgress="true" @start="start"
-    @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
+    description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
+    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
+    :isWin="isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
+    :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
+    @cleared="handleContinue">
     <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
       @moved="onMoved" />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
