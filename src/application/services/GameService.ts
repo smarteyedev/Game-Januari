@@ -30,12 +30,12 @@ export type GameServiceOptions = {
 
 export type GameServiceReturn = {
   // State
-  gameState: Ref<GameState>
-  isPlaying: ComputedRef<boolean>
-  isFinished: ComputedRef<boolean>
-  isWon: ComputedRef<boolean>
-  isLost: ComputedRef<boolean>
-  canSubmit: ComputedRef<boolean>
+  _gameState: Ref<GameState>
+  _isPlaying: ComputedRef<boolean>
+  _isFinished: ComputedRef<boolean>
+  _isWon: ComputedRef<boolean>
+  _isLost: ComputedRef<boolean>
+  _canSubmit: ComputedRef<boolean>
 
   // Timer
   time: Ref<number>
@@ -89,13 +89,13 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   })
 
   // Computed states
-  const gameState = computed(() => game.value.state)
-  const isPlaying = computed(() => game.value.isPlaying)
-  const isFinished = computed(() => game.value.isFinished)
-  const isWon = computed(() => game.value.isFinished && didWin.value)
-  const isLost = computed(() => game.value.isFinished && !didWin.value)
-  const canSubmit = computed(() => isPlaying.value || isFinished.value)
-  const didWin = ref(false)
+  const _gameState = computed(() => game.value.state)
+  const _isPlaying = computed(() => game.value.isPlaying)
+  const _isFinished = computed(() => game.value.isFinished)
+  const _isWon = computed(() => game.value.isFinished && _didWin.value)
+  const _isLost = computed(() => game.value.isFinished && !_didWin.value)
+  const _canSubmit = computed(() => _isPlaying.value || _isFinished.value)
+  const _didWin = ref(false)
 
   /**
    * Handle game over - win or lose
@@ -104,7 +104,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     stopTimer()
     game.value.setSubmitting()
 
-    didWin.value = won
+    _didWin.value = won
     const score = won ? 100 : 0
 
     if (finalAnswers) {
@@ -227,7 +227,7 @@ async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
 function reset() {
   stopTimer()
   time.value = maxTime
-  didWin.value = false
+  _didWin.value = false
   game.value.reset()
 }
 
@@ -244,12 +244,12 @@ function reset() {
 
   return {
     // State
-    gameState,
-    isPlaying,
-    isFinished,
-    isWon,
-    isLost,
-    canSubmit,
+    _gameState,
+    _isPlaying,
+    _isFinished,
+    _isWon,
+    _isLost,
+    _canSubmit,
 
     // Timer
     time,

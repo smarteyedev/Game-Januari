@@ -73,13 +73,15 @@ type Submission = {
   correct: boolean
 }
 
-type GameResult = 'playing' | 'win' | 'lose'
-const gameResult = ref<GameResult>('playing')
-
-const { time, isWon, startGame, finish, reset } = useGameService({
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, reset, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.scrambles,
+  offline: true
 })
+
+const isWin = computed(() => _isWon.value)
+const isLose = computed(() => _isLost.value)
+const isPlaying = computed(() => _isPlaying.value)
 
 const loading = ref(false)
 const error = ref<unknown>(null)
@@ -95,10 +97,6 @@ const userInput = ref<(string | null)[]>([])
 const submissions = ref<Submission[]>([])
 const hints = ref<(string | null)[]>([])
 
-const isWin = computed(() => gameResult.value === 'win')
-const isLose = computed(() => gameResult.value === 'lose')
-const isPlaying = computed(() => gameResult.value === 'playing')
-
 onMounted(async () => {
   const data = gameData
   question.value = data.question
@@ -106,6 +104,8 @@ onMounted(async () => {
 
   hints.value = Array(answer.value.length).fill(null)
   userInput.value = Array(answer.value.length).fill(null)
+
+  await startGame()
 })
 
 const displayInput = computed(() =>
@@ -160,8 +160,8 @@ function deleteChar() {
   }
 }
 
-function submitAnswer() {
-  if (gameResult.value !== 'playing') return
+async function submitAnswer() {
+  if (!isPlaying) return
 
   const guess = displayInput.value
   const correct = guess === answer.value
@@ -169,19 +169,18 @@ function submitAnswer() {
   submissions.value.push({ value: guess, correct })
 
   if (correct) {
-    gameResult.value = 'win'
+    await finish(true)
     return
   }
 
   attempts.value--
 
   if (attempts.value <= 0) {
-    gameResult.value = 'lose'
-
     // reveal full answer
     hints.value = answer.value.split('')
     userInput.value = Array(answer.value.length).fill(null)
     submissions.value.push({ value: answer.value, correct: true })
+    await finish(false)
   }
 
   // reveal one random hint
@@ -206,7 +205,7 @@ function submitAnswer() {
   userInput.value = Array(answer.value.length).fill(null)
 
   if (attempts.value <= 0) {
-    gameResult.value = 'lose'
+    await finish(false)
   }
 }
 
@@ -222,12 +221,12 @@ function getRandomLetter(exclude: Set<string>): string {
   return available[Math.floor(Math.random() * available.length)]!
 }
 
-function restartGame() {
+async function restartGame() {
   attempts.value = MAX_ATTEMPTS
   submissions.value = []
   hints.value = Array(answer.value.length).fill(null)
   userInput.value = Array(answer.value.length).fill(null)
-  gameResult.value = 'playing'
+  await retry()
 }
 
 function continueGame() {

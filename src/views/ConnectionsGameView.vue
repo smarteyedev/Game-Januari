@@ -46,7 +46,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
 import gameData from '@/assets/gameData/connection_game.json'
@@ -98,8 +98,8 @@ const COLOR_POOL = [
 
 const {
   time,
-  isWon,
-  isLost,
+  _isWon,
+  _isLost,
   isTimeOver,
   startGame,
   finish,
@@ -113,6 +113,8 @@ const {
 const loading = ref(false)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
+const isWon = computed(() => _isWon.value)
+const isLost = computed(() => _isLost.value)
 
 const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])
