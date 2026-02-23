@@ -1,6 +1,6 @@
 <template>
   <BaseGame title="Scrambles Game" :description="question" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[4]">
+    :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame">
 
     <div class="p-2">
       <BoxInput :value="userInput" :locked="hints" />
@@ -83,7 +83,7 @@ const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
 const isPlaying = computed(() => _isPlaying.value)
 
-const loading = ref(false)
+const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
 
@@ -97,15 +97,35 @@ const userInput = ref<(string | null)[]>([])
 const submissions = ref<Submission[]>([])
 const hints = ref<(string | null)[]>([])
 
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    const data = gameData
+    question.value = data.question
+    answer.value = data.answer.toUpperCase()
+
+    hints.value = Array(answer.value.length).fill(null)
+    userInput.value = Array(answer.value.length).fill(null)
+
+    await startGame()
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
+
 onMounted(async () => {
-  const data = gameData
-  question.value = data.question
-  answer.value = data.answer.toUpperCase()
-
-  hints.value = Array(answer.value.length).fill(null)
-  userInput.value = Array(answer.value.length).fill(null)
-
-  await startGame()
+  await initializeGame()
 })
 
 const displayInput = computed(() =>

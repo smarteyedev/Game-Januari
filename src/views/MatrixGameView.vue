@@ -1,6 +1,6 @@
 <template>
   <BaseGame title="Matrix Game" :description="survey?.title" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[5]">
+    :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
 
 
     <div v-if="survey" v-for="q in survey.questions" :key="q.id" class="mb-6">
@@ -49,7 +49,7 @@ const { time, _isWon, _isLost, _isPlaying, startGame, finish, reset, retry } = u
   offline: true
 })
 
-const loading = ref(false)
+const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
 
@@ -57,14 +57,35 @@ const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
 const isPlaying = computed(() => _isPlaying.value)
 
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    if (survey.value) {
+      // initialize answers
+      survey.value.questions.forEach((q) => {
+        answers.value[q.id] = undefined
+      })
+    }
+    await startGame()
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
+
 onMounted(async () => {
   survey.value = gameData
-
-  // initialize answers
-  survey.value.questions.forEach((q) => {
-    answers.value[q.id] = undefined
-  })
-  await startGame()
+  await initializeGame()
 })
 
 const submit = async () => {

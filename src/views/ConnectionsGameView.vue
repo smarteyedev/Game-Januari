@@ -1,6 +1,6 @@
 <template>
   <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[3]">
+    :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
     <div class="grid grid-cols-4 gap-2 p-2 min-w-40 min-h-22.5">
       <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
         :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
@@ -110,9 +110,10 @@ const {
   offline: true,
 })
 
-const loading = ref(false)
+const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
+
 const isWon = computed(() => _isWon.value)
 const isLost = computed(() => _isLost.value)
 
@@ -148,30 +149,50 @@ function colorFromCategory(id: string) {
 }
 
 function assignCategoryColors(categories: { id: string }[]) {
-  categories.forEach((cat, _) => {
+  categories.forEach((cat) => {
     categoryColorMap.value[cat.id] = colorFromCategory(cat.id)
   })
 }
 
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    await startGame()
+
+    const data = gameData
+
+    categories.value = data.category
+    assignCategoryColors(data.category)
+
+    categoryLabelMap.value = Object.fromEntries(
+      data.category.map((c: any) => [c.id, c.label])
+    )
+
+    items.value = shuffle(
+      data.items.map((item: any) => ({
+        label: item.label,
+        category: item.category,
+        state: 'idle',
+      })),
+    )
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
+
 onMounted(async () => {
-  await startGame()
-
-  const data = gameData
-
-  categories.value = data.category
-  assignCategoryColors(data.category)
-
-  categoryLabelMap.value = Object.fromEntries(
-    data.category.map((c: any) => [c.id, c.label])
-  )
-
-  items.value = shuffle(
-    data.items.map((item: any) => ({
-      label: item.label,
-      category: item.category,
-      state: 'idle',
-    })),
-  )
+  await initializeGame()
 })
 
 function toggleItem(item: Item) {
