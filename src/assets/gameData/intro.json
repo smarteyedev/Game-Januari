@@ -50,17 +50,16 @@
         }
       ]
     },
-        {
+    {
       "title": "Scrambles Game",
       "description": "Reorganize the scrambled word",
       "key_points": [
         {
           "description": "OWRD -> WORD"
         }
-               
       ]
     },
-     {
+    {
       "title": "Matrix Game",
       "description": "Answer the right question",
       "key_points": [

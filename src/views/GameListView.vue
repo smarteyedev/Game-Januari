@@ -3,35 +3,32 @@ import Background from '@/assets/img/bg.jpg'
 </script>
 
 <template>
-  <div class="min-h-screen w-full flex items-center justify-center relative overflow-hidden" :style="{
-    backgroundImage: `url(${Background})`,
-    backgroundPosition: 'center',
-    backgroundSize: 'cover',
-    backgroundRepeat: 'no-repeat'
-  }">
+  <div
+    class="min-h-screen w-full flex items-center justify-center relative overflow-hidden"
+    :style="{
+      backgroundImage: `url(${Background})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+    }"
+  >
     <!-- Dark overlay -->
     <div class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
 
     <!-- Main Menu Container -->
     <div class="relative z-10 w-full px-8 py-12">
-
       <!-- Title -->
       <div class="text-center mb-12">
         <h1 class="text-5xl font-extrabold text-white tracking-widest drop-shadow-lg">
           GBL MINIGAME HUB
         </h1>
-        <p class="text-gray-300 mt-2 text-lg">
-          SELECT GAME
-        </p>
+        <p class="text-gray-300 mt-2 text-lg">SELECT GAME</p>
       </div>
 
       <div class="space-y-10">
-
         <!-- February -->
         <div class="menu-panel">
-          <h2 class="panel-title">
-            2026 — FEBRUARY
-          </h2>
+          <h2 class="panel-title">2026 — FEBRUARY</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <RouterLink to="connections-game" class="menu-tile">
@@ -50,9 +47,7 @@ import Background from '@/assets/img/bg.jpg'
 
         <!-- January -->
         <div class="menu-panel">
-          <h2 class="panel-title">
-            2026 — JANUARY
-          </h2>
+          <h2 class="panel-title">2026 — JANUARY</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <RouterLink to="automation-spotter" class="menu-tile">
@@ -68,7 +63,6 @@ import Background from '@/assets/img/bg.jpg'
             </RouterLink>
           </div>
         </div>
-
       </div>
     </div>
   </div>
@@ -101,9 +95,7 @@ import Background from '@/assets/img/bg.jpg'
   cursor: pointer;
   user-select: none;
 
-  background: linear-gradient(145deg,
-      rgba(255, 255, 255, 0.15),
-      rgba(255, 255, 255, 0.05));
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.05));
 
   border: 1px solid rgba(255, 255, 255, 0.25);
   transition: all 0.25s ease;
@@ -128,9 +120,7 @@ import Background from '@/assets/img/bg.jpg'
     0 16px 40px rgba(0, 0, 0, 0.7),
     0 0 20px rgba(255, 255, 255, 0.2);
 
-  background: linear-gradient(145deg,
-      rgba(255, 255, 255, 0.3),
-      rgba(255, 255, 255, 0.1));
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
 }
 
 .menu-tile:active {

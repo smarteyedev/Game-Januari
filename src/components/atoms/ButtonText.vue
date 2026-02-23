@@ -12,11 +12,9 @@ const base =
   'inline-flex items-center justify-center font-black ' +
   'transition-all duration-150 select-none rounded-3xl shadow-xl'
 
-const baseHoverEffects =
-  'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
+const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 
-const plainHoverEffects =
-  'hover:border-[3px] hover:shadow-primary-700 hover:border-primary-700'
+const plainHoverEffects = 'hover:border-[3px] hover:shadow-primary-700 hover:border-primary-700'
 
 const sizes = {
   xl: 'min-w-[180px] min-h-[48px] text-[16px] hover:text-[18px]',
@@ -70,11 +68,7 @@ const classes = computed(() => [
 const textEffects = computed(() => {
   if (props.variant === 'secondary') return ''
 
-  return [
-    'text-cartoon',
-    'text-cartoon-sm',
-    props.disabled ? 'text-gray-300' : '',
-  ]
+  return ['text-cartoon', 'text-cartoon-sm', props.disabled ? 'text-gray-300' : '']
 })
 </script>
 

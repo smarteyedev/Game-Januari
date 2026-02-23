@@ -9,7 +9,13 @@
     <Tooltip v-if="tooltip" placement="right" trigger="hover" v-bind="floatingVueConfig">
       <template #default="slotProps">
         <slot name="tooltip-icon" v-bind="slotProps">
-          <UiAtomsIcon name="mdi-information-outline" width="17" height="17" mode="svg" class="text-gray-400" />
+          <UiAtomsIcon
+            name="mdi-information-outline"
+            width="17"
+            height="17"
+            mode="svg"
+            class="text-gray-400"
+          />
         </slot>
       </template>
 

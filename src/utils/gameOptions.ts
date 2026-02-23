@@ -234,4 +234,3 @@ export function getDefaultGameOptions(gameType: GameOptions['gameType']) {
       return baseOptions
   }
 }
-

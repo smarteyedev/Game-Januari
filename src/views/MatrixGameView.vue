@@ -1,13 +1,26 @@
 <template>
-  <BaseGame title="Matrix Game" :description="survey?.title" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
-
-
-    <div v-if="survey" v-for="q in survey.questions" :key="q.id" class="mb-6">
-      <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
-        :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
+  <BaseGame
+    title="Matrix Game"
+    :description="survey?.title"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[5]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div v-if="survey">
+      <div v-for="q in survey.questions" :key="q.id" class="mb-6">
+        <MatrixQuestion
+          :title="q.label"
+          :options="survey.options"
+          :correct-answer="q.correctAnswer"
+          :finished="isWin || isLose"
+          v-model="answers[q.id]"
+          :disabled="!isPlaying"
+        />
+      </div>
     </div>
-
 
     <div class="flex flex-wrap items-center justify-center gap-2 p-4">
       <ButtonText @click="submit" text="Submit" :disabled="!isPlaying"></ButtonText>
@@ -26,14 +39,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import gameData from '@/assets/gameData/matrix_game.json'
-import { UiButton } from '@/components/atoms/button'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import ButtonText from '@/components/atoms/ButtonText.vue'
-
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }
@@ -43,10 +54,10 @@ const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
 
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, reset, retry } = useGameService({
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.matrix,
-  offline: true
+  offline: true,
 })
 
 const loading = ref(true)
@@ -103,10 +114,10 @@ const submit = async () => {
 
   await finish(
     won,
-    survey.value.questions.map(q => ({
+    survey.value.questions.map((q) => ({
       questionId: q.id,
-      answer: answers.value[q.id]
-    }))
+      answer: answers.value[q.id],
+    })),
   )
 }
 
@@ -122,5 +133,4 @@ const restart = async () => {
 const continueQuiz = () => {
   alert('Continue to next step')
 }
-
 </script>

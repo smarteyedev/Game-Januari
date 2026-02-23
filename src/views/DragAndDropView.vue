@@ -50,7 +50,7 @@ function playClick() {
   }
 }
 
-const { time, isWon, startGame, finish, reset } = useGameService({
+const { time, _isWon, startGame, finish, reset } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
 })
@@ -221,7 +221,7 @@ onUnmounted(() => {
 <template>
   <BaseGame :title="'Drag and Drop Prompt'" :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time"
     :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
-    :introData="introData.data[1]" :isWin="isWon" :hasLost="hasLost" :isChecked="isChecked"
+    :introData="introData.data[1]" :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked"
     :currentProgress="correctCount ?? 0" :targetProgress="totalSlots" :showProgress="true" @start="start"
     @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
     <!-- Sentence Board -->

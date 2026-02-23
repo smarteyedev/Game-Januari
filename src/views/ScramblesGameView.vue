@@ -1,52 +1,62 @@
 <template>
-  <BaseGame title="Scrambles Game" :description="question" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame">
-
+  <BaseGame
+    title="Scrambles Game"
+    :description="question"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[4]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
     <div class="p-2">
       <BoxInput :value="userInput" :locked="hints" />
     </div>
 
     <div class="p-2 flex gap-2">
-      <UiLabel :label="`You have ${attempts} attempts left`" class="text-primary-700 font-semibold text-body-lg" />
+      <UiLabel
+        :label="`You have ${attempts} attempts left`"
+        class="text-primary-700 font-semibold text-body-lg"
+      />
     </div>
 
     <div class="p-2 flex flex-col items-center gap-3">
       <div v-for="(s, i) in submissions" :key="i" class="flex gap-2">
-        <div v-for="(char, j) in s.value.split('')" :key="j" class="aspect-square min-w-[80px] min-h-[80px]
-             grid place-items-center
-             border-[3px] rounded-xl
-             shadow-xl
-             text-[32px] font-bold
-             select-none transition" :class="{
-              // Correct guess (green styled)
-              'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
+        <div
+          v-for="(char, j) in s.value.split('')"
+          :key="j"
+          class="aspect-square min-w-[80px] min-h-[80px] grid place-items-center border-[3px] rounded-xl shadow-xl text-[32px] font-bold select-none transition"
+          :class="{
+            // Correct guess (green styled)
+            'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
 
-              // Wrong guess (muted + strike feeling)
-              'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct
-            }">
+            // Wrong guess (muted + strike feeling)
+            'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
+          }"
+        >
           {{ char }}
         </div>
       </div>
     </div>
 
     <div class="flex gap-2 p-2">
-      <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
-        :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
+      <CharacterKey
+        v-for="{ c, i } in answerChars"
+        :key="`${c}-${i}`"
+        :char="c"
+        :disabled="isCharDisabled(c) || !isPlaying"
+        @input="onCharInput"
+      />
     </div>
 
     <div class="flex gap-2 p-2">
       <ButtonText text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
       </ButtonText>
-      <ButtonText text="Submit" @click="submitAnswer" :disabled="!isPlaying">
+      <ButtonText text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </ButtonText>
 
-      </ButtonText>
+      <ButtonText text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </ButtonText>
 
-      <ButtonText text="Restart" v-if="isLose" variant="danger" @click="restartGame">
-
-      </ButtonText>
-
-      <ButtonText text="Continue" v-if="isWin" @click="continueGame">
-      </ButtonText>
+      <ButtonText text="Continue" v-if="isWin" @click="continueGame"> </ButtonText>
     </div>
 
     <template #footer>
@@ -73,10 +83,10 @@ type Submission = {
   correct: boolean
 }
 
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, reset, retry } = useGameService({
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.scrambles,
-  offline: true
+  offline: true,
 })
 
 const isWin = computed(() => _isWon.value)
@@ -181,7 +191,7 @@ function deleteChar() {
 }
 
 async function submitAnswer() {
-  if (!isPlaying) return
+  if (!isPlaying.value) return
 
   const guess = displayInput.value
   const correct = guess === answer.value

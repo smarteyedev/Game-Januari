@@ -34,11 +34,11 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
-const { time, isWon, isLost, startGame, finish, reset } = useGameService({
+const { time, _isWon, _isLost, startGame, finish, reset } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.memory,
 })
@@ -118,7 +118,7 @@ const showIntro = ref(true)
 const allMatched = computed(
   () => cards.value.length > 0 && cards.value.every((card) => card.matched),
 )
-const gameOver = computed(() => isLost.value || (isWon.value && allMatched.value))
+const gameOver = computed(() => _isLost.value || (_isWon.value && allMatched.value))
 
 // Emit for session tracking
 const emit = defineEmits<{
@@ -151,24 +151,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[2]"
-    :isWin="isWon"
-    :hasLost="isLost"
-    :hideSubmit="true"
-    :isChecked="allMatched"
-    @start="start"
-    @retry="retryGame"
-    @cleared="handleContinue"
-  >
+  <BaseGame :title="'Memory Game'" :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time"
+    :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
+    :introData="introData.data[2]" :isWin="_isWon" :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched"
+    @start="start" @retry="retryGame" @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
   </BaseGame>
 </template>

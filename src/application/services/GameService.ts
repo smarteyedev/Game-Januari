@@ -57,14 +57,14 @@ export type GameServiceReturn = {
 
 export function useGameService(options: GameServiceOptions): GameServiceReturn {
   const {
-  maxTime = 180,
-  minigameId,
-  offline = false,
-  onWin,
-  onLose,
-  onSubmit,
-  autoSubmit = true,
-} = options
+    maxTime = 180,
+    minigameId,
+    offline = false,
+    onWin,
+    onLose,
+    onSubmit,
+    autoSubmit = true,
+  } = options
 
   // Game entity
   const game = ref<Game>(
@@ -148,71 +148,71 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Start a new game
    */
-async function startGame() {
-  if (offline) {
-    // if offline or no backend simulate launched game
+  async function startGame() {
+    if (offline) {
+      // if offline or no backend simulate launched game
+      game.value = new Game({
+        gameId: 'offline-game',
+        minigameId,
+        state: GameState.Playing,
+      })
+
+      game.value.launch('offline-session')
+      game.value.start()
+      startTimer()
+      return
+    }
+
+    // normal with backend flow
+    const session = sessionRepository.getCurrentSession()
+    if (!session) {
+      throw new Error('No guest session available')
+    }
+
     game.value = new Game({
-      gameId: 'offline-game',
+      gameId: session.gameId,
       minigameId,
-      state: GameState.Playing,
+      state: GameState.Launching,
     })
 
-    game.value.launch('offline-session')
+    const response = await gameRepository.launchGame(
+      session.gameId,
+      minigameId,
+      session.accessToken,
+    )
+
+    if (!response?.sessionId) {
+      throw new Error('launchGame did not return sessionId')
+    }
+
+    game.value.launch(response.sessionId)
     game.value.start()
     startTimer()
-    return
   }
-
-  // normal with backend flow
-  const session = sessionRepository.getCurrentSession()
-  if (!session) {
-    throw new Error('No guest session available')
-  }
-
-  game.value = new Game({
-    gameId: session.gameId,
-    minigameId,
-    state: GameState.Launching,
-  })
-
-  const response = await gameRepository.launchGame(
-    session.gameId,
-    minigameId,
-    session.accessToken,
-  )
-
-  if (!response?.sessionId) {
-    throw new Error('launchGame did not return sessionId')
-  }
-
-  game.value.launch(response.sessionId)
-  game.value.start()
-  startTimer()
-}
 
   /**
    * Submit score to the server
    */
-async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
-  if (offline) {
-    console.log('Offline mode → score:', finalScore)
-    return
-  }
+  async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
+    if (offline) {
+      console.log('Offline mode → score:', finalScore)
+      return
+    }
 
-  const session = sessionRepository.getCurrentSession()
-  if (!session || !game.value.sessionId) {
-    console.warn('No active game session to submit')
-    return
-  }
+    const session = sessionRepository.getCurrentSession()
+    if (!session || !game.value.sessionId) {
+      console.warn('No active game session to submit')
+      return
+    }
 
-  await gameRepository.submitScore(
-    game.value.sessionId,
-    finalScore,
-    finalAnswers ?? game.value.answers,
-    (maxTime - time.value) * 1000,
-    session.accessToken,
-  )
-}
+    await gameRepository.submitScore(
+      game.value.sessionId,
+      finalScore,
+      finalAnswers ?? game.value.answers,
+      (maxTime - time.value) * 1000,
+      session.accessToken,
+    )
+  }
 
   /**
    * Finish the game manually
@@ -224,12 +224,12 @@ async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
   /**
    * Reset game state
    */
-function reset() {
-  stopTimer()
-  time.value = maxTime
-  _didWin.value = false
-  game.value.reset()
-}
+  function reset() {
+    stopTimer()
+    time.value = maxTime
+    _didWin.value = false
+    game.value.reset()
+  }
 
   /**
    * Retry the game

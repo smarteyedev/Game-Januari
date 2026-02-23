@@ -284,7 +284,6 @@
 }
 
 @layer utilities {
-
   .text-shadow-flat-sm {
     text-shadow: 0 3px 0 var(--btn-accent);
   }

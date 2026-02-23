@@ -34,7 +34,7 @@ const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
 
-const { time, isWon, startGame, finish, reset } = useGameService({
+const { time, _isWon, startGame, finish, reset } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
 })
@@ -147,7 +147,7 @@ onUnmounted(() => {
   <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
     description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
     :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
-    :isWin="isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
+    :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
     :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
     @cleared="handleContinue">
     <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
