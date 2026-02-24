@@ -75,7 +75,7 @@ const backStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div class="w-full aspect-4/5 perspective cursor-pointer" @click="!flipped && !matched && emit('flip')">
+  <div class=" aspect-4/5 w-40 perspective cursor-pointer" @click="!flipped && !matched && emit('flip')">
     <div class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
       :class="{ 'rotate-y-180': flipped || matched }">
       <!-- BACK SIDE -->

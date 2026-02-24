@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ButtonText from '../atoms/ButtonText.vue'
+import UiButton from '@/components/atoms/button/index.vue'
 import ProgressWithIcon from './ProgressWithIcon.vue'
 
 defineProps<{
@@ -29,8 +29,8 @@ const emit = defineEmits<{
             :target="target" />
         </div>
         <!-- SUBMIT -->
-        <ButtonText v-if="!hideSubmit && !isChecked" variant="secondary" size="md" @click="emit('check')" text="Check">
-        </ButtonText>
+        <UiButton v-if="!hideSubmit && !isChecked" variant="secondary" size="md" @click="emit('check')" text="Check">
+        </UiButton>
       </slot>
     </div>
 
@@ -38,13 +38,13 @@ const emit = defineEmits<{
     <div class="flex items-end gap-3 sm:gap-4">
       <slot name="footer-right">
         <!-- RETRY
-      <ButtonText v-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
-      </ButtonText>
+      <UiButton v-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
+      </UiButton>
        -->
 
         <!-- CONTINUE -->
-        <ButtonText v-if="isWin || hasLost" text="Continue" variant="primary" size="md" @click="emit('cleared')">
-        </ButtonText>
+        <UiButton v-if="isWin || hasLost" text="Continue" variant="primary" size="md" @click="emit('cleared')">
+        </UiButton>
       </slot>
     </div>
   </div>

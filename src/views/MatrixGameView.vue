@@ -1,33 +1,19 @@
 <template>
-  <BaseGame
-    title="Matrix Game"
-    :description="survey?.title"
-    :time="time"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[5]"
-    :loading="loading"
-    :error="error"
-    :retryFn="retryGame"
-  >
+  <BaseGame title="Matrix Game" :description="survey?.title" :time="time" v-model:showIntro="showIntro"
+    :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
     <div v-if="survey">
       <div v-for="q in survey.questions" :key="q.id" class="mb-6">
-        <MatrixQuestion
-          :title="q.label"
-          :options="survey.options"
-          :correct-answer="q.correctAnswer"
-          :finished="isWin || isLose"
-          v-model="answers[q.id]"
-          :disabled="!isPlaying"
-        />
+        <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
+          :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
       </div>
     </div>
 
     <div class="flex flex-wrap items-center justify-center gap-2 p-4">
-      <ButtonText @click="submit" text="Submit" :disabled="!isPlaying"></ButtonText>
-      <ButtonText @click="restart" text="Restart" variant="danger" :disabled="!isLose">
-      </ButtonText>
-      <ButtonText @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
-      </ButtonText>
+      <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
+      <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose">
+      </UiButton>
+      <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
+      </UiButton>
     </div>
 
     <template #footer>
@@ -44,7 +30,7 @@ import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
-import ButtonText from '@/components/atoms/ButtonText.vue'
+import { UiButton } from '@/components/atoms/button'
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }

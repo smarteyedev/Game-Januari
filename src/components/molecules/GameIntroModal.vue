@@ -3,7 +3,7 @@ import UiModal from '@/components/molecules/modal/index.vue'
 import GameIntro from '../molecules/GameIntro.vue'
 import type { IntroData } from '@/domain/types'
 import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
-import ButtonText from '../atoms/ButtonText.vue'
+import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal'
 
 interface Props {
@@ -68,7 +68,7 @@ const onStart = () => {
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <ButtonText text="Mulai Game" variant="primary" size="lg" class="w-40.5 h-11" @click="onStart" />
+        <UiButton text="Mulai Game" variant="primary" size="lg" class="w-40.5 h-11" @click="onStart" />
       </div>
     </template>
   </UiModal>

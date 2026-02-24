@@ -27,14 +27,14 @@
     <template #footer>
       <div class="flex flex-col items-center">
         <div class="flex p-2 gap-2">
-          <ButtonText text="Submit" variant="primary" :disabled="selected.length !== 4 || isWon || isLost"
+          <UiButton text="Submit" variant="primary" :disabled="selected.length !== 4 || isWon || isLost"
             @click="submitSelection">
-          </ButtonText>
+          </UiButton>
 
           <!--Hidden, if lose show restart, if win show continue-->
-          <ButtonText text="Restart" variant="danger" v-if="isLost" @click="restartGame" :color="'error'">
-          </ButtonText>
-          <ButtonText text="Continue" v-if="isWon" :color="'success'"> </ButtonText>
+          <UiButton text="Restart" variant="danger" v-if="isLost" @click="restartGame" :color="'error'">
+          </UiButton>
+          <UiButton text="Continue" v-if="isWon" :color="'success'"> </UiButton>
         </div>
         <div class="p-2 text-primary-700 font-semibold text-body-lg">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
@@ -53,7 +53,7 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
-import ButtonText from '@/components/atoms/ButtonText.vue'
+import { UiButton } from '@/components/atoms/button'
 import { shuffle } from '@/utils/shuffle'
 
 type Category = {

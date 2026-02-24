@@ -219,13 +219,13 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame :title="'Drag and Drop Prompt'" :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time"
-    :maxTime="180" :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro"
-    :introData="introData.data[1]" :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked"
-    :currentProgress="correctCount ?? 0" :targetProgress="totalSlots" :showProgress="true" @start="start"
-    @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
+    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
     <!-- Sentence Board -->
-    <div class="border rounded-xl p-4 text-base text-justify">
+    <div class="border-2 rounded-xl p-2.5 text-justify text-primary-700 font-medium text-body-sm ">
       <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}

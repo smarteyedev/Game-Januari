@@ -1,30 +1,17 @@
 <template>
-  <BaseGame
-    title="Scrambles Game"
-    :description="question"
-    :time="time"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[4]"
-    :loading="loading"
-    :error="error"
-    :retryFn="retryGame"
-  >
+  <BaseGame title="Scrambles Game" :description="question" :time="time" v-model:showIntro="showIntro"
+    :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame">
     <div class="p-2">
       <BoxInput :value="userInput" :locked="hints" />
     </div>
 
     <div class="p-2 flex gap-2">
-      <UiLabel
-        :label="`You have ${attempts} attempts left`"
-        class="text-primary-700 font-semibold text-body-lg"
-      />
+      <UiLabel :label="`You have ${attempts} attempts left`" class="text-primary-700 font-semibold text-body-lg" />
     </div>
 
     <div class="p-2 flex flex-col items-center gap-3">
       <div v-for="(s, i) in submissions" :key="i" class="flex gap-2">
-        <div
-          v-for="(char, j) in s.value.split('')"
-          :key="j"
+        <div v-for="(char, j) in s.value.split('')" :key="j"
           class="aspect-square min-w-[80px] min-h-[80px] grid place-items-center border-[3px] rounded-xl shadow-xl text-[32px] font-bold select-none transition"
           :class="{
             // Correct guess (green styled)
@@ -32,31 +19,25 @@
 
             // Wrong guess (muted + strike feeling)
             'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
-          }"
-        >
+          }">
           {{ char }}
         </div>
       </div>
     </div>
 
     <div class="flex gap-2 p-2">
-      <CharacterKey
-        v-for="{ c, i } in answerChars"
-        :key="`${c}-${i}`"
-        :char="c"
-        :disabled="isCharDisabled(c) || !isPlaying"
-        @input="onCharInput"
-      />
+      <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
+        :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
     </div>
 
     <div class="flex gap-2 p-2">
-      <ButtonText text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
-      </ButtonText>
-      <ButtonText text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </ButtonText>
+      <UiButton text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+      </UiButton>
+      <UiButton text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </UiButton>
 
-      <ButtonText text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </ButtonText>
+      <UiButton text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </UiButton>
 
-      <ButtonText text="Continue" v-if="isWin" @click="continueGame"> </ButtonText>
+      <UiButton text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
     </div>
 
     <template #footer>
@@ -69,7 +50,7 @@
 import { onMounted, ref, computed } from 'vue'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
-import ButtonText from '@/components/atoms/ButtonText.vue'
+import UiButton from '@/components/atoms/button/index.vue'
 import gameData from '@/assets/gameData/scrambles.json'
 import { shuffle } from '@/utils/shuffle'
 import BaseGame from '@/components/templates/BaseGame.vue'

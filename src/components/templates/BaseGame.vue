@@ -113,7 +113,15 @@ function handleStart() {
           <slot name="footer">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
               :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
-              @retry="emit('retry')" @cleared="emit('cleared')" />
+              @retry="emit('retry')" @cleared="emit('cleared')">
+              <template #footer-left>
+                <slot name="footer-left" />
+              </template>
+
+              <template #footer-right>
+                <slot name="footer-right" />
+              </template>
+            </GameFooter>
           </slot>
         </div>
       </div>

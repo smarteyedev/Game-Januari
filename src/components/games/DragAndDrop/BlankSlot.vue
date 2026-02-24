@@ -1,26 +1,15 @@
 <!-- BlankSlot.vue -->
 <template>
   <div
-    class="inline-flex min-w-25 min-h-6 px-3 rounded justify-center items-center align-middle blank"
+    class="inline-flex min-w-25 min-h-6 py-[6px] mb-[4px] px-2.5 border justify-center items-center align-middle rounded-lg"
     :class="{
-      'bg-green-100 border border-green-300': isCorrect === true,
-      'bg-red-100 border border-red-300': isCorrect === false,
-      'bg-gray-100': isCorrect === null,
-    }"
-    @drop.prevent="handleDrop"
-    @dragover.prevent
-  >
-    <WordItem
-      v-if="item"
-      :key="item?.id"
-      :item="item"
-      :slotId="slotId"
-      :inSlot="true"
-      :disabled="disabled"
-      :noBackground="true"
-      class="bg-transparent"
-      @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')"
-    />
+      'bg-green-100 border-green-300': isCorrect === true,
+      'bg-red-100 border-red-300': isCorrect === false,
+      'bg-gray-100 border-gray-200': isCorrect === null,
+    }" @drop.prevent="handleDrop" @dragover.prevent>
+    <WordItem v-if="item" :key="item?.id" :item="item" :slotId="slotId" :inSlot="true" :disabled="disabled"
+      :noBackground="true" class="bg-transparent"
+      @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')" />
   </div>
 </template>
 
