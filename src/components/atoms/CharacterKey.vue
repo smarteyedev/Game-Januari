@@ -1,6 +1,6 @@
 <template>
   <button
-    class="aspect-square min-w-[80px] min-h-[80px] grid place-items-center border-[3px] shadow-xl rounded-xl text-lg font-bold select-none transition text-[32px]"
+    class="aspect-square min-w-17.5 min-h-17.5 grid place-items-center border-[3px] shadow-xl rounded-3xl text-lg font-bold select-none transition text-h3"
     :class="
       disabled
         ? 'bg-gray-100 text-gray-700 cursor-not-allowed border-gray-700 shadow-gray-700'

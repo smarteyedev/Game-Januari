@@ -1,43 +1,60 @@
 <template>
-  <BaseGame title="Scrambles Game" :description="question" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div class="p-2">
-      <BoxInput :value="userInput" :locked="hints" />
-    </div>
+  <BaseGame
+    title="Scrambles Game"
+    :description="question"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[4]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div class="flex flex-col gap-[32px] justify-center items-center">
+      <div class="flex flex-col gap-[20px] justify-center items-center">
+        <BoxInput :value="userInput" :locked="hints" />
+        <UiLabel
+          :label="`You have ${attempts} attempts left`"
+          class="text-primary-700 font-semibold text-body-md"
+        />
+      </div>
 
-    <div class="p-2 flex gap-2">
-      <UiLabel :label="`You have ${attempts} attempts left`" class="text-primary-700 font-semibold text-body-lg" />
-    </div>
-
-    <div class="p-2 flex flex-col items-center gap-3">
-      <div v-for="(s, i) in submissions" :key="i" class="flex gap-2">
-        <div v-for="(char, j) in s.value.split('')" :key="j"
-          class="aspect-square min-w-[80px] min-h-[80px] grid place-items-center border-[3px] rounded-xl shadow-xl text-[32px] font-bold select-none transition"
+      <div v-for="(s, i) in submissions" :key="i" class="flex gap-[20px]">
+        <div
+          v-for="(char, j) in s.value.split('')"
+          :key="j"
+          class="aspect-square min-w-15 min-h-15 grid place-items-center border-[3px] rounded-3xl shadow-xl text-h3 font-bold select-none transition"
           :class="{
             // Correct guess (green styled)
             'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
 
             // Wrong guess (muted + strike feeling)
             'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
-          }">
+          }"
+        >
           {{ char }}
         </div>
       </div>
     </div>
 
-    <div class="flex gap-2 p-2">
-      <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
-        :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
-    </div>
+    <div class="flex flex-col justify-center items-center gap-[20px]">
+      <div class="flex gap-[20px]">
+        <CharacterKey
+          v-for="{ c, i } in answerChars"
+          :key="`${c}-${i}`"
+          :char="c"
+          :disabled="isCharDisabled(c) || !isPlaying"
+          @input="onCharInput"
+        />
+      </div>
+      <div class="flex gap-4.5">
+        <UiButton text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+        </UiButton>
+        <UiButton text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </UiButton>
 
-    <div class="flex gap-2 p-2">
-      <UiButton text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
-      </UiButton>
-      <UiButton text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </UiButton>
+        <UiButton text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </UiButton>
 
-      <UiButton text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </UiButton>
-
-      <UiButton text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+        <UiButton text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+      </div>
     </div>
 
     <template #footer>

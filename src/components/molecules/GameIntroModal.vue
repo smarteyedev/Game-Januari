@@ -36,20 +36,29 @@ const onStart = () => {
 </script>
 
 <template>
-  <UiModal :container-position="props.containerPosition" :prevent-close="true" :modelValue="modelValue" size="md"
-    position="center" scroll-mode="content" :content-style="{
+  <UiModal
+    :container-position="props.containerPosition"
+    :prevent-close="true"
+    :modelValue="modelValue"
+    size="md"
+    position="center"
+    scroll-mode="content"
+    :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
       background: '#FFFCF6',
-      maxHeight: '90vh',
+      maxHeight: '85vh',
       display: 'flex',
       flexDirection: 'column',
-    }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
+    }"
+    @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose"
+  >
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center items-center w-full">
-        <div>
+        <div class="w-31 h-33.25">
           <UnknownIcon />
         </div>
       </div>
@@ -61,14 +70,25 @@ const onStart = () => {
 
     <!-- BODY -->
     <div class="flex-1 overflow-y-auto px-10 pt-[24px] flex justify-center">
-      <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
-        :key_points="introData.key_points" class="w-full max-w-149.25" />
+      <GameIntro
+        v-if="introData"
+        :title="introData.title"
+        :description="introData.description"
+        :key_points="introData.key_points"
+        class="w-full max-w-149.25"
+      />
     </div>
 
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <UiButton text="Mulai Game" variant="primary" size="lg" class="w-40.5 h-11" @click="onStart" />
+        <UiButton
+          text="Mulai Game"
+          variant="primary"
+          size="lg"
+          class="w-40.5 h-11"
+          @click="onStart"
+        />
       </div>
     </template>
   </UiModal>

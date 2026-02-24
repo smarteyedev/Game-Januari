@@ -1,19 +1,38 @@
 <template>
-  <BaseGame title="Matrix Game" :description="survey?.title" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div v-if="survey">
-      <div v-for="q in survey.questions" :key="q.id" class="mb-6">
-        <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
-          :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
+  <BaseGame
+    title="Matrix Game"
+    :description="survey?.title"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[5]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div class="flex flex-col items-center justify-center gap-[32px]">
+      <div v-if="survey">
+        <div
+          v-for="q in survey.questions"
+          :key="q.id"
+          class="flex flex-col items-center justify-center gap-[28px] mb-4"
+        >
+          <MatrixQuestion
+            :title="q.label"
+            :options="survey.options"
+            :correct-answer="q.correctAnswer"
+            :finished="isWin || isLose"
+            v-model="answers[q.id]"
+            :disabled="!isPlaying"
+          />
+        </div>
       </div>
-    </div>
 
-    <div class="flex flex-wrap items-center justify-center gap-2 p-4">
-      <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-      <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose">
-      </UiButton>
-      <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
-      </UiButton>
+      <div class="flex flex-wrap items-center justify-center gap-4.5">
+        <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
+        <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose"> </UiButton>
+        <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
+        </UiButton>
+      </div>
     </div>
 
     <template #footer>

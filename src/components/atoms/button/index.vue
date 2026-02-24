@@ -1,21 +1,24 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { UiIcon } from '../icon';
+import { UiIcon } from '../icon'
 
-const props = withDefaults(defineProps<{
-  text?: string
-  variant?: 'primary' | 'secondary' | 'plain' | 'danger'
-  size?: 'sm' | 'md' | 'lg' | 'xl'
-  disabled?: boolean
+const props = withDefaults(
+  defineProps<{
+    text?: string
+    variant?: 'primary' | 'secondary' | 'plain' | 'danger'
+    size?: 'sm' | 'md' | 'lg' | 'xl'
+    disabled?: boolean
 
-  icon?: string
-  iconAppend?: string
-  loading?: boolean
-  square?: boolean
-}>(), {
-  icon: '',
-  iconAppend: '',
-})
+    icon?: string
+    iconAppend?: string
+    loading?: boolean
+    square?: boolean
+  }>(),
+  {
+    icon: '',
+    iconAppend: '',
+  },
+)
 
 const isDisabled = computed(() => props.disabled || props.loading)
 
@@ -97,8 +100,13 @@ const textEffects = computed(() => {
   <button :class="classes" :disabled="isDisabled" :aria-disabled="isDisabled">
     <!-- Prepend -->
     <span v-if="props.loading || props.icon" class="mr-2 flex items-center">
-      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" :class="{ 'animate-spin': props.loading }" />
+      <UiIcon
+        :name="props.loading ? 'uil-spinner' : props.icon"
+        :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')"
+        mode="svg"
+        :class="{ 'animate-spin': props.loading }"
+      />
     </span>
 
     <!-- Label -->
@@ -108,8 +116,12 @@ const textEffects = computed(() => {
 
     <!-- Append -->
     <span v-if="props.iconAppend" class="ml-2 flex items-center">
-      <UiAtomsIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" />
+      <UiAtomsIcon
+        :name="props.iconAppend"
+        :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')"
+        mode="svg"
+      />
     </span>
   </button>
 </template>

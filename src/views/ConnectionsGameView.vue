@@ -1,42 +1,80 @@
 <template>
-  <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div class="grid grid-cols-4 gap-2 p-2 min-w-40 min-h-22.5">
-      <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
-        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
+  <BaseGame
+    title="Connections Game"
+    description="Connections game"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[3]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div
+      class="flex flex-wrap lg:flex-nowrap justify-center gap-[20px] items-center min-w-25 min-h-22.5"
+    >
+      <ConnectionsCard
+        v-for="index in 4"
+        :key="index"
+        class="min-w-50"
+        :label="getSolvedGroup(index - 1)?.label || ''"
+        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
+        :color="getSolvedColor(index - 1)"
+        :clickable="false"
+      />
+    </div>
+    <div>
+      <span class="text-body-xl font-semibold text-primary-700">Create a group of four</span>
+    </div>
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-[20px] p-2">
+      <ConnectionsCard
+        v-for="item in items"
+        :key="item.label"
+        :label="item.label"
+        :state="item.state"
+        :color="categoryColorMap[item.category]"
+        :clickable="item.state !== 'solved'"
+        @click="toggleItem(item)"
+      />
     </div>
 
-    <div class="p-2">
-      <span class="text-body-xl font-bold text-primary-700">Create a group of four</span>
-    </div>
-    <div class="grid grid-cols-8 gap-2">
-      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
-    </div>
-    <!--Event message for user feedback-->
-    <div class="p-2 text-primary-700 text-body-xl font-bold">
-      <UiLabel v-if="wrongCount !== null && !(isWon || isLost)"
-        :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-      <UiLabel v-if="solvedNewGroup !== null && !(isWon || isLost)"
-        :label="`You found a new group: ${solvedNewGroup.label}`" />
-      <UiLabel v-if="isWon" :label="`You win`" />
-      <UiLabel v-if="isLost" :label="`you lose`" />
-    </div>
     <!-- Control Buttons -->
 
     <template #footer>
-      <div class="flex flex-col items-center">
-        <div class="flex p-2 gap-2">
-          <UiButton text="Submit" variant="primary" :disabled="selected.length !== 4 || isWon || isLost"
-            @click="submitSelection">
+      <div class="flex flex-col items-center gap-4.5">
+        <!--Event message for user feedback-->
+        <div class="text-primary-700 text-body-xl font-bold">
+          <UiLabel
+            v-if="wrongCount !== null && !(isWon || isLost)"
+            :label="`Wrong, you are ${wrongCount} away to form a correct group`"
+          />
+          <UiLabel
+            v-if="solvedNewGroup !== null && !(isWon || isLost)"
+            :label="`You found a new group: ${solvedNewGroup.label}`"
+          />
+          <UiLabel v-if="isWon" :label="`You win`" />
+          <UiLabel v-if="isLost" :label="`you lose`" />
+        </div>
+        <div class="flex gap-[16px]">
+          <UiButton
+            text="Submit"
+            variant="primary"
+            :disabled="selected.length !== 4 || isWon || isLost"
+            @click="submitSelection"
+          >
           </UiButton>
 
           <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton text="Restart" variant="danger" v-if="isLost" @click="restartGame" :color="'error'">
+          <UiButton
+            text="Restart"
+            variant="danger"
+            v-if="isLost"
+            @click="restartGame"
+            :color="'error'"
+          >
           </UiButton>
           <UiButton text="Continue" v-if="isWon" :color="'success'"> </UiButton>
         </div>
-        <div class="p-2 text-primary-700 font-semibold text-body-lg">
+        <div class="text-primary-700 font-semibold text-body-md">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>

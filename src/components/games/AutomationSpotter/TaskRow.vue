@@ -52,12 +52,25 @@ function playClick() {
 </script>
 
 <template>
-  <VueDraggable v-model="local" :group="{ name: 'cards', pull: true, put: true }" item-key="id" :disabled="disabled"
-    @start="playClick" @end="playClick"
-    class="flex flex-wrap justify-center items-center gap-[16px] 2xl:gap-[24px] w-full">
-    <DraggableCard v-for="c in local" :key="c.id" :card="c" :is-in-zone="false" :checked="getChecked(c.id)" :class="{
-      'cursor-grab active:cursor-grabbing': !disabled,
-      'cursor-default': disabled,
-    }" />
+  <VueDraggable
+    v-model="local"
+    :group="{ name: 'cards', pull: true, put: true }"
+    item-key="id"
+    :disabled="disabled"
+    @start="playClick"
+    @end="playClick"
+    class="flex flex-wrap justify-center items-center gap-[16px] 2xl:gap-[24px] w-full"
+  >
+    <DraggableCard
+      v-for="c in local"
+      :key="c.id"
+      :card="c"
+      :is-in-zone="false"
+      :checked="getChecked(c.id)"
+      :class="{
+        'cursor-grab active:cursor-grabbing': !disabled,
+        'cursor-default': disabled,
+      }"
+    />
   </VueDraggable>
 </template>

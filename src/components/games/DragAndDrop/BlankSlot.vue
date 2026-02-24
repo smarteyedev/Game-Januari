@@ -6,10 +6,21 @@
       'bg-green-100 border-green-300': isCorrect === true,
       'bg-red-100 border-red-300': isCorrect === false,
       'bg-gray-100 border-gray-200': isCorrect === null,
-    }" @drop.prevent="handleDrop" @dragover.prevent>
-    <WordItem v-if="item" :key="item?.id" :item="item" :slotId="slotId" :inSlot="true" :disabled="disabled"
-      :noBackground="true" class="bg-transparent"
-      @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')" />
+    }"
+    @drop.prevent="handleDrop"
+    @dragover.prevent
+  >
+    <WordItem
+      v-if="item"
+      :key="item?.id"
+      :item="item"
+      :slotId="slotId"
+      :inSlot="true"
+      :disabled="disabled"
+      :noBackground="true"
+      class="bg-transparent"
+      @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')"
+    />
   </div>
 </template>
 

@@ -35,7 +35,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 }
 
@@ -152,16 +152,28 @@ onMounted(() => {
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="180" :loading="loading"
-    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[2]" :isWin="_isWon"
-    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" @start="start" @retry="retryGame"
-    @cleared="handleContinue">
+  <BaseGame
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[2]"
+    :isWin="_isWon"
+    :hasLost="_isLost"
+    :hideSubmit="true"
+    :isChecked="allMatched"
+    @start="start"
+    @retry="retryGame"
+    @cleared="handleContinue"
+  >
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
-      <span class="text-body-md text-primary-700 font-bold">
-        Card Turns: {{ turns }}
-      </span>
+      <span class="text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
     </template>
   </BaseGame>
 </template>

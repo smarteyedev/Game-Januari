@@ -1,9 +1,9 @@
 <template>
-  <div class="flex gap-2 cursor-text p-2 relative" @click="focusInput">
+  <div class="flex gap-[20px] cursor-text relative" @click="focusInput">
     <div
       v-for="(char, i) in value"
       :key="i"
-      class="aspect-square min-w-[80px] min-h-[80px] grid place-items-center border-[3px] rounded-xl shadow-xl text-[32px] font-bold select-none transition bg-white border-primary-700 shadow-primary-700 text-black"
+      class="aspect-square min-w-17.5 min-h-17.5 grid place-items-center border-[3px] rounded-3xl shadow-xl text-h3 font-bold select-none transition bg-white border-primary-700 shadow-primary-700 text-black"
     >
       {{ locked[i] ?? char ?? '' }}
     </div>

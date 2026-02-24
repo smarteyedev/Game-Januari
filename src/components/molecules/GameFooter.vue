@@ -25,11 +25,20 @@ const emit = defineEmits<{
     <div class="flex gap-[36px]">
       <slot name="footer-left">
         <div class="w-full sm:w-71.25">
-          <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
-            :target="target" />
+          <ProgressWithIcon
+            v-if="showProgress && current !== undefined && target !== undefined"
+            :current="current"
+            :target="target"
+          />
         </div>
         <!-- SUBMIT -->
-        <UiButton v-if="!hideSubmit && !isChecked" variant="secondary" size="md" @click="emit('check')" text="Check">
+        <UiButton
+          v-if="!hideSubmit && !isChecked"
+          variant="secondary"
+          size="md"
+          @click="emit('check')"
+          text="Check"
+        >
         </UiButton>
       </slot>
     </div>
@@ -43,7 +52,13 @@ const emit = defineEmits<{
        -->
 
         <!-- CONTINUE -->
-        <UiButton v-if="isWin || hasLost" text="Continue" variant="primary" size="md" @click="emit('cleared')">
+        <UiButton
+          v-if="isWin || hasLost"
+          text="Continue"
+          variant="primary"
+          size="md"
+          @click="emit('cleared')"
+        >
         </UiButton>
       </slot>
     </div>
