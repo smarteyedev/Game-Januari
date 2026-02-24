@@ -167,23 +167,23 @@
   --font-sans: 'Inter', system-ui, sans-serif;
 
   /* Body */
-  --text-body-sm: 0.875rem;
-  --text-body-md: 1rem;
-  --text-body-lg: 1.125rem;
+  --text-body-xs: 12px;
+  --text-body-sm: 14px;
+  --text-body-md: 16px;
+  --text-body-lg: 18px;
+  --text-body-xl: 20px;
 
   /* Headings */
-  --text-h6: 1.25rem;
-  --text-h5: 1.5rem;
-  --text-h4: 1.75rem;
-  --text-h3: 2.125rem;
-  --text-h2: 2.5rem;
-  --text-h1: 3rem;
+  --text-h4: 24px;
+  --text-h3: 30px;
+  --text-h2: 36px;
+  --text-h1: 48px;
 
   /* Display */
-  --text-display-sm: 3.5rem;
-  --text-display-md: 4.5rem;
-  --text-display-lg: 5.625rem;
-  --text-display-xl: 7rem;
+  --text-display-sm: 60px;
+  --text-display-md: 72px;
+  --text-display-lg: 96px;
+  --text-display-xl: 128px;
   --text-display-xxl: 8.75rem;
 
   /* Global typography rules */
@@ -247,11 +247,11 @@
     @apply text-base text-body-lg;
   }
 
-  .text-h6 {
-    @apply text-base text-h6;
+  .text-body-xl {
+    @apply text-base text-body-xl;
   }
-  .text-h5 {
-    @apply text-base text-h5;
+  .text-h4 {
+    @apply text-base text-h4;
   }
   .text-h4 {
     @apply text-base text-h4;

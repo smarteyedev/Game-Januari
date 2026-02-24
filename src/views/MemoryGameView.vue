@@ -9,6 +9,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import GameFooter from '@/components/molecules/GameFooter.vue'
 
 // Level fetching
 const loading = ref(false)
@@ -156,5 +157,12 @@ onMounted(() => {
     :introData="introData.data[2]" :isWin="_isWon" :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched"
     @start="start" @retry="retryGame" @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
+    <template #footer>
+      <GameFooter>
+        <template #footer-left>
+          <span class="text-body-md text-primary-700 font-bold">Card Turns: {{ turns }}</span>
+        </template>
+      </GameFooter>
+    </template>
   </BaseGame>
 </template>

@@ -85,60 +85,35 @@ function handleStart() {
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div
-      class="min-h-screen flex flex-col p-6 gap-4 w-full"
-      :style="{
-        backgroundImage: `url(${Background})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-      }"
-    >
+    <div class="min-h-screen flex flex-col p-6 gap-4 w-full" :style="{
+      backgroundImage: `url(${Background})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+    }">
       <!-- Topbar (always visible) -->
       <DisplayLabel v-if="moduleTitle" :text="moduleTitle" class="z-60" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
         <!-- Intro Modal -->
-        <GameIntroModal
-          v-if="showIntro && introData"
-          :modelValue="showIntro"
-          @update:modelValue="emit('update:showIntro', $event)"
-          :title="title"
-          :introData="introData"
-          @start="handleStart"
-          containerPosition="relative"
-        />
+        <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
+          @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
+          @start="handleStart" containerPosition="relative" />
 
         <!-- Game Content -->
-        <div
-          v-else
-          class="border-[6px] border-primary-700 flex flex-col items-center gap-4 w-full max-w-full p-6 rounded-4xl bg-white"
-        >
+        <div v-else
+          class="border-[6px] border-primary-700 flex flex-col items-center gap-[32px] w-full max-w-full p-[20px] rounded-[36px] bg-white">
           <slot name="header">
-            <GameHeader
-              :title="title"
-              :description="description"
-              :question="question"
-              :time="time"
-            />
+            <GameHeader :title="title" :description="description" :question="question" :time="time" />
           </slot>
 
           <slot />
 
           <slot name="footer">
-            <GameFooter
-              :current="currentProgress"
-              :target="targetProgress"
-              :showProgress="showProgress"
-              :isChecked="isChecked"
-              :isWin="isWin"
-              :hasLost="hasLost"
-              :hideSubmit="hideSubmit"
-              @check="emit('check')"
-              @retry="emit('retry')"
-              @cleared="emit('cleared')"
-            />
+            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
+              @retry="emit('retry')" @cleared="emit('cleared')" />
           </slot>
         </div>
       </div>

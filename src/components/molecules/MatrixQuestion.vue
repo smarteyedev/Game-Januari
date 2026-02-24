@@ -1,11 +1,11 @@
 <template>
     <div class="flex flex-col items-center gap-[16px]">
-        <p class="font-semibold text-h6">{{ title }}</p>
+        <p class="font-semibold text-body-xl">{{ title }}</p>
 
         <div class="flex flex-wrap gap-2.5 justify-center">
             <button v-for="option in options" :key="option.value" @click="$emit('update:modelValue', option.value)"
                 :disabled="disabled" :class="[
-                    'min-w-45 min-h-[56px] rounded-xl font-semibold text-h6 border transition-all duration-150',
+                    'min-w-45 min-h-[56px] rounded-xl font-semibold text-body-xl border transition-all duration-150',
                     getButtonClass(option.value),
                 ]">
                 {{ option.label }}

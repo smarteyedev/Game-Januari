@@ -1,18 +1,13 @@
 <template>
-  <div
-    :draggable="draggable && !disabled"
-    @dragstart="handleDragStart"
-    @click="handleClick"
-    :class="[
-      baseClass,
-      customClass,
-      {
-        'cursor-grab': draggable && !disabled,
-        'cursor-default': disabled,
-        'w-full h-full flex items-center justify-center': centered,
-      },
-    ]"
-  >
+  <div :draggable="draggable && !disabled" @dragstart="handleDragStart" @click="handleClick" :class="[
+    baseClass,
+    customClass,
+    {
+      'cursor-grab': draggable && !disabled,
+      'cursor-default': disabled,
+      'w-full h-full flex items-center justify-center': centered,
+    },
+  ]">
     <slot>
       {{ label }}
     </slot>
@@ -56,5 +51,5 @@ function handleClick(ev?: MouseEvent) {
   emit('click', ev)
 }
 
-const baseClass = 'select-none text-sm rounded-lg break-words flex items-center justify-center'
+const baseClass = 'select-none break-words flex items-center justify-center'
 </script>

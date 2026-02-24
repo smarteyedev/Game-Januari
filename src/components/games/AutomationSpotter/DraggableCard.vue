@@ -17,16 +17,16 @@ const customClass = computed(() => {
 
     // Background based on checked state
     if (props.checked === true) {
-      classes.push('bg-green-500 text-white')
+      classes.push('bg-green-500')
     } else if (props.checked === false) {
-      classes.push('bg-red-500 text-white')
+      classes.push('bg-red-500')
     } else {
       classes.push('bg-gray-50')
     }
   } else {
     // When in source pool
     classes.push(
-      'bg-gray-50 px-3 py-1 border rounded text-center text-body-sm font-medium  min-w-[96px] md:min-w-[128px]',
+      'bg-gray-50 px-[12px] py-[10px] gap-2px border border-gray-200 rounded-[8px] text-center text-body-xs font-semibold  min-w-[96px] md:min-w-[128px]',
     )
   }
 

@@ -1,13 +1,10 @@
 <template>
-  <button
-    @click="clickable && $emit('click')"
-    :class="[
-      'p-4 font-bold transition border-gray-500 border rounded-lg aspect-video',
-      stateClass,
-      clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
-    ]"
-  >
-    <UiLabel :label="label" class="font-semibold text-h6" />
+  <button @click="clickable && $emit('click')" :class="[
+    'p-4 font-bold transition border-gray-500 border rounded-lg aspect-video',
+    stateClass,
+    clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
+  ]">
+    <UiLabel :label="label" class="font-semibold text-body-xl" />
   </button>
 </template>
 
