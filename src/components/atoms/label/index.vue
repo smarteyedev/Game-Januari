@@ -1,26 +1,14 @@
 <template>
-  <div
-class="ui-label"
-:style="genStyle">
-    <label
-:for="name"
-class="ui-label__text">
-      <slot
-name="label"
-v-bind="{ label }">
+  <div class="ui-label" :style="genStyle">
+    <label :for="name" class="ui-label__text">
+      <slot name="label" v-bind="{ label }">
         {{ label }}
       </slot>
     </label>
 
-    <Tooltip
-v-if="tooltip"
-placement="right"
-trigger="hover"
-v-bind="floatingVueConfig">
+    <Tooltip v-if="tooltip" placement="right" trigger="hover" v-bind="floatingVueConfig">
       <template #default="slotProps">
-        <slot
-name="tooltip-icon"
-v-bind="slotProps">
+        <slot name="tooltip-icon" v-bind="slotProps">
           <UiAtomsIcon
             name="mdi-information-outline"
             width="17"
@@ -89,9 +77,7 @@ const genStyle = computed(() => {
 }
 
 .ui-label {
-  @apply flex items-center gap-2;
-
-  color: var(--label-color);
+  @apply flex items-center gap-2 text-gray-900;
 }
 
 .ui-label__text {

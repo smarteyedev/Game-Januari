@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { LevelButtonState } from '@/types/types'
+import type { LevelButtonState } from '@/domain/types'
 import { UiButton } from '../atoms/button'
 
 const { state } = defineProps<{

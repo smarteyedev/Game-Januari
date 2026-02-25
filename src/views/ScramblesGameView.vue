@@ -1,90 +1,99 @@
 <template>
-  <div class="flex flex-col items-center p-8">
-    <div class="p-2">
-      <UiLabel :label="question" />
-    </div>
+  <BaseGame
+    title="Scrambles Game"
+    :description="question"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[4]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div class="flex flex-col gap-[32px] justify-center items-center">
+      <div class="flex flex-col gap-[20px] justify-center items-center">
+        <BoxInput :value="userInput" :locked="hints" />
+        <UiLabel
+          :label="`You have ${attempts} attempts left`"
+          class="text-primary-700 font-semibold text-body-md"
+        />
+      </div>
 
-    <div class="p-2">
-      <BoxInput
-:value="userInput"
-:locked="hints" />
-    </div>
+      <div v-for="(s, i) in submissions" :key="i" class="flex gap-[20px]">
+        <div
+          v-for="(char, j) in s.value.split('')"
+          :key="j"
+          class="aspect-square min-w-15 min-h-15 grid place-items-center border-[3px] rounded-3xl shadow-xl text-h3 font-bold select-none transition"
+          :class="{
+            // Correct guess (green styled)
+            'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
 
-    <div class="p-2 flex gap-2">
-      <span
-v-for="i in MAX_ATTEMPTS"
-:key="i"
-class="w-3 h-3 rounded-full border transition-all"
-        :class="i <= MAX_ATTEMPTS - attempts ? 'bg-red-500 border-red-500' : 'border-red-400'" />
-    </div>
-
-    <div class="p-2 flex flex-col items-center gap-2">
-      <div
-v-for="(s, i) in submissions"
-:key="i"
-class="text-lg font-medium"
-        :class="s.correct ? 'text-green-600' : 'line-through text-gray-400'">
-        {{ s.value }}
+            // Wrong guess (muted + strike feeling)
+            'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
+          }"
+        >
+          {{ char }}
+        </div>
       </div>
     </div>
 
-    <div class="flex gap-2 p-2">
-      <CharacterKey
-v-for="{ c, i } in answerChars"
-:key="`${c}-${i}`"
-:char="c"
-        :disabled="isCharDisabled(c) || !isPlaying"
-@input="onCharInput" />
+    <div class="flex flex-col justify-center items-center gap-[20px]">
+      <div class="flex gap-[20px]">
+        <CharacterKey
+          v-for="{ c, i } in answerChars"
+          :key="`${c}-${i}`"
+          :char="c"
+          :disabled="isCharDisabled(c) || !isPlaying"
+          @input="onCharInput"
+        />
+      </div>
+      <div class="flex gap-4.5">
+        <UiButton text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+        </UiButton>
+        <UiButton text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </UiButton>
+
+        <UiButton text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </UiButton>
+
+        <UiButton text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+      </div>
     </div>
 
-    <div class="flex gap-2 p-2">
-      <UiButton
-class="flex items-center p-4 rounded-sm"
-color="error"
-@click="deleteChar"
-:disabled="!isPlaying">
-        <span>Delete</span>
-      </UiButton>
-      <UiButton
-class="flex items-center p-4 rounded-sm"
-@click="submitAnswer"
-:disabled="!isPlaying">
-        <span>Submit</span>
-      </UiButton>
-
-      <UiButton
-v-if="isLose"
-color="error"
-class="flex items-center p-4 rounded-sm"
-@click="restartGame">
-        <span>Restart</span>
-      </UiButton>
-
-      <UiButton
-v-if="isWin"
-color="success"
-class="flex items-center p-4 rounded-sm"
-@click="continueGame">
-        <span>Continue</span>
-      </UiButton>
-    </div>
-  </div>
+    <template #footer>
+      <span></span>
+    </template>
+  </BaseGame>
 </template>
 
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue'
-import { UiLabel } from '@/components/atoms/label'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
-import { UiButton } from '@/components/atoms/button'
+import UiButton from '@/components/atoms/button/index.vue'
+import gameData from '@/assets/gameData/scrambles.json'
+import { shuffle } from '@/utils/shuffle'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameService } from '@/application'
+import introData from '@/assets/gameData/intro.json'
+import { UiLabel } from '@/components/atoms/label'
 
 type Submission = {
   value: string
   correct: boolean
 }
 
-type GameResult = 'playing' | 'win' | 'lose'
-const gameResult = ref<GameResult>('playing')
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.scrambles,
+  offline: true,
+})
+
+const isWin = computed(() => _isWon.value)
+const isLose = computed(() => _isLost.value)
+const isPlaying = computed(() => _isPlaying.value)
+
+const loading = ref(true)
+const error = ref<unknown>(null)
+const showIntro = ref(true)
 
 const MAX_ATTEMPTS = 4
 const JUNK_LETTERS = 3 // increase to make it evil
@@ -96,19 +105,35 @@ const userInput = ref<(string | null)[]>([])
 const submissions = ref<Submission[]>([])
 const hints = ref<(string | null)[]>([])
 
-const isWin = computed(() => gameResult.value === 'win')
-const isLose = computed(() => gameResult.value === 'lose')
-const isPlaying = computed(() => gameResult.value === 'playing')
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
 
-import gameData from '@/assets/gameData/scrambles.json'
+  try {
+    const data = gameData
+    question.value = data.question
+    answer.value = data.answer.toUpperCase()
+
+    hints.value = Array(answer.value.length).fill(null)
+    userInput.value = Array(answer.value.length).fill(null)
+
+    await startGame()
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
 
 onMounted(async () => {
-  const data = gameData
-  question.value = data.question
-  answer.value = data.answer.toUpperCase()
-
-  hints.value = Array(answer.value.length).fill(null)
-  userInput.value = Array(answer.value.length).fill(null)
+  await initializeGame()
 })
 
 const displayInput = computed(() =>
@@ -163,8 +188,8 @@ function deleteChar() {
   }
 }
 
-function submitAnswer() {
-  if (gameResult.value !== 'playing') return
+async function submitAnswer() {
+  if (!isPlaying.value) return
 
   const guess = displayInput.value
   const correct = guess === answer.value
@@ -172,19 +197,18 @@ function submitAnswer() {
   submissions.value.push({ value: guess, correct })
 
   if (correct) {
-    gameResult.value = 'win'
+    await finish(true)
     return
   }
 
   attempts.value--
 
   if (attempts.value <= 0) {
-    gameResult.value = 'lose'
-
     // reveal full answer
     hints.value = answer.value.split('')
     userInput.value = Array(answer.value.length).fill(null)
     submissions.value.push({ value: answer.value, correct: true })
+    await finish(false)
   }
 
   // reveal one random hint
@@ -209,7 +233,7 @@ function submitAnswer() {
   userInput.value = Array(answer.value.length).fill(null)
 
   if (attempts.value <= 0) {
-    gameResult.value = 'lose'
+    await finish(false)
   }
 }
 
@@ -225,16 +249,12 @@ function getRandomLetter(exclude: Set<string>): string {
   return available[Math.floor(Math.random() * available.length)]!
 }
 
-function shuffle<T>(arr: T[]) {
-  return [...arr].sort(() => Math.random() - 0.5)
-}
-
-function restartGame() {
+async function restartGame() {
   attempts.value = MAX_ATTEMPTS
   submissions.value = []
   hints.value = Array(answer.value.length).fill(null)
   userInput.value = Array(answer.value.length).fill(null)
-  gameResult.value = 'playing'
+  await retry()
 }
 
 function continueGame() {

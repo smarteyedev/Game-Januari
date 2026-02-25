@@ -1,142 +1,100 @@
+/**
+ * Session Store - Pinia Store
+ * Manages guest session
+ */
+
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import useApi from '@/composables/useApi'
-import type { ApiResponse, GuestSession, GameSession } from '@/types/types'
+import { sessionRepository } from '@/infrastructure'
+import type { GuestSession, GameSession, MinigameId } from '@/domain/types'
+import { GameState } from '@/domain/types'
 
 export const useSessionStore = defineStore('session', () => {
+  // State
   const guest = ref<GuestSession | null>(null)
   const game = ref<GameSession | null>(null)
 
-  const { post } = useApi()
+  // Computed
+  const isPlaying = computed(() => game.value?.state === GameState.Playing)
+  const hasActiveSession = computed(() => !!guest.value && !!guest.value.accessToken)
 
-  /* -----------------------------
-   * Helpers
-   * ----------------------------- */
-
-  function persistGuest(session: GuestSession | null) {
-    guest.value = session
-
-    if (session) {
-      localStorage.setItem('guest_session', JSON.stringify(session))
-    } else {
-      localStorage.removeItem('guest_session')
-    }
-  }
-
-  function ensureAuth() {
-    if (!guest.value?.accessToken) {
-      throw new Error('Guest is not authenticated')
-    }
-    return {
-      Authorization: `Bearer ${guest.value.accessToken}`,
-    }
-  }
-
-  function handleApiFailure(res: any) {
-    if (!res || res.success === false || res.error) {
-      const msg = res?.message ?? res?.error?.details ?? 'Unexpected API error'
-      const err = new Error(msg)
-      ;(err as any).apiError = res
-      throw err
-    }
-  }
-
-  /* -----------------------------
-   * Guest session
-   * ----------------------------- */
-
-  async function createGuestSession() {
-    const res = await post<
-      ApiResponse<{
-        guestId: string
-        accessToken: string
-        expiresAt: string
-      }>
-    >('/api/v1/guest/session')
-
-    handleApiFailure(res)
-
-    persistGuest({
-      guestId: res.data!.guestId,
-      accessToken: res.data!.accessToken,
-      expiresAt: res.data!.expiresAt,
-      gameId: crypto.randomUUID(),
-    })
-  }
-
+  // Initialize - load session from storage
   function loadSession() {
-    const stored = localStorage.getItem('guest_session')
-    if (stored) guest.value = JSON.parse(stored)
+    const stored = sessionRepository.loadSession()
+    if (stored) {
+      guest.value = stored
+    }
   }
 
+  // Create new guest session
+  async function createGuestSession() {
+    try {
+      const session = await sessionRepository.createGuestSession()
+      guest.value = session
+      return session
+    } catch (error) {
+      console.error('Failed to create guest session:', error)
+      throw error
+    }
+  }
+
+  // Ensure we have a valid session
+  async function ensureSession() {
+    if (!guest.value) {
+      loadSession()
+    }
+
+    if (!guest.value || !guest.value.accessToken) {
+      await createGuestSession()
+    }
+
+    return guest.value!
+  }
+
+  // Launch a game
+  async function launchGame(minigameId: MinigameId) {
+    const session = await ensureSession()
+
+    game.value = {
+      gameId: session.gameId,
+      minigameId,
+      state: GameState.Launching,
+    }
+
+    // Note: Game launch is now handled by GameService
+    // This store just tracks the current game state
+    game.value.state = GameState.Playing
+  }
+
+  // Update game state
+  function updateGameState(state: GameState) {
+    if (game.value) {
+      game.value.state = state
+    }
+  }
+
+  // Clear session
   function clearSession() {
-    persistGuest(null)
+    sessionRepository.clearSession()
+    guest.value = null
     game.value = null
   }
 
-  /* -----------------------------
-   * Game lifecycle
-   * ----------------------------- */
-
-  async function launchGame(minigameId: string) {
-    if (!guest.value) throw new Error('No guest session')
-
-    game.value = {
-      gameId: guest.value.gameId,
-      minigameId,
-      state: 'launching',
-    }
-
-    const res = await post<ApiResponse<{ sessionId: string }>>(
-      '/api/v1/hpl/game/launch',
-      {
-        gameId: guest.value.gameId,
-        minigameId,
-      },
-      { headers: ensureAuth() },
-    )
-
-    handleApiFailure(res)
-
-    game.value.sessionId = res.data!.sessionId
-    game.value.state = 'playing'
-  }
-
-  async function submitScore(score: number, answers: any[] = [], timeMs = 0) {
-    if (!game.value?.sessionId) {
-      throw new Error('No active game session')
-    }
-
-    game.value.state = 'submitting'
-
-    const res = await post(
-      `/api/v1/hpl/session/${game.value.sessionId}/submit`,
-      { score, answers, timeMs },
-      { headers: ensureAuth() },
-    )
-
-    handleApiFailure(res)
-
-    game.value.state = 'finished'
-    return res
-  }
-
-  /* -----------------------------
-   * Derived state
-   * ----------------------------- */
-
-  const isPlaying = computed(() => game.value?.state === 'playing')
-
   return {
+    // State
     guest,
     game,
+
+    // Computed
     isPlaying,
+    hasActiveSession,
 
-    createGuestSession,
+    // Actions
     loadSession,
-    clearSession,
-
+    createGuestSession,
+    ensureSession,
     launchGame,
-    submitScore,
+    updateGameState,
+    clearSession,
   }
 })

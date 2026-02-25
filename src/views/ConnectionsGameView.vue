@@ -1,23 +1,31 @@
 <template>
-  <div class="flex flex-col items-center p-8">
-    <div class="p-2">
-      <UiLabel label="Connections game"></UiLabel>
-    </div>
-    <div class="grid grid-cols-4 gap-2 border-b border-t p-2 min-w-100 min-h-12.5">
+  <BaseGame
+    title="Connections Game"
+    description="Connections game"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[3]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div
+      class="flex flex-wrap lg:flex-nowrap justify-center gap-[20px] items-center min-w-25 min-h-22.5"
+    >
       <ConnectionsCard
-        v-for="group in solvedGroups"
-        :key="group.id"
-        :label="group.label"
-        state="solved"
-        :color="categoryColorMap[group.id]"
+        v-for="index in 4"
+        :key="index"
+        class="min-w-50"
+        :label="getSolvedGroup(index - 1)?.label || ''"
+        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
+        :color="getSolvedColor(index - 1)"
         :clickable="false"
       />
     </div>
-
-    <div class="p-2">
-      <UiLabel label="Create a group of four"></UiLabel>
+    <div>
+      <span class="text-body-xl font-semibold text-primary-700">Create a group of four</span>
     </div>
-    <div class="grid grid-cols-4 gap-2">
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-[20px] p-2">
       <ConnectionsCard
         v-for="item in items"
         :key="item.label"
@@ -28,60 +36,63 @@
         @click="toggleItem(item)"
       />
     </div>
-    <!--Event message for user feedback-->
-    <div class="p-2">
-      <UiLabel
-        v-if="wrongCount !== null && !(win || lose)"
-        :label="`Wrong, you are ${wrongCount} away to form a correct group`"
-      />
-      <UiLabel
-        v-if="solvedNewGroup !== null && !(win || lose)"
-        :label="`You found a new group: ${solvedNewGroup.label}`"
-      />
-      <UiLabel
-v-if="win"
-:label="`You win`" />
-      <UiLabel
-v-if="lose"
-:label="`you lose`" />
-    </div>
-    <!-- Control Buttons -->
-    <div class="flex p-2 gap-2">
-      <UiButton
-        class="p-4 flex items-center rounded-sm"
-        :disabled="selected.length !== 4 || win || lose"
-        @click="submitSelection"
-      >
-        <span>Submit</span>
-      </UiButton>
 
-      <!--Hidden, if lose show restart, if win show continue-->
-      <UiButton
-        class="p-4 flex items-center rounded-sm"
-        v-if="lose"
-        @click="restartGame"
-        :color="'error'"
-      >
-        <span>Restart</span>
-      </UiButton>
-      <UiButton
-class="p-4 flex items-center rounded-sm"
-v-if="win"
-:color="'success'">
-        <span>Continue</span>
-      </UiButton>
-    </div>
-    <div class="p-2">
-      <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
-    </div>
-  </div>
+    <!-- Control Buttons -->
+
+    <template #footer>
+      <div class="flex flex-col items-center gap-4.5">
+        <!--Event message for user feedback-->
+        <div class="text-primary-700 text-body-xl font-bold">
+          <UiLabel
+            v-if="wrongCount !== null && !(isWon || isLost)"
+            :label="`Wrong, you are ${wrongCount} away to form a correct group`"
+          />
+          <UiLabel
+            v-if="solvedNewGroup !== null && !(isWon || isLost)"
+            :label="`You found a new group: ${solvedNewGroup.label}`"
+          />
+          <UiLabel v-if="isWon" :label="`You win`" />
+          <UiLabel v-if="isLost" :label="`you lose`" />
+        </div>
+        <div class="flex gap-[16px]">
+          <UiButton
+            text="Submit"
+            variant="primary"
+            :disabled="selected.length !== 4 || isWon || isLost"
+            @click="submitSelection"
+          >
+          </UiButton>
+
+          <!--Hidden, if lose show restart, if win show continue-->
+          <UiButton
+            text="Restart"
+            variant="danger"
+            v-if="isLost"
+            @click="restartGame"
+            :color="'error'"
+          >
+          </UiButton>
+          <UiButton text="Continue" v-if="isWon" :color="'success'"> </UiButton>
+        </div>
+        <div class="text-primary-700 font-semibold text-body-md">
+          <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
+        </div>
+      </div>
+    </template>
+  </BaseGame>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
+import gameData from '@/assets/gameData/connection_game.json'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameService } from '@/application'
+import introData from '@/assets/gameData/intro.json'
 import { UiButton } from '@/components/atoms/button'
+import { shuffle } from '@/utils/shuffle'
 
 type Category = {
   id: string
@@ -103,24 +114,37 @@ type SolvedGroup = {
 }
 
 const COLOR_POOL = [
-  'bg-red-500',
-  'bg-orange-500',
-  'bg-amber-500',
-  'bg-yellow-500',
-  'bg-lime-500',
-  'bg-green-500',
-  'bg-emerald-500',
-  'bg-teal-500',
-  'bg-cyan-500',
-  'bg-sky-500',
-  'bg-blue-500',
-  'bg-indigo-500',
-  'bg-violet-500',
-  'bg-purple-500',
-  'bg-fuchsia-500',
-  'bg-pink-500',
-  'bg-rose-500',
+  'bg-red-200',
+  'bg-orange-200',
+  'bg-amber-200',
+  'bg-yellow-200',
+  'bg-lime-200',
+  'bg-green-200',
+  'bg-emerald-200',
+  'bg-teal-200',
+  'bg-cyan-200',
+  'bg-sky-200',
+  'bg-blue-200',
+  'bg-indigo-200',
+  'bg-violet-200',
+  'bg-purple-200',
+  'bg-fuchsia-200',
+  'bg-pink-200',
+  'bg-rose-200',
 ]
+
+const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.connections,
+  offline: true,
+})
+
+const loading = ref(true)
+const error = ref<unknown>(null)
+const showIntro = ref(true)
+
+const isWon = computed(() => _isWon.value)
+const isLost = computed(() => _isLost.value)
 
 const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])
@@ -133,18 +157,6 @@ const attemptsLeft = ref(maxAttempts)
 
 const wrongCount = ref<number | null>(null)
 const solvedNewGroup = ref<{ id: string; label: string } | null>(null)
-
-const win = ref(false)
-const lose = ref(false)
-
-function shuffle<T>(array: T[]): T[] {
-  const result = [...array]
-  for (let i = result.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[result[i]!, result[j]!] = [result[j]!, result[i]!]
-  }
-  return result
-}
 
 function countAway(items: Item[]) {
   const freq: Record<string, number> = {}
@@ -166,33 +178,53 @@ function colorFromCategory(id: string) {
 }
 
 function assignCategoryColors(categories: { id: string }[]) {
-  categories.forEach((cat, _) => {
+  categories.forEach((cat) => {
     categoryColorMap.value[cat.id] = colorFromCategory(cat.id)
   })
 }
 
-import gameData from '@/assets/gameData/connection_game.json'
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    await startGame()
+
+    const data = gameData
+
+    categories.value = data.category
+    assignCategoryColors(data.category)
+
+    categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
+
+    items.value = shuffle(
+      data.items.map((item: any) => ({
+        label: item.label,
+        category: item.category,
+        state: 'idle',
+      })),
+    )
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
+
 onMounted(async () => {
-  const data = gameData
-
-  categories.value = data.category
-
-  assignCategoryColors(data.category)
-
-  categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
-
-  items.value = shuffle(
-    data.items.map((item: any) => ({
-      label: item.label,
-      category: item.category,
-      state: 'idle',
-    })),
-  )
+  await initializeGame()
 })
 
 function toggleItem(item: Item) {
   if (item.state === 'solved') return
-  if (win.value || lose.value) return
+  if (isWon.value || isLost.value) return
 
   if (item.state === 'selected') {
     item.state = 'idle'
@@ -206,9 +238,9 @@ function toggleItem(item: Item) {
   }
 }
 
-function submitSelection() {
+async function submitSelection() {
   if (selected.value.length !== 4) return
-  if (win.value || lose.value) return
+  if (isWon.value || isLost.value) return
 
   solvedNewGroup.value = null
   wrongCount.value = null
@@ -225,8 +257,8 @@ function submitSelection() {
     selected.value = []
 
     if (attemptsLeft.value <= 0) {
-      lose.value = true
       revealAllGroups()
+      await finish(false)
     }
 
     return
@@ -252,8 +284,17 @@ function submitSelection() {
 
   // win condition
   if (solvedGroups.value.length === categories.value.length) {
-    win.value = true
+    await finish(true)
   }
+}
+
+function getSolvedGroup(index: number) {
+  return solvedGroups.value[index]
+}
+
+function getSolvedColor(index: number) {
+  const group = solvedGroups.value[index]
+  return group ? (categoryColorMap.value[group.id] ?? 'bg-gray-50') : 'bg-gray-50'
 }
 
 function revealAllGroups() {
@@ -276,10 +317,13 @@ function revealAllGroups() {
   })
 }
 
-function restartGame() {
+async function restartGame() {
+  await retry()
+  resetLocalState()
+}
+
+function resetLocalState() {
   attemptsLeft.value = maxAttempts
-  win.value = false
-  lose.value = false
   wrongCount.value = null
   solvedNewGroup.value = null
   solvedGroups.value = []

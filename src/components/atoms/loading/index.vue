@@ -1,7 +1,5 @@
 <template>
-  <div
-class="ui-loading"
-:style="genStyle">
+  <div class="ui-loading" :style="genStyle">
     <slot name="loading-icon">
       <UiAtomsIcon
         name="uil-spinner"

@@ -1,25 +1,14 @@
 <template>
-  <div
-class="flex gap-2 cursor-text border p-2 relative"
-@click="focusInput">
+  <div class="flex gap-[20px] cursor-text relative" @click="focusInput">
     <div
       v-for="(char, i) in value"
       :key="i"
-      class="w-10 h-11 grid place-items-center text-[22px] border-b-[1.5px]"
-      :class="{
-        'border-b-green-600 font-bold': locked[i],
-        'border-b-gray-300': !locked[i] && char,
-        'border-b-gray-600': !locked[i] && !char,
-      }"
+      class="aspect-square min-w-17.5 min-h-17.5 grid place-items-center border-[3px] rounded-3xl shadow-xl text-h3 font-bold select-none transition bg-white border-primary-700 shadow-primary-700 text-black"
     >
       {{ locked[i] ?? char ?? '' }}
     </div>
 
-    <input
-ref="input"
-class="absolute opacity-0 pointer-events-none"
-readonly
-@keydown.prevent />
+    <input ref="input" class="absolute opacity-0 pointer-events-none" readonly @keydown.prevent />
   </div>
 </template>
 

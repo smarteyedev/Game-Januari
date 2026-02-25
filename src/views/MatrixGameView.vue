@@ -1,71 +1,54 @@
 <template>
-  <div class="p-4">
-    <UiLabel :label="survey?.title" />
+  <BaseGame
+    title="Matrix Game"
+    :description="survey?.title"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[5]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+  >
+    <div class="flex flex-col items-center justify-center gap-[32px]">
+      <div v-if="survey">
+        <div
+          v-for="q in survey.questions"
+          :key="q.id"
+          class="flex flex-col items-center justify-center gap-[28px] mb-4"
+        >
+          <MatrixQuestion
+            :title="q.label"
+            :options="survey.options"
+            :correct-answer="q.correctAnswer"
+            :finished="isWin || isLose"
+            v-model="answers[q.id]"
+            :disabled="!isPlaying"
+          />
+        </div>
+      </div>
 
-    <table class="w-full border-collapse">
-      <thead>
-        <tr>
-          <th class="p-3"></th>
-          <th
-v-for="o in survey?.options"
-:key="o.value"
-class="p-3 text-center">
-            <UiLabel :label="o.label" />
-          </th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr
-v-for="q in survey?.questions"
-:key="q.id"
-class="border-t">
-          <td class="p-3 text-left whitespace-nowrap">
-            <UiLabel :label="q.label" />
-          </td>
-
-          <td
-v-for="o in survey?.options"
-:key="o.value"
-class="p-3 text-center">
-            <UiRadio
-              v-model="answers[q.id]"
-              :value="o.value"
-              :class="radioClass(q, o)"
-              :disabled="score !== null"
-            />
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <div class="flex gap-2 p-4">
-      <UiButton
-@click="submit"
-class="flex items-center p-2 rounded-sm">Submit</UiButton>
-      <UiButton
-        @click="restart"
-        class="flex items-center p-2 rounded-sm"
-        color="error"
-        :disabled="!finished"
-        >Restart
-      </UiButton>
-      <UiButton
-        @click="continueQuiz"
-        class="flex items-center p-2 rounded-sm"
-        color="success"
-        :disabled="!finished"
-      >
-        Continue</UiButton
-      >
+      <div class="flex flex-wrap items-center justify-center gap-4.5">
+        <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
+        <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose"> </UiButton>
+        <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
+        </UiButton>
+      </div>
     </div>
-  </div>
+
+    <template #footer>
+      <span></span>
+    </template>
+  </BaseGame>
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import { UiLabel } from '@/components/atoms/label'
-import { UiRadio } from '@/components/atoms/radio'
+import { computed, onMounted, ref } from 'vue'
+import gameData from '@/assets/gameData/matrix_game.json'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameService } from '@/application'
+import introData from '@/assets/gameData/intro.json'
+import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
 
 type Option = { value: number; label: string }
@@ -75,55 +58,84 @@ type Survey = { title: string; options: Option[]; questions: Question[] }
 const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
-const finished = ref(false)
 
-import gameData from '@/assets/gameData/matrix_game.json'
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.matrix,
+  offline: true,
+})
+
+const loading = ref(true)
+const error = ref<unknown>(null)
+const showIntro = ref(true)
+
+const isWin = computed(() => _isWon.value)
+const isLose = computed(() => _isLost.value)
+const isPlaying = computed(() => _isPlaying.value)
+
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    if (survey.value) {
+      // initialize answers
+      survey.value.questions.forEach((q) => {
+        answers.value[q.id] = undefined
+      })
+    }
+    await startGame()
+  } catch (err) {
+    error.value = err
+    console.error('Failed to initialize game', err)
+  } finally {
+    loading.value = false
+  }
+}
+
+// Retry function for error state
+function retryGame() {
+  initializeGame()
+}
 
 onMounted(async () => {
   survey.value = gameData
-
-  // initialize answers
-  survey.value.questions.forEach((q) => {
-    answers.value[q.id] = undefined
-  })
+  await initializeGame()
 })
 
-const submit = () => {
+const submit = async () => {
   if (!survey.value) return
 
-  let s = 0
+  let correct = 0
+
   survey.value.questions.forEach((q) => {
-    if (answers.value[q.id] === q.correctAnswer) s++
+    if (answers.value[q.id] === q.correctAnswer) correct++
   })
-  score.value = s
-  finished.value = true
+
+  score.value = correct
+
+  const won = correct === survey.value.questions.length
+
+  await finish(
+    won,
+    survey.value.questions.map((q) => ({
+      questionId: q.id,
+      answer: answers.value[q.id],
+    })),
+  )
 }
 
-const restart = () => {
+const restart = async () => {
   if (!survey.value) return
   survey.value.questions.forEach((q) => {
     answers.value[q.id] = undefined
   })
   score.value = null
+  await retry()
 }
 
 const continueQuiz = () => {
   alert('Continue to next step')
-}
-
-// returns CSS class for radio based on correctness
-const radioClass = (q: Question, o: Option) => {
-  if (score.value === null) return 'scale-125 cursor-pointer'
-
-  const userSelected = answers.value[q.id]
-  if (userSelected === o.value && userSelected === q.correctAnswer) {
-    return 'scale-125 cursor-pointer bg-green-200 rounded'
-  } else if (userSelected === o.value && userSelected !== q.correctAnswer) {
-    return 'scale-125 cursor-pointer bg-red-200 rounded'
-  } else if (o.value === q.correctAnswer) {
-    return 'scale-125 cursor-pointer bg-green-100 rounded'
-  } else {
-    return 'scale-125 cursor-pointer'
-  }
 }
 </script>

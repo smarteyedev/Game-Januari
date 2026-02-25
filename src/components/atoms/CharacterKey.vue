@@ -1,10 +1,10 @@
 <template>
   <button
-    class="w-10 h-11 grid place-items-center border rounded text-lg font-medium select-none transition"
+    class="aspect-square min-w-17.5 min-h-17.5 grid place-items-center border-[3px] shadow-xl rounded-3xl text-lg font-bold select-none transition text-h3"
     :class="
       disabled
-        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-        : 'bg-white hover:bg-gray-100 active:scale-95'
+        ? 'bg-gray-100 text-gray-700 cursor-not-allowed border-gray-700 shadow-gray-700'
+        : 'bg-white hover:bg-gray-100 border-primary-700 shadow-primary-700'
     "
     :disabled="disabled"
     @click="$emit('input', char)"
