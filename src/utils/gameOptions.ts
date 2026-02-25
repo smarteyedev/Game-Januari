@@ -3,6 +3,8 @@
  * Contains timer, game service, and game-specific options
  */
 
+// TODO gameflow.json for each game
+
 import type { MinigameId } from '@/domain/types'
 
 // TIMER OPTIONS

@@ -1,0 +1,22 @@
+{
+  "intro": {
+      "title": "Task Automation & AI Agent",
+      "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
+      "key_points": [
+        { "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
+        { "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
+        { "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
+      ]
+  },
+  "config": {
+    "module_title": "Explore Artificial Intelligence (AI) Tools",
+    "max_time": 180,
+    "max_attempt": 4
+  },
+  "content": {
+  
+  "question": "Provides energy for a circuit",
+  "answer": "BATTERY"
+
+  }
+}

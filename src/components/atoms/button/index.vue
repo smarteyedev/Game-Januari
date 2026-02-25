@@ -34,17 +34,17 @@ function getIconSize(size: 'sm' | 'md' | 'lg' | 'xl') {
 
 const base =
   'inline-flex items-center justify-center font-black ' +
-  'cursor-pointer rounded-[12px] shadow-xl px-6 py-4'
+  'cursor-pointer rounded-[12px] shadow-xl px-6'
 
 // const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 
 // const plainHoverEffects = 'hover:border-[3px] hover:shadow-primary-700 hover:border-primary-700'
 
 const sizes = {
-  xl: ' text-[20px] active:text-[24px]',
-  lg: ' text-[18px] active:text-[20px]',
-  md: ' text-[16px] active:text-[18px]',
-  sm: ' text-[14px] active:text-[14px]',
+  xl: 'min-h-[56px] text-[20px] active:text-[24px] active:min-h-[64px]',
+  lg: 'min-h-[48px] text-[18px] active:text-[20px] active:min-h-[56px]',
+  md: 'min-h-[44px] text-[16px] active:text-[18px] active:min-h-[48px]',
+  sm: 'min-h-[40px] text-[14px] active:text-[14px] active:min-h-[44px]',
 }
 
 const variants = {
