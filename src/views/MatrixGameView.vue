@@ -1,24 +1,22 @@
 <template>
   <BaseGame title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div class="flex flex-col items-center justify-center gap-8">
-      <div v-if="survey">
-        <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-7 mb-4">
-          <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
-            :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
-        </div>
+    <div v-if="survey" class="flex flex-col items-center justify-center gap-5 md:gap-8">
+      <div v-for="q in survey.questions" :key="q.id">
+        <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
+          :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
       </div>
 
-      <div class="flex flex-wrap items-center justify-center gap-4.5">
-        <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-        <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose"> </UiButton>
-        <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
-        </UiButton>
-      </div>
+
     </div>
 
     <template #footer>
-      <span></span>
+      <div class="flex flex-wrap items-center justify-center gap-4.5">
+        <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
+        <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" :disabled="!isLose"> </UiButton>
+        <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
+        </UiButton>
+      </div>
     </template>
   </BaseGame>
 </template>
@@ -32,6 +30,7 @@ import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
+import { useBreakpoint } from '@/composables/useBreakpoint'
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }
@@ -54,6 +53,15 @@ const showIntro = ref(true)
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
 const isPlaying = computed(() => _isPlaying.value)
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
 
 // Fetch game data and start game
 async function initializeGame() {

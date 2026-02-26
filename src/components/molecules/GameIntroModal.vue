@@ -5,6 +5,8 @@ import type { IntroData } from '@/domain/types'
 import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal'
+import { useBreakpoint } from '@/composables/useBreakpoint'
+import { computed } from 'vue'
 
 interface Props {
   title: string
@@ -33,6 +35,15 @@ const onStart = () => {
   emit('start')
   emit('update:modelValue', false)
 }
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
 </script>
 
 <template>
@@ -68,7 +79,7 @@ const onStart = () => {
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <UiButton text="Mulai Game" variant="primary" size="md" class="w-40.5 h-11" @click="onStart" />
+        <UiButton text="Mulai Game" variant="primary" :size="buttonSize" @click="onStart" />
       </div>
     </template>
   </UiModal>

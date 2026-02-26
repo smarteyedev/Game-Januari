@@ -16,6 +16,7 @@
   },
   "content": {
     "id": 1,
+  "question": "How would you rate your overall experience with our delivery service?",
   "options": [
     {"id": 1,  "label": "Excellent" },
     { "id": 2,  "label": "Good" },
@@ -23,25 +24,25 @@
     { "id": 4,  "label": "Poor" },
     { "id": 5,  "label": "Very Poor" }
   ],
-  "questions": [
+  "subquestions": [
     {
       "id": 1,
-      "question": "Your interaction with our staff",
+      "label": "Your interaction with our staff",
       "answer": 5
     },
     {
       "id": 2,
-      "question": "The cost of delivery",
+      "label": "The cost of delivery",
       "answer": 4
     },
     {
       "id": 3,
-      "question": "The delivery options offered",
+      "label": "The delivery options offered",
       "answer": 3
     },
     {
       "id": 4,
-      "question": "The condition of your package",
+      "label": "The condition of your package",
       "answer": 5
     }
   ]

@@ -1,14 +1,14 @@
 <template>
-  <BaseGame title="Connections Game" description="Connections game" :time="time" v-model:showIntro="showIntro"
-    :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div class="flex  justify-center gap-2.5 md:gap-5 items-center">
+  <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
+    v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
+    <div class="grid grid-cols-4 gap-5 place-items-center">
       <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
         :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
     </div>
     <div>
-      <span class="text-body-xl font-semibold text-primary-700">Create a group of four</span>
+      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700">Create a group of four</span>
     </div>
-    <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 p-2">
+    <div class="grid grid-cols-4 xl:grid-cols-8 gap-5 place-items-center">
       <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
         :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
@@ -18,7 +18,7 @@
     <template #footer>
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
-        <div class="text-primary-700 text-body-xl font-bold">
+        <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
           <UiLabel v-if="wrongCount !== null && !(isWon || isLost)"
             :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
           <UiLabel v-if="solvedNewGroup !== null && !(isWon || isLost)"
@@ -27,16 +27,17 @@
           <UiLabel v-if="isLost" :label="`you lose`" />
         </div>
         <div class="flex gap-4">
-          <UiButton text="Submit" variant="primary" :disabled="selected.length !== 4 || isWon || isLost"
-            @click="submitSelection">
+          <UiButton :size="buttonSize" text="Submit" variant="primary"
+            :disabled="selected.length !== 4 || isWon || isLost" @click="submitSelection">
           </UiButton>
 
           <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton text="Restart" variant="danger" v-if="isLost" @click="restartGame" :color="'error'">
+          <UiButton :size="buttonSize" text="Restart" variant="danger" v-if="isLost" @click="restartGame"
+            :color="'error'">
           </UiButton>
-          <UiButton text="Continue" v-if="isWon" :color="'success'"> </UiButton>
+          <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"> </UiButton>
         </div>
-        <div class="text-primary-700 font-semibold text-body-md">
+        <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>
@@ -55,6 +56,7 @@ import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import { UiButton } from '@/components/atoms/button'
 import { shuffle } from '@/utils/shuffle'
+import { useBreakpoint } from '@/composables/useBreakpoint'
 
 type Category = {
   id: string
@@ -94,6 +96,16 @@ const COLOR_POOL = [
   'bg-pink-200',
   'bg-rose-200',
 ]
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
+
 
 const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
   maxTime: 180,

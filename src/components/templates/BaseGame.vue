@@ -81,11 +81,14 @@ function handleStart() {
   emit('update:showIntro', false)
   emit('start')
 }
+
+
+
 </script>
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div class="min-h-screen flex flex-col p-6 gap-4 w-full" :style="{
+    <div class="min-h-screen flex flex-col p-4 gap-4 w-full" :style="{
       backgroundImage: `url(${Background})`,
       backgroundPosition: 'center',
       backgroundSize: 'cover',

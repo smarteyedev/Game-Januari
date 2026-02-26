@@ -4,9 +4,9 @@
       "title": "Task Automation & AI Agent",
       "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
       "key_points": [
-        { "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
-        { "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
-        { "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
+        {"id": 1, "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
+        { "id": 2, "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
+        { "id": 3, "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
       ]
   },
   "config": {
@@ -24,22 +24,22 @@
     { "id": 4, "category": "algoritma", "label": "Algoritma" }
   ],
   "items": [
-    { "category": "ai_platform", "label": "Chat GPT" },
-    { "category": "ai_platform", "label": "Gemini" },
-    { "category": "ai_platform", "label": "CoPilot" },
-    { "category": "ai_platform", "label": "Claude" },
-    { "category": "hewan_darat", "label": "Sapi" },
-    { "category": "hewan_darat", "label": "Kuda" },
-    { "category": "hewan_darat", "label": "Domba" },
-    { "category": "hewan_darat", "label": "Kucing" },
-    { "category": "hewan_laut", "label": "Ikan" },
-    { "category": "hewan_laut", "label": "Gurita" },
-    { "category": "hewan_laut", "label": "Cumi-cumi" },
-    { "category": "hewan_laut", "label": "Udang" },
-    { "category": "algoritma", "label": "Bubble search" },
-    { "category": "algoritma", "label": "FFT" },
-    { "category": "algoritma", "label": "A* Search" },
-    { "category": "algoritma", "label": "DFS" }
+    { "id": 1, "category": "ai_platform", "label": "Chat GPT" },
+    { "id": 2, "category": "ai_platform", "label": "Gemini" },
+    { "id": 3, "category": "ai_platform", "label": "CoPilot" },
+    { "id": 4, "category": "ai_platform", "label": "Claude" },
+    { "id": 5, "category": "hewan_darat", "label": "Sapi" },
+    { "id": 6, "category": "hewan_darat", "label": "Kuda" },
+    { "id": 7, "category": "hewan_darat", "label": "Domba" },
+    { "id": 8, "category": "hewan_darat", "label": "Kucing" },
+    { "id": 9, "category": "hewan_laut", "label": "Ikan" },
+    { "id": 10, "category": "hewan_laut", "label": "Gurita" },
+    { "id": 11, "category": "hewan_laut", "label": "Cumi-cumi" },
+    { "id": 12, "category": "hewan_laut", "label": "Udang" },
+    { "id": 13, "category": "algoritma", "label": "Bubble search" },
+    { "id": 14, "category": "algoritma", "label": "FFT" },
+    { "id": 15, "category": "algoritma", "label": "A* Search" },
+    { "id": 16,	"category":"algoritma",	"label":"DFS"}
   ]
   }
 }

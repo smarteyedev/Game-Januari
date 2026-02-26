@@ -6,7 +6,7 @@ const props = withDefaults(
   defineProps<{
     text?: string
     variant?: 'primary' | 'secondary' | 'plain' | 'danger'
-    size?: 'sm' | 'md' | 'lg' | 'xl'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     disabled?: boolean
 
     icon?: string
@@ -22,8 +22,9 @@ const props = withDefaults(
 
 const isDisabled = computed(() => props.disabled || props.loading)
 
-function getIconSize(size: 'sm' | 'md' | 'lg' | 'xl') {
+function getIconSize(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') {
   const map = {
+    xs: 14,
     sm: 16,
     md: 18,
     lg: 20,
@@ -45,6 +46,7 @@ const sizes = {
   lg: 'min-h-[48px] text-[18px] active:text-[20px] active:min-h-[56px]',
   md: 'min-h-[44px] text-[16px] active:text-[18px] active:min-h-[48px]',
   sm: 'min-h-[40px] text-[14px] active:text-[14px] active:min-h-[44px]',
+  xs: 'min-h-[36px] text-[12px] active:text-[14px] active:min-h-[40px]',
 }
 
 const variants = {

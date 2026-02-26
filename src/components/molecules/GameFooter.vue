@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import UiButton from '@/components/atoms/button/index.vue'
 import ProgressWithIcon from './ProgressWithIcon.vue'
+import { useBreakpoint } from '@/composables/useBreakpoint';
+import { computed } from 'vue';
 
 defineProps<{
   current?: number
@@ -17,6 +19,15 @@ const emit = defineEmits<{
   (e: 'retry'): void
   (e: 'cleared'): void
 }>()
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
 </script>
 
 <template>
@@ -29,7 +40,8 @@ const emit = defineEmits<{
             :target="target" />
         </div>
         <!-- SUBMIT -->
-        <UiButton v-if="!hideSubmit && !isChecked" variant="secondary" size="md" @click="emit('check')" text="Check">
+        <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
+          text="Check">
         </UiButton>
       </slot>
     </div>
@@ -43,7 +55,7 @@ const emit = defineEmits<{
        -->
 
         <!-- CONTINUE -->
-        <UiButton v-if="isWin || hasLost" text="Continue" variant="primary" size="md" @click="emit('cleared')">
+        <UiButton :size="buttonSize" v-if="isWin || hasLost" text="Continue" variant="primary" @click="emit('cleared')">
         </UiButton>
       </slot>
     </div>
