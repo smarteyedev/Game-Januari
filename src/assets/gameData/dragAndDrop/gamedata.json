@@ -1,19 +1,21 @@
 {
   "intro": {
+    "id": 1,
       "title": "Task Automation & AI Agent",
       "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
       "key_points": [
-        { "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
-        { "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
-        { "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
+        {"id": 1, "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
+        { "id": 2, "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
+        { "id": 3, "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
       ]
   },
   "config": {
+    "id": 1,
     "module_title": "Explore Artificial Intelligence (AI) Tools",
     "max_time": 180
   },
   "content": {
- "id": 1,
+    "id": 1,
     "sentence": "Saya sedang menulis review untuk riset di bidang {{1}}. Tulis ulasan akademik dengan gaya seorang peneliti tentang konsep dan penerapan {{2}} dalam organisasi modern. Gunakan bahasa formal dan netral, berikan kerangka teori dan contoh penerapan, dan strukturkan {{3}} agar mudah dimasukkan ke dalam {{4}}. Target pembaca saya Adalah {{5}} di perusahaan.",
     "blanks": [
       {

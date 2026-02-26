@@ -1,5 +1,6 @@
 {
   "intro": {
+    "id": 1,
       "title": "Task Automation & AI Agent",
       "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
       "key_points": [
@@ -9,16 +10,18 @@
       ]
   },
   "config": {
+    "id": 1,
     "module_title": "Explore Artificial Intelligence (AI) Tools",
     "max_time": 180,
     "max_attempt": 4
   },
   "content": {
+    "id": 1,
   "category": [
-    { "id": "ai_platform", "label": "AI Platform" },
-    { "id": "hewan_darat", "label": "Hewan Darat" },
-    { "id": "hewan_laut", "label": "Hewan Laut" },
-    { "id": "algoritma", "label": "Algoritma" }
+    {"id": 1, "category": "ai_platform", "label": "AI Platform" },
+    { "id": 2, "category": "hewan_darat", "label": "Hewan Darat" },
+    { "id": 3, "category": "hewan_laut", "label": "Hewan Laut" },
+    { "id": 4, "category": "algoritma", "label": "Algoritma" }
   ],
   "items": [
     { "category": "ai_platform", "label": "Chat GPT" },

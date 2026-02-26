@@ -111,7 +111,7 @@ const textEffects = computed(() => {
 
     <!-- Append -->
     <span v-if="props.iconAppend" class="ml-2 flex items-center">
-      <UiAtomsIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
+      <UiIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
         :height="getIconSize(props.size ?? 'xl')" mode="svg" />
     </span>
   </button>

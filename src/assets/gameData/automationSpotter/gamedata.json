@@ -1,5 +1,6 @@
 {
   "intro": {
+      "id": 1,
       "title": "Task Automation & AI Agent",
       "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
       "key_points": [
@@ -9,6 +10,7 @@
       ]
   },
   "config": {
+    "id": 1,
     "module_title": "Explore Artificial Intelligence (AI) Tools",
     "max_time": 180
   },
