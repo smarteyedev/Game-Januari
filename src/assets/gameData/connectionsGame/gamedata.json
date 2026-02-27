@@ -17,7 +17,7 @@
   },
   "content": {
     "id": 1,
-  "category": [
+  "target_category": [
     {"id": 1, "category": "ai_platform", "label": "AI Platform" },
     { "id": 2, "category": "hewan_darat", "label": "Hewan Darat" },
     { "id": 3, "category": "hewan_laut", "label": "Hewan Laut" },

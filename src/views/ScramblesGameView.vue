@@ -8,7 +8,7 @@
           left</span>
       </div>
 
-      <div ref="scrollContainer" class="h-15.5 overflow-y-auto">
+      <div ref="scrollContainer" class="h-35 overflow-y-auto">
         <div class="flex flex-col justify-center items-center gap-6 py-3">
           <div v-for="(s, i) in submissions" :key="i" class="flex w-full items-center justify-center gap-1.5 md:gap-5 ">
             <div v-for="(char, j) in s.value.split('')" :key="j"

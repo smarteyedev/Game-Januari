@@ -172,10 +172,12 @@ async function initializeGame() {
     const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
     const data: any = (raw && raw.content) ? raw.content : raw
 
-    categories.value = data.category || []
-    assignCategoryColors(data.category || [])
+    // Normalize categories to use the `category` string as id (matches items' category field)
+    const rawCategories = data.target_category || []
+    categories.value = rawCategories.map((c: any) => ({ id: String(c.category), label: c.label }))
+    assignCategoryColors(categories.value)
 
-    categoryLabelMap.value = Object.fromEntries((data.category || []).map((c: any) => [c.id, c.label]))
+    categoryLabelMap.value = Object.fromEntries(categories.value.map((c) => [c.id, c.label]))
 
     const itemsSrc = data.items || []
     items.value = shuffle(
