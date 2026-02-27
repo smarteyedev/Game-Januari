@@ -35,14 +35,17 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
-const { time, _isWon, _isLost, startGame, finish, reset } = useGameService({
+const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.memory,
-})
+  offline: true,
+}
+
+const { time, _isWon, _isLost, startGame, finish, reset } = useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -50,12 +53,26 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<{
-      id: number
-      card: MemoryCard[]
-    }>(MinigameId.Memory, 1)
+    const data = await levelRepository.getLevel<unknown>(MinigameId.Memory, 1, gameServiceOptions.offline)
+    const raw: any = data as any
 
-    gameData.value = data
+    if (raw && raw.content && (raw.content.card || raw.content.id)) {
+      gameData.value = {
+        id: raw.content.id ?? raw.id ?? 1,
+        card: raw.content.card,
+      }
+    } else if (raw && (raw.card || raw.id)) {
+      gameData.value = raw as any
+    } else if (Array.isArray(raw) && raw.length > 0) {
+      const first = raw[0]
+      gameData.value = {
+        id: first.id ?? 1,
+        card: first.card ?? first.cards ?? [],
+      }
+    } else {
+      gameData.value = raw as any
+    }
+
     cards.value = loadLevel()
   } catch (err) {
     error.value = err
@@ -152,28 +169,14 @@ onMounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[2]"
-    :isWin="_isWon"
-    :hasLost="_isLost"
-    :hideSubmit="true"
-    :isChecked="allMatched"
-    @start="start"
-    @retry="retryGame"
-    @cleared="handleContinue"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[2]" :isWin="_isWon"
+    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" @start="start" @retry="retryGame"
+    @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
-      <span class="text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
+      <span class="text-body-xs md:text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
     </template>
   </BaseGame>
 </template>

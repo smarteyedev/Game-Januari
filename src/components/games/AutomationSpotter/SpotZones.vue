@@ -20,20 +20,9 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex w-full gap-[32px]">
-    <DropZone
-      v-for="zone in zones"
-      :key="String(zone.id)"
-      :id="String(zone.id)"
-      :text="zone.label"
-      v-model="zone.cards"
-      :checked-map="checkedMap"
-      :is-checked="isChecked"
-      :disabled="isChecked"
-      :className="
-        zone.id ? 'bg-green-100 flex-1 text-primary-500' : 'bg-red-100  flex-1 text-[#DA4A4A]'
-      "
-      @moved="emit('moved', $event)"
-    />
+  <div class="flex flex-col md:flex-row w-full gap-2.5 md:gap-8">
+    <DropZone v-for="zone in zones" :key="String(zone.id)" :id="String(zone.id)" :text="zone.label" v-model="zone.cards"
+      :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked" :className="zone.id ? 'bg-green-100 flex-1 text-primary-500' : 'bg-red-100  flex-1 text-[#DA4A4A]'
+        " @moved="emit('moved', $event)" />
   </div>
 </template>

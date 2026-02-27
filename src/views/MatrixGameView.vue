@@ -23,7 +23,8 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import gameData from '@/assets/gameData/matrix_game.json'
+import { levelRepository } from '@/infrastructure'
+import { MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
@@ -69,7 +70,7 @@ async function initializeGame() {
   error.value = null
 
   try {
-    if (survey.value) {
+    if (survey.value && survey.value.questions) {
       // initialize answers
       survey.value.questions.forEach((q) => {
         answers.value[q.id] = undefined
@@ -90,7 +91,33 @@ function retryGame() {
 }
 
 onMounted(async () => {
-  survey.value = gameData
+  const raw = await levelRepository.getLevel<unknown>(MinigameId.Matrix, 1, true)
+  const data: any = raw as any
+
+  // Transform the new JSON structure to the expected format
+  // New format has content.options and content.subquestions
+  if (data && data.content && data.content.options && data.content.subquestions) {
+    survey.value = {
+      title: data.content.question || data.intro?.title || '',
+      options: data.content.options.map((opt: { id: number; label: string }) => ({
+        value: opt.id,
+        label: opt.label
+      })),
+      questions: data.content.subquestions.map((sq: { id: number; label: string; answer: number }) => ({
+        id: String(sq.id),
+        label: sq.label,
+        correctAnswer: sq.answer
+      }))
+    }
+  } else if (data && data.options && data.questions) {
+    // Old format - use directly
+    survey.value = data
+  } else {
+    // Handle case where data might be empty or malformed
+    console.error('Unexpected data format:', data)
+    survey.value = null
+  }
+
   await initializeGame()
 })
 

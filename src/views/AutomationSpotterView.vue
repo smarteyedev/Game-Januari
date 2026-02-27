@@ -9,6 +9,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+// local asset will be loaded by levelRepository when offline
 
 // Level fetching
 const loading = ref(false)
@@ -34,10 +35,13 @@ const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
 
-const { time, _isWon, startGame, finish, reset } = useGameService({
+const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
-})
+  offline: true,
+}
+
+const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
@@ -56,12 +60,21 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<{
-      question: string
-      card: DragCard[]
-    }>(MinigameId.AutomationSpotter, 1)
-
-    gameData.value = data
+    // pass offline flag so repository can load local asset when needed
+    const offlineData = await levelRepository.getLevel<unknown>(MinigameId.AutomationSpotter, 1, gameServiceOptions.offline)
+    // Support multiple gamedata.json shapes: new structured object (intro/config/content)
+    const raw: any = offlineData as any
+    if (raw && raw.content && (raw.content.question || raw.content.card)) {
+      gameData.value = {
+        question: raw.content.question,
+        card: raw.content.card,
+      }
+    } else if (raw && (raw.question || raw.card)) {
+      gameData.value = raw as any
+    } else {
+      // Fallback: assign whatever was loaded and let loader handle absence
+      gameData.value = raw as any
+    }
     loadLevel()
   } catch (err) {
     error.value = err
@@ -144,36 +157,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Automation Spotter'"
-    description="Masukkan kata ke dalam tempat yang benar!"
-    :question="question"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[0]"
-    :isWin="_isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="matchedCount"
-    :targetProgress="allCards.length"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
-    <TaskRow
-      v-model="sourceCards"
-      :checked-map="checkedMap"
-      :is-checked="isChecked"
-      :disabled="isChecked"
-      @moved="onMoved"
-    />
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
+    description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
+    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
+    :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
+    :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
+    @cleared="handleContinue">
+    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+      @moved="onMoved" />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
   </BaseGame>
 </template>

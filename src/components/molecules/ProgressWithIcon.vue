@@ -21,7 +21,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
       <!-- Progress -->
       <div class="flex items-center">
         <UiProgressBar :progress="current" :max="target" :ui="{ color: '#00A3B5' }"
-          class="rounded-full min-w-55 min-h-4" />
+          class="rounded-full min-w-35 md:min-w-55 min-h-4" />
 
         <!-- Star -->
         <UiIcon name="mdi:star" size="20" :class="[
@@ -30,7 +30,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
         ]" />
 
         <!-- Label -->
-        <span class="text-body-lg text-primary-700 font-semibold whitespace-nowrap">
+        <span class="text-body-xs md:text-body-lg text-primary-700 font-semibold whitespace-nowrap">
           {{ current }} / {{ target }}
         </span>
       </div>

@@ -35,7 +35,7 @@ function getIconSize(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') {
 
 const base =
   'inline-flex items-center justify-center font-black ' +
-  'cursor-pointer rounded-[12px] shadow-xl px-6'
+  'cursor-pointer rounded-[12px] shadow-xl px-6 transition-all'
 
 // const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 

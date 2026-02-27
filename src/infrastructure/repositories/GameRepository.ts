@@ -48,7 +48,51 @@ export class GameRepository implements IGameRepository {
 
 // Level Repository Implementation
 export class LevelRepository {
-  async getLevel<T extends LevelData>(minigameId: MinigameId, level: number): Promise<T> {
+  async getLevel<T extends LevelData>(minigameId: MinigameId, level: number, offline = false): Promise<T> {
+    if (offline) {
+      // Load from local assets based on minigame id
+      const mapping: Record<MinigameId, () => Promise<any>> = {
+        [MinigameIdEnum.AutomationSpotter]: () => import('@/assets/gameData/automationSpotter/gamedata.json'),
+        [MinigameIdEnum.DragAndDrop]: () => import('@/assets/gameData/dragAndDrop/gamedata.json'),
+        [MinigameIdEnum.Memory]: () => import('@/assets/gameData/memoryGame/gamedata.json'),
+        [MinigameIdEnum.Connections]: () => import('@/assets/gameData/connectionsGame/gamedata.json'),
+        [MinigameIdEnum.Scrambles]: () => import('@/assets/gameData/scramblesGame/gamedata.json'),
+        [MinigameIdEnum.Matrix]: () => import('@/assets/gameData/matrixGame/gamedata.json'),
+      }
+
+      const loader = mapping[minigameId]
+      if (!loader) {
+        throw new Error('No local game data available for this minigame')
+      }
+
+      const mod = await loader()
+      // Vite returns JSON as default export
+      const data: T = (mod && (mod.default ?? mod)) || mod
+
+      const raw: any = data as any
+
+      // 1) Old format: { data: [ ...levels ] }
+      if (Array.isArray(raw.data)) {
+        const found = raw.data.find((d: any) => d.id === level) || raw.data[0]
+        return found as T
+      }
+
+      // 2) Root array format: [ { id, ... }, ... ]
+      if (Array.isArray(raw)) {
+        const found = raw.find((d: any) => d.id === level) || raw[0]
+        return found as T
+      }
+
+      // 3) Object-per-level keyed by id (e.g. { "1": { ... } })
+      if (raw[level] && typeof raw[level] === 'object') {
+        return raw[level] as T
+      }
+
+      // 4) New single-level structured format (e.g. { intro, config, content })
+      // Return the whole object and let callers read fields they need.
+      return raw as T
+    }
+
     const endpoint = this.getEndpoint(minigameId)
     const response = await httpClient.get<T>(API_ENDPOINTS.MINIGAME_LEVELS(endpoint, level))
     return response.data

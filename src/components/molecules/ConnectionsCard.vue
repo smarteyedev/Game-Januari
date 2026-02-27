@@ -1,6 +1,6 @@
 <template>
   <button @click="clickable && $emit('click')" :class="[
-    'min-w-[72px] min-h-[72px] md:p-1 font-bold transition border-gray-500 border rounded-2xl aspect-square md:aspect-video gap-2.5',
+    'min-w-[72px] min-h-[72px] w-full font-bold border-gray-500 border rounded-2xl aspect-video gap-2.5 transition-all',
     stateClass,
     clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
   ]">

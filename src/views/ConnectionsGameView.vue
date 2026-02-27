@@ -1,14 +1,17 @@
 <template>
   <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div class="grid grid-cols-4 gap-5 place-items-center">
-      <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
-        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)" :clickable="false" />
+    <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
+      <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
+        <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
+          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)"
+          :clickable="false" />
+      </div>
     </div>
     <div>
       <span class="text-body-xs md:text-body-xl font-semibold text-primary-700">Create a group of four</span>
     </div>
-    <div class="grid grid-cols-4 xl:grid-cols-8 gap-5 place-items-center">
+    <div class="grid grid-cols-4 md:grid-cols-8 gap-5 place-items-center w-full">
       <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
         :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
@@ -49,7 +52,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
-import gameData from '@/assets/gameData/connection_game.json'
+import { levelRepository } from '@/infrastructure'
+import { MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
@@ -165,15 +169,17 @@ async function initializeGame() {
   try {
     await startGame()
 
-    const data = gameData
+    const raw = await levelRepository.getLevel<unknown>(MinigameId.Connections, 1, true)
+    const data: any = (raw && raw.content) ? raw.content : raw
 
-    categories.value = data.category
-    assignCategoryColors(data.category)
+    categories.value = data.category || []
+    assignCategoryColors(data.category || [])
 
-    categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
+    categoryLabelMap.value = Object.fromEntries((data.category || []).map((c: any) => [c.id, c.label]))
 
+    const itemsSrc = data.items || []
     items.value = shuffle(
-      data.items.map((item: any) => ({
+      itemsSrc.map((item: any) => ({
         label: item.label,
         category: item.category,
         state: 'idle',

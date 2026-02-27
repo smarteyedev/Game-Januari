@@ -11,7 +11,7 @@
       <div class="flex flex-col justify-center items-center gap-6">
         <div v-for="(s, i) in submissions" :key="i" class="flex w-full items-center justify-center gap-1.5 md:gap-5">
           <div v-for="(char, j) in s.value.split('')" :key="j"
-            class="aspect-square min-w-9 min-h-9 md:min-w-17.5 md:min-h-17.5 grid place-items-center border-2 md:border-[3px] rounded-xl md:rounded-3xl shadow-xl text-body-xl md:text-h3 font-bold select-none transition"
+            class="aspect-square min-w-8 min-h-8 md:min-w-12 md:min-h-12 grid place-items-center border-2 md:border-[3px] rounded-xl md:rounded-3xl shadow-xl text-body-xl md:text-h3 font-bold select-none transition-all"
             :class="{
               // Correct guess (green styled)
               'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
@@ -51,7 +51,8 @@ import { onMounted, ref, computed } from 'vue'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
 import UiButton from '@/components/atoms/button/index.vue'
-import gameData from '@/assets/gameData/scrambles.json'
+import { levelRepository } from '@/infrastructure'
+import { MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
@@ -103,9 +104,11 @@ async function initializeGame() {
   error.value = null
 
   try {
-    const data = gameData
-    question.value = data.question
-    answer.value = data.answer.toUpperCase()
+    const raw = await levelRepository.getLevel<unknown>(MinigameId.Scrambles, 1, true)
+    const data: any = raw && raw.content ? raw.content : raw
+
+    question.value = data.question || ''
+    answer.value = (data.answer || '').toUpperCase()
 
     hints.value = Array(answer.value.length).fill(null)
     userInput.value = Array(answer.value.length).fill(null)

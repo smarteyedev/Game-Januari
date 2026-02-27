@@ -75,14 +75,10 @@ const backStyle = computed<CSSProperties>(() => {
 </script>
 
 <template>
-  <div
-    class="aspect-4/5 w-40 perspective cursor-pointer"
-    @click="!flipped && !matched && emit('flip')"
-  >
-    <div
-      class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
-      :class="{ 'rotate-y-180': flipped || matched }"
-    >
+  <div class="min-w-21.5 min-h-24.5 md:min-w-40 md:min-h-47.5 perspective cursor-pointer"
+    @click="!flipped && !matched && emit('flip')">
+    <div class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
+      :class="{ 'rotate-y-180': flipped || matched }">
       <!-- BACK SIDE -->
       <div class="absolute inset-0 backface-hidden" :style="backStyle">
         <div class="w-full h-full flex items-center justify-center">
@@ -93,45 +89,20 @@ const backStyle = computed<CSSProperties>(() => {
       <!-- FRONT SIDE -->
       <div class="absolute inset-0 backface-hidden rotate-y-180" :style="frontStyle">
         <!-- TEXT CARD -->
-        <div
-          v-if="contentType === 'text'"
-          class="w-full h-full flex items-center justify-center p-4"
-        >
-          <p
-            class="font-inter font-medium text-xs leading-4.5 text-center text-black"
-            style="
-              font-family: 'Inter', sans-serif;
-              font-style: normal;
-              font-weight: 500;
-              font-size: 12px;
-              line-height: 18px;
-              text-align: center;
-              color: #000000;
-            "
-          >
+        <div v-if="contentType === 'text'" class="w-full h-full flex items-center justify-center">
+          <p class="font-semibold text-[10px] md:text-body-sm text-center text-black">
             {{ text }}
           </p>
         </div>
 
         <!-- LOGO CARD -->
-        <div
-          v-else-if="contentType === 'svg'"
-          class="w-full h-full flex items-center justify-center"
-        >
-          <component :is="LogoComponent" class="w-20 h-auto" />
+        <div v-else-if="contentType === 'svg'" class="w-full h-full flex items-center justify-center">
+          <component :is="LogoComponent" class="w-14 md:w-[128px] h-auto" />
         </div>
 
         <!-- IMAGE CARD -->
-        <div
-          v-else-if="contentType === 'img'"
-          class="w-full h-full flex items-center justify-center p-4"
-        >
-          <img
-            v-if="text"
-            :src="text"
-            alt="Card image"
-            class="max-w-full max-h-full object-contain"
-          />
+        <div v-else-if="contentType === 'img'" class="w-full h-full flex items-center justify-center p-4">
+          <img v-if="text" :src="text" alt="Card image" class="max-w-full max-h-full object-contain" />
         </div>
       </div>
     </div>

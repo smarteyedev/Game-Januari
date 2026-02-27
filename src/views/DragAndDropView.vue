@@ -46,14 +46,17 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService({
+const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
-})
+  offline: true
+}
+
+const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -70,12 +73,26 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<{
-      sentence: string
-      blanks: Blank[]
-    }>(MinigameId.DragAndDrop, 1)
+    const data = await levelRepository.getLevel<unknown>(MinigameId.DragAndDrop, 1, gameServiceOptions.offline)
+    const raw: any = data as any
 
-    gameData.value = data
+    if (raw && raw.content && (raw.content.sentence || raw.content.blanks)) {
+      gameData.value = {
+        sentence: raw.content.sentence,
+        blanks: raw.content.blanks,
+      }
+    } else if (raw && (raw.sentence || raw.blanks)) {
+      gameData.value = raw as any
+    } else if (Array.isArray(raw) && raw.length > 0) {
+      const first = raw[0]
+      gameData.value = {
+        sentence: first.sentence ?? '',
+        blanks: first.blanks ?? [],
+      }
+    } else {
+      gameData.value = raw as any
+    }
+
     loadLevel()
   } catch (err) {
     error.value = err
@@ -219,60 +236,27 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[1]"
-    :isWin="_isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="correctCount ?? 0"
-    :targetProgress="totalSlots"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
+    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
     <!-- Sentence Board -->
-    <div class="border-2 rounded-xl p-2.5 text-justify text-primary-700 font-medium text-body-sm">
-      <template
-        v-for="(part, index) in board"
-        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
-      >
+    <div
+      class="border-2 rounded-[14px] px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
+      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-          @drop="onDrop"
-        />
+        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+          :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" @drop="onDrop" />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-        v-for="(item, index) in items"
-        :key="item.id"
-        :item="item"
-        :slotId="index"
-        :inSlot="false"
-        :disabled="isLocked"
-        @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
-      />
+      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
+        :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
     </div>
   </BaseGame>
 </template>
