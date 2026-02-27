@@ -91,7 +91,7 @@ function retryGame() {
 }
 
 onMounted(async () => {
-  const raw = await levelRepository.getLevel<unknown>(MinigameId.Matrix, 1, true)
+  const raw = await levelRepository.getLevel<any>(MinigameId.Matrix, 1, true)
   const data: any = raw as any
 
   // Transform the new JSON structure to the expected format

@@ -169,7 +169,7 @@ async function initializeGame() {
   try {
     await startGame()
 
-    const raw = await levelRepository.getLevel<unknown>(MinigameId.Connections, 1, true)
+    const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
     const data: any = (raw && raw.content) ? raw.content : raw
 
     categories.value = data.category || []

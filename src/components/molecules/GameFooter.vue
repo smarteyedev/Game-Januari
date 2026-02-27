@@ -26,7 +26,7 @@ const buttonSize = computed(() => {
   if (isXs.value) return 'xs'
   if (isSm.value) return 'sm'
   if (isMd.value) return 'md'
-  return 'xl'
+  return 'lg'
 })
 </script>
 
@@ -35,24 +35,26 @@ const buttonSize = computed(() => {
     <!-- LEFT -->
     <div class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
       <slot name="footer-left">
-        <div class="w-full">
+        <div>
           <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
             :target="target" />
         </div>
         <!-- SUBMIT -->
-        <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
-          class="self-center" text="Check">
-        </UiButton>
+        <div class="grow">
+          <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
+            class="self-center" text="Check">
+          </UiButton>
+        </div>
       </slot>
     </div>
 
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4">
       <slot name="footer-right">
-        <!-- RETRY
-      <UiButton v-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
-      </UiButton>
-       -->
+
+        <UiButton :size="buttonSize" v-if="hasLost" text="Retry" variant="danger" @click="emit('retry')">
+        </UiButton>
+
 
         <!-- CONTINUE -->
         <UiButton :size="buttonSize" v-if="isWin || hasLost" text="Continue" variant="primary" @click="emit('cleared')">

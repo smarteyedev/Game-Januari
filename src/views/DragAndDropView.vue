@@ -73,7 +73,7 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<unknown>(MinigameId.DragAndDrop, 1, gameServiceOptions.offline)
+    const data = await levelRepository.getLevel<any>(MinigameId.DragAndDrop, 1, gameServiceOptions.offline)
     const raw: any = data as any
 
     if (raw && raw.content && (raw.content.sentence || raw.content.blanks)) {
