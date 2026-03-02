@@ -419,8 +419,8 @@ onUnmounted(() => {
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
-        :disabled="isLocked" @dragstart="onDragStart" />
+      <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :inSlot="false" :disabled="isLocked"
+        @dragstart="onDragStart" />
     </div>
 
   </BaseGame>
