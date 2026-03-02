@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
 import type { Blank } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
 import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
@@ -151,6 +151,7 @@ function loadLevel() {
 // Drag handlers
 // Pointer / drag start (mouse, pointer or touch)
 const hoveredSlotId = ref<number | null>(null)
+const dragCompleted = ref(false)
 
 function onDragStart(e: any, item: Blank, index: number, type: 'pool' | 'board') {
   playClick()
@@ -172,6 +173,7 @@ function onDragStart(e: any, item: Blank, index: number, type: 'pool' | 'board')
   // show ghost
   ghostLabel.value = item.word
   ghostVisible.value = true
+  dragCompleted.value = false
 }
 
 const lastPointerX = ref<number | null>(null)
@@ -245,17 +247,26 @@ function handleGlobalPointerUp(e: PointerEvent | TouchEvent) {
   ghostVisible.value = false
 }
 
-function cancelDrag() {
-  // If we picked the item up from a board slot, restore it back to that slot
-  if (draggedItem.value && draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
-    slots.value[draggedFromIndex.value] = draggedItem.value
+async function cancelDrag() {
+  // Hide ghost immediately and clear label so it cannot re-render
+  ghostVisible.value = false
+  ghostLabel.value = null
+
+  // Wait for DOM update to ensure ghost is removed from DOM
+  await nextTick()
+
+  // If drag already completed, do not restore
+  if (!dragCompleted.value) {
+    // If we picked the item up from a board slot, restore it back to that slot
+    if (draggedItem.value && draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
+      slots.value[draggedFromIndex.value] = draggedItem.value
+    }
   }
 
   draggedItem.value = null
   draggedFromIndex.value = null
   draggedFromType.value = null
   hoveredSlotId.value = null
-  ghostVisible.value = false
 }
 
 function handleGlobalDragEnd() {
@@ -298,9 +309,16 @@ function onDrop(_: DragEvent, dropSlotId: number) {
     }
   }
 
+  // Mark drag as completed so cancel handlers won't restore source
+  dragCompleted.value = true
+
   draggedItem.value = null
   draggedFromIndex.value = null
   draggedFromType.value = null
+
+  // Hide ghost and clear label
+  ghostVisible.value = false
+  ghostLabel.value = null
 }
 
 onMounted(() => {
