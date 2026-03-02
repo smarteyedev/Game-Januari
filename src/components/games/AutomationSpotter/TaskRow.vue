@@ -54,7 +54,7 @@ function playClick() {
 <template>
   <VueDraggable v-model="local" :group="{ name: 'cards', pull: true, put: true }" item-key="id" :disabled="disabled"
     @start="playClick" @end="playClick"
-    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 w-full [&>*:last-child:nth-child(odd)]:col-span-2">
+    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2">
     <DraggableCard v-for="c in local" :key="c.id" :card="c" :is-in-zone="false" :checked="getChecked(c.id)" :class="{
       'cursor-grab active:cursor-grabbing': !disabled,
       'cursor-default': disabled,

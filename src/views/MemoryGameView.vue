@@ -176,7 +176,7 @@ onMounted(() => {
     @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
-      <span class="text-body-xs md:text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
+      <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full"> Card Turns: {{ turns }} </span>
     </template>
   </BaseGame>
 </template>

@@ -242,8 +242,9 @@ onUnmounted(() => {
     :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
     :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
     <!-- Sentence Board -->
+
     <div
-      class="border-2 rounded-[14px] px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
       <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}
@@ -258,5 +259,6 @@ onUnmounted(() => {
       <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :slotId="index" :inSlot="false"
         :disabled="isLocked" @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')" />
     </div>
+
   </BaseGame>
 </template>

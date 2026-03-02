@@ -88,7 +88,7 @@ function handleStart() {
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div class="min-h-screen flex flex-col p-2 gap-4 w-full" :style="{
+    <div class="min-h-screen flex flex-col p-2 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
       backgroundImage: `url(${Background})`,
       backgroundPosition: 'center',
       backgroundSize: 'cover',
