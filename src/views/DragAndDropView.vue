@@ -181,8 +181,12 @@ const lastPointerY = ref<number | null>(null)
 
 // Ghost (floating feedback)
 const ghostVisible = ref(false)
-const ghostLabel = ref<string | null>(null)
+const ghostLabel = ref<string | undefined>(undefined)
 const ghostClass = 'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center'
+
+// Computed ghost position strings to ensure correct template typings
+const ghostLeft = computed(() => (lastPointerX.value !== null ? `${lastPointerX.value}px` : '-9999px'))
+const ghostTop = computed(() => (lastPointerY.value !== null ? `${lastPointerY.value}px` : '-9999px'))
 
 function updateHoveredSlot(x: number, y: number) {
   const el = document.elementFromPoint(x, y) as HTMLElement | null
@@ -221,8 +225,10 @@ function handleGlobalPointerUp(e: PointerEvent | TouchEvent) {
     y = (e as PointerEvent).clientY
   } else if ((e as TouchEvent).changedTouches && (e as TouchEvent).changedTouches[0]) {
     const t = (e as TouchEvent).changedTouches[0]
-    x = t.clientX
-    y = t.clientY
+    if (t) {
+      x = t.clientX
+      y = t.clientY
+    }
   }
 
   if (x !== null && y !== null) {
@@ -250,7 +256,7 @@ function handleGlobalPointerUp(e: PointerEvent | TouchEvent) {
 async function cancelDrag() {
   // Hide ghost immediately and clear label so it cannot re-render
   ghostVisible.value = false
-  ghostLabel.value = null
+  ghostLabel.value = undefined
 
   // Wait for DOM update to ensure ghost is removed from DOM
   await nextTick()
@@ -318,7 +324,7 @@ function onDrop(_: DragEvent, dropSlotId: number) {
 
   // Hide ghost and clear label
   ghostVisible.value = false
-  ghostLabel.value = null
+  ghostLabel.value = undefined
 }
 
 onMounted(() => {
@@ -414,8 +420,7 @@ onUnmounted(() => {
     </div>
 
   </BaseGame>
-  <div v-if="ghostVisible" class="dd-ghost"
-    :style="{ left: (lastPointerX !== null ? lastPointerX + 'px' : '-9999px'), top: (lastPointerY !== null ? lastPointerY + 'px' : '-9999px') }">
+  <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">
     <Card :label="ghostLabel" :class="ghostClass" :draggable="false" />
   </div>
 </template>
