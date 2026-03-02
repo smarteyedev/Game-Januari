@@ -4,10 +4,7 @@
  */
 
 import type { MinigameId } from '@/domain/types'
-<<<<<<< HEAD
 import { GAME_CONFIG } from '@/utils/constants'
-=======
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 // TIMER OPTIONS
 export interface TimerOptions {
@@ -20,11 +17,7 @@ export interface TimerOptions {
 }
 
 export const DEFAULT_TIMER_OPTIONS: TimerOptions = {
-<<<<<<< HEAD
   maxTime: GAME_CONFIG.DEFAULT_MAX_TIME,
-=======
-  maxTime: 180,
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   immediate: false,
 }
 
@@ -47,11 +40,7 @@ export interface GameServiceOptions {
 }
 
 export const DEFAULT_GAME_SERVICE_OPTIONS = {
-<<<<<<< HEAD
   maxTime: GAME_CONFIG.DEFAULT_MAX_TIME,
-=======
-  maxTime: 180,
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   offline: false,
   autoSubmit: true,
 }
@@ -91,11 +80,7 @@ export interface BaseGameOptions {
 }
 
 export const DEFAULT_BASE_GAME_OPTIONS: Partial<BaseGameOptions> = {
-<<<<<<< HEAD
   maxTime: GAME_CONFIG.DEFAULT_MAX_TIME,
-=======
-  maxTime: 180,
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   loading: false,
   showIntro: false,
   showProgress: false,
@@ -161,11 +146,7 @@ export interface MemoryGameOptions {
 }
 
 export const DEFAULT_MEMORY_GAME_OPTIONS: MemoryGameOptions = {
-<<<<<<< HEAD
   cardFlipDelay: GAME_CONFIG.CARD_FLIP_DELAY,
-=======
-  cardFlipDelay: 800,
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 }
 
 // DRAG AND DROP GAME
@@ -204,15 +185,9 @@ export interface ScoringOptions {
 }
 
 export const DEFAULT_SCORING_OPTIONS: ScoringOptions = {
-<<<<<<< HEAD
   baseScore: GAME_CONFIG.SCORE_BASE,
   scoreBonusPer10Sec: GAME_CONFIG.SCORE_BONUS_PER_10_SEC,
   maxScore: GAME_CONFIG.SCORE_MAX,
-=======
-  baseScore: 50,
-  scoreBonusPer10Sec: 10,
-  maxScore: 100,
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 }
 
 // ALL GAME OPTIONS (UNION TYPE)

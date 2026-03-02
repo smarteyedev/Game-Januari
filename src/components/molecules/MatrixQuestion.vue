@@ -1,29 +1,13 @@
 <template>
-<<<<<<< HEAD
   <div class="flex flex-col items-center gap-2 md:gap-4 w-full">
     <p class="font-semibold text-body-xs md:text-body-xl">{{ title }}</p>
 
     <div class="flex gap-1.5 md:gap-4 justify-center w-full">
-=======
-  <div class="flex flex-col items-center gap-[16px]">
-    <p class="font-semibold text-body-xl">{{ title }}</p>
-
-    <div class="flex flex-wrap gap-[16px] justify-center">
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
-      <button
-        v-for="option in options"
-        :key="option.value"
-        @click="$emit('update:modelValue', option.value)"
-        :disabled="disabled"
-        :class="[
-<<<<<<< HEAD
+      <button v-for="option in options" :key="option.value" @click="$emit('update:modelValue', option.value)"
+        :disabled="disabled" :class="[
           'min-w-[60px] min-h-8 px-3.25 w-full md:min-h-12 rounded-lg md:rounded-xl font-semibold text-[10px] md:text-body-xl border transition-all duration-150',
-=======
-          'min-w-50 min-h-[48px] rounded-xl font-semibold text-body-xl border transition-all duration-150',
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           getButtonClass(option.value),
-        ]"
-      >
+        ]">
         {{ option.label }}
       </button>
     </div>

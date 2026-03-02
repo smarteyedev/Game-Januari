@@ -52,29 +52,12 @@ function playClick() {
 </script>
 
 <template>
-  <VueDraggable
-    v-model="local"
-    :group="{ name: 'cards', pull: true, put: true }"
-    item-key="id"
-    :disabled="disabled"
-    @start="playClick"
-    @end="playClick"
-<<<<<<< HEAD
-    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2"
-=======
-    class="flex flex-wrap justify-center items-center gap-[16px] 2xl:gap-[24px] w-full"
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
-  >
-    <DraggableCard
-      v-for="c in local"
-      :key="c.id"
-      :card="c"
-      :is-in-zone="false"
-      :checked="getChecked(c.id)"
-      :class="{
-        'cursor-grab active:cursor-grabbing': !disabled,
-        'cursor-default': disabled,
-      }"
-    />
+  <VueDraggable v-model="local" :group="{ name: 'cards', pull: true, put: true }" item-key="id" :disabled="disabled"
+    @start="playClick" @end="playClick"
+    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2">
+    <DraggableCard v-for="c in local" :key="c.id" :card="c" :is-in-zone="false" :checked="getChecked(c.id)" :class="{
+      'cursor-grab active:cursor-grabbing': !disabled,
+      'cursor-default': disabled,
+    }" />
   </VueDraggable>
 </template>

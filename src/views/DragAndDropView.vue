@@ -1,19 +1,12 @@
 <script setup lang="ts">
-<<<<<<< HEAD
 import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
-=======
-import { computed, onMounted, onUnmounted, ref } from 'vue'
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 import type { Blank } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
 import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
 import WordItem from '@/components/games/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
-<<<<<<< HEAD
 import Card from '@/components/molecules/Card.vue'
-=======
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
@@ -41,7 +34,6 @@ const draggedItem = ref<Blank | null>(null)
 const draggedFromIndex = ref<number | null>(null)
 const draggedFromType = ref<'pool' | 'board' | null>(null)
 
-<<<<<<< HEAD
 const lastPointerX = ref(0)
 const lastPointerY = ref(0)
 
@@ -58,26 +50,14 @@ const audio = new Audio(clickSound)
 
 const isTouchDevice = computed(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 
-=======
-// Game state
-const showIntro = ref(true)
-const isChecked = ref(false)
-const isWin = ref(false)
-const correctCount = ref<number | null>(null)
-
-// Audio
-const audio = new Audio(clickSound)
-
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
-<<<<<<< HEAD
 const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
@@ -85,12 +65,6 @@ const gameServiceOptions = {
 }
 
 const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
-=======
-const { time, _isWon, startGame, finish, reset } = useGameService({
-  maxTime: 180,
-  minigameId: MINIGAME_IDS.dragAndDrop,
-})
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -107,7 +81,6 @@ async function fetchLevel() {
   error.value = null
 
   try {
-<<<<<<< HEAD
     const data = await levelRepository.getLevel<any>(
       MinigameId.DragAndDrop,
       1,
@@ -132,14 +105,6 @@ async function fetchLevel() {
       gameData.value = raw as any
     }
 
-=======
-    const data = await levelRepository.getLevel<{
-      sentence: string
-      blanks: Blank[]
-    }>(MinigameId.DragAndDrop, 1)
-
-    gameData.value = data
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     loadLevel()
   } catch (err) {
     error.value = err
@@ -195,15 +160,11 @@ function loadLevel() {
 }
 
 // Drag handlers
-<<<<<<< HEAD
 // Pointer / drag start (mouse, pointer or touch)
 const hoveredSlotId = ref<number | null>(null)
 const dragCompleted = ref(false)
 
 function onDragStart(payload: { item: Blank; slotId?: number; clientX: number; clientY: number }) {
-=======
-function onDragStart(_: DragEvent, item: Blank, index: number, type: 'pool' | 'board') {
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   playClick()
   draggedItem.value = payload.item
   draggedFromIndex.value = payload.slotId ?? null
@@ -341,14 +302,6 @@ function performDrop(dropSlotId: number) {
   if (isLocked.value || !draggedItem.value) return
 
   const currentSlotItem = slots.value[dropSlotId]
-<<<<<<< HEAD
-=======
-  slotCorrectness.value[dropSlotId] = null
-
-  if (draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
-    slotCorrectness.value[draggedFromIndex.value] = null
-  }
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
   if (currentSlotItem) {
     if (draggedFromType.value === 'board') {
@@ -384,7 +337,6 @@ function cleanupDrag() {
   window.removeEventListener('pointerup', handlePointerUp)
 }
 
-<<<<<<< HEAD
 onMounted(() => {
   window.addEventListener('pointermove', handleGlobalPointerMove)
   window.addEventListener('pointerup', handleGlobalPointerUp as any)
@@ -397,8 +349,6 @@ onUnmounted(() => {
   window.removeEventListener('pointercancel', handleGlobalPointerCancel as any)
 })
 
-=======
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 // Check answers
 async function checkAnswers() {
   isChecked.value = true
@@ -447,103 +397,33 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[1]"
-    :isWin="_isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="correctCount ?? 0"
-    :targetProgress="totalSlots"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
+    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
     <!-- Sentence Board -->
-<<<<<<< HEAD
 
     <div
-      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm"
-    >
-      <template
-        v-for="(part, index) in board"
-        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
-      >
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
+      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isTouchDevice="isTouchDevice"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-        />
+        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+          :isTouchDevice="isTouchDevice" :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-        v-for="(item, _) in items"
-        :key="item.id"
-        :item="item"
-        :inSlot="false"
-        :disabled="isLocked"
-        @dragstart="onDragStart"
-      />
+      <WordItem v-for="(item, _) in items" :key="item.id" :item="item" :inSlot="false" :disabled="isLocked"
+        @dragstart="onDragStart" />
     </div>
   </BaseGame>
   <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">
     <Card :label="ghostLabel" :class="ghostClass" />
   </div>
-=======
-    <div class="border-2 rounded-xl p-2.5 text-justify text-primary-700 font-medium text-body-sm">
-      <template
-        v-for="(part, index) in board"
-        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
-      >
-        <span v-if="part.type === 'text'">
-          {{ part.value }}
-        </span>
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-          @drop="onDrop"
-        />
-      </template>
-    </div>
-
-    <!-- Word Pool -->
-    <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-        v-for="(item, index) in items"
-        :key="item.id"
-        :item="item"
-        :slotId="index"
-        :inSlot="false"
-        :disabled="isLocked"
-        @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
-      />
-    </div>
-  </BaseGame>
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 </template>
 
 <style scoped>
