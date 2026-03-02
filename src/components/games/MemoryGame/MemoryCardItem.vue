@@ -76,7 +76,7 @@ const backStyle = computed<CSSProperties>(() => {
 
 <template>
   <div
-    class="aspect-4/5 w-40 perspective cursor-pointer"
+    class="min-w-21.5 min-h-24.5 md:min-w-40 md:min-h-47.5 perspective cursor-pointer"
     @click="!flipped && !matched && emit('flip')"
   >
     <div
@@ -93,22 +93,8 @@ const backStyle = computed<CSSProperties>(() => {
       <!-- FRONT SIDE -->
       <div class="absolute inset-0 backface-hidden rotate-y-180" :style="frontStyle">
         <!-- TEXT CARD -->
-        <div
-          v-if="contentType === 'text'"
-          class="w-full h-full flex items-center justify-center p-4"
-        >
-          <p
-            class="font-inter font-medium text-xs leading-4.5 text-center text-black"
-            style="
-              font-family: 'Inter', sans-serif;
-              font-style: normal;
-              font-weight: 500;
-              font-size: 12px;
-              line-height: 18px;
-              text-align: center;
-              color: #000000;
-            "
-          >
+        <div v-if="contentType === 'text'" class="w-full h-full flex items-center justify-center">
+          <p class="font-semibold text-[10px] md:text-body-sm text-center text-black">
             {{ text }}
           </p>
         </div>
@@ -118,7 +104,7 @@ const backStyle = computed<CSSProperties>(() => {
           v-else-if="contentType === 'svg'"
           class="w-full h-full flex items-center justify-center"
         >
-          <component :is="LogoComponent" class="w-20 h-auto" />
+          <component :is="LogoComponent" class="w-14 md:w-[128px] h-auto" />
         </div>
 
         <!-- IMAGE CARD -->

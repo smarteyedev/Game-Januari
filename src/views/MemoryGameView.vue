@@ -9,7 +9,6 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
-import GameFooter from '@/components/molecules/GameFooter.vue'
 
 // Level fetching
 const loading = ref(false)
@@ -39,10 +38,13 @@ function playClick() {
   }
 }
 
-const { time, _isWon, _isLost, startGame, finish, reset } = useGameService({
+const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.memory,
-})
+  offline: true,
+}
+
+const { time, _isWon, _isLost, startGame, finish, reset } = useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -50,12 +52,30 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<{
-      id: number
-      card: MemoryCard[]
-    }>(MinigameId.Memory, 1)
+    const data = await levelRepository.getLevel<any>(
+      MinigameId.Memory,
+      1,
+      gameServiceOptions.offline,
+    )
+    const raw: any = data as any
 
-    gameData.value = data
+    if (raw && raw.content && (raw.content.card || raw.content.id)) {
+      gameData.value = {
+        id: raw.content.id ?? raw.id ?? 1,
+        card: raw.content.card,
+      }
+    } else if (raw && (raw.card || raw.id)) {
+      gameData.value = raw as any
+    } else if (Array.isArray(raw) && raw.length > 0) {
+      const first = raw[0]
+      gameData.value = {
+        id: first.id ?? 1,
+        card: first.card ?? first.cards ?? [],
+      }
+    } else {
+      gameData.value = raw as any
+    }
+
     cards.value = loadLevel()
   } catch (err) {
     error.value = err
@@ -173,7 +193,9 @@ onMounted(() => {
   >
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
-      <span class="text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
+      <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
+        Card Turns: {{ turns }}
+      </span>
     </template>
   </BaseGame>
 </template>

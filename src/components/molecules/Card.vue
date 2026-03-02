@@ -48,6 +48,14 @@ function handleDragStart(ev: DragEvent) {
     ev.preventDefault()
     return
   }
+  try {
+    if (ev.dataTransfer) {
+      ev.dataTransfer.setData('text/plain', '')
+      ev.dataTransfer.effectAllowed = 'move'
+    }
+  } catch (e) {
+    // ignore
+  }
   emit('dragstart', ev)
 }
 

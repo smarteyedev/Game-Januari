@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { IRadioProps, IRadioUi } from '@/components/atoms/radio/types.ts'
 import { computed, toRefs } from 'vue'
 

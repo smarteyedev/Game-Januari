@@ -1,6 +1,8 @@
 <template>
   <BaseGame
+    v-if="survey"
     title="Matrix Game"
+    module-title="Lorem Ipsum"
     :description="survey?.title"
     :time="time"
     v-model:showIntro="showIntro"
@@ -9,47 +11,62 @@
     :error="error"
     :retryFn="retryGame"
   >
-    <div class="flex flex-col items-center justify-center gap-[32px]">
-      <div v-if="survey">
-        <div
-          v-for="q in survey.questions"
-          :key="q.id"
-          class="flex flex-col items-center justify-center gap-[28px] mb-4"
-        >
-          <MatrixQuestion
-            :title="q.label"
-            :options="survey.options"
-            :correct-answer="q.correctAnswer"
-            :finished="isWin || isLose"
-            v-model="answers[q.id]"
-            :disabled="!isPlaying"
-          />
-        </div>
-      </div>
-
-      <div class="flex flex-wrap items-center justify-center gap-4.5">
-        <UiButton @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-        <UiButton @click="restart" text="Restart" variant="danger" :disabled="!isLose"> </UiButton>
-        <UiButton @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
-        </UiButton>
+    <div class="flex flex-col w-full">
+      <div
+        v-for="q in survey.questions"
+        :key="q.id"
+        class="flex flex-col items-center justify-center gap-5 md:gap-8"
+      >
+        <MatrixQuestion
+          :title="q.label"
+          :options="survey.options"
+          :correct-answer="q.correctAnswer"
+          :finished="isWin || isLose"
+          v-model="answers[q.id]"
+          :disabled="!isPlaying"
+        />
       </div>
     </div>
 
     <template #footer>
-      <span></span>
+      <div class="flex flex-wrap items-center justify-center gap-4.5">
+        <UiButton
+          :size="buttonSize"
+          @click="submit"
+          text="Submit"
+          :disabled="!isPlaying"
+        ></UiButton>
+        <UiButton
+          :size="buttonSize"
+          @click="restart"
+          text="Restart"
+          variant="danger"
+          :disabled="!isLose"
+        >
+        </UiButton>
+        <UiButton
+          :size="buttonSize"
+          @click="continueQuiz"
+          text="Continue"
+          color="success"
+          :disabled="!isWin"
+        >
+        </UiButton>
+      </div>
     </template>
   </BaseGame>
 </template>
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
-import gameData from '@/assets/gameData/matrix_game.json'
+import { levelRepository } from '@/infrastructure'
+import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
+import { useBreakpoint } from '@/composables/useBreakpoint'
 
 type Option = { value: number; label: string }
 type Question = { id: string; label: string; correctAnswer: number }
@@ -73,13 +90,22 @@ const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
 const isPlaying = computed(() => _isPlaying.value)
 
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
+
 // Fetch game data and start game
 async function initializeGame() {
   loading.value = true
   error.value = null
 
   try {
-    if (survey.value) {
+    if (survey.value && survey.value.questions) {
       // initialize answers
       survey.value.questions.forEach((q) => {
         answers.value[q.id] = undefined
@@ -100,7 +126,35 @@ function retryGame() {
 }
 
 onMounted(async () => {
-  survey.value = gameData
+  const raw = await levelRepository.getLevel<any>(MinigameId.Matrix, 1, true)
+  const data: any = raw as any
+
+  // Transform the new JSON structure to the expected format
+  // New format has content.options and content.subquestions
+  if (data && data.content && data.content.options && data.content.subquestions) {
+    survey.value = {
+      title: data.content.question || data.intro?.title || '',
+      options: data.content.options.map((opt: { id: number; label: string }) => ({
+        value: opt.id,
+        label: opt.label,
+      })),
+      questions: data.content.subquestions.map(
+        (sq: { id: number; label: string; answer: number }) => ({
+          id: String(sq.id),
+          label: sq.label,
+          correctAnswer: sq.answer,
+        }),
+      ),
+    }
+  } else if (data && data.options && data.questions) {
+    // Old format - use directly
+    survey.value = data
+  } else {
+    // Handle case where data might be empty or malformed
+    console.error('Unexpected data format:', data)
+    survey.value = null
+  }
+
   await initializeGame()
 })
 

@@ -12,7 +12,6 @@ const router = createRouter({
     { path: '/connections-game', component: () => import('@/views/ConnectionsGameView.vue') },
     { path: '/scrambles-game', component: () => import('@/views/ScramblesGameView.vue') },
     { path: '/matrix-game', component: () => import('@/views/MatrixGameView.vue') },
-    { path: '/p/:token', component: () => import('@/views/GameListView.vue') },
   ],
 })
 

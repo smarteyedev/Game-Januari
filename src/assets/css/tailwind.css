@@ -159,9 +159,38 @@
   --color-purple-default: var(--color-purple-500);
   --color-purple: var(--color-purple-default);
 
-  /* Brand */
-  --color-brand-primary: #e2fef7;
+  /* accent cream */
+  --color-cream-base: #ffeed0;
+  --color-cream-10: #fffcf6;
+  --color-cream-20: #fff9ef;
+  --color-cream-30: #fff6e7;
+  --color-cream-40: #fff4e0;
+  --color-cream-50: #fff1d8;
+  --color-cream-60: #d4c6ad;
+  --color-cream-70: #aa9f8b;
+  --color-cream-80: #807768;
+  --color-cream-90: #554f45;
+  --color-cream-100: #33302a;
+
+  /* accent brown */
+  --color-brown-base: #54382a;
+  --color-brown-10: #ddd7d4;
+  --color-brown-20: #c6bdb8;
+  --color-brown-30: #a99b94;
+  --color-brown-40: #8d7a71;
+  --color-brown-50: #71594e;
+  --color-brown-60: #462f23;
+  --color-brown-70: #38251c;
+  --color-brown-80: #2a1c15;
+  --color-brown-90: #1c130e;
+  --color-brown-100: #110b08;
+
+  /* shadow default */
   --color-shadow: #0000000d;
+
+  /* Semantic alias */
+  --color-danger: var(--color-error-500);
+  --color-danger-dark: var(--color-error-900);
 
   /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
@@ -293,23 +322,23 @@
 
 @layer utilities {
   .text-shadow-flat-sm {
-    text-shadow: 0 3px 0 var(--btn-accent);
+    text-shadow: 0 3px 0 var(--btn);
   }
 
   .text-shadow-flat-md {
-    text-shadow: 0 4px 0 var(--btn-accent);
+    text-shadow: 0 4px 0 var(--btn);
   }
 
   .text-shadow-flat-lg {
-    text-shadow: 0 8px 0 var(--btn-accent);
+    text-shadow: 0 8px 0 var(--btn);
   }
 
   .text-stroke-sm {
-    -webkit-text-stroke: 1px var(--btn-accent);
+    -webkit-text-stroke: 1px var(--btn);
   }
 
   .text-stroke-md {
-    -webkit-text-stroke: 2px var(--btn-accent);
+    -webkit-text-stroke: 2px var(--btn);
   }
 
   .text-cartoon {
@@ -317,10 +346,10 @@
     line-height: 1;
     word-spacing: -1px;
     color: var(--color-white);
-    -webkit-text-stroke: var(--text-stroke, 5px) var(--btn-accent);
+    -webkit-text-stroke: var(--text-stroke, 5px) var(--btn);
     -webkit-text-stroke-linejoin: round;
     paint-order: stroke fill;
-    filter: drop-shadow(0px var(--text-shadow, 4px) 0 var(--btn-accent));
+    filter: drop-shadow(0px var(--text-shadow, 4px) 0 var(--btn));
   }
 
   .text-cartoon-sm {

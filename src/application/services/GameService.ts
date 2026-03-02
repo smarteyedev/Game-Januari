@@ -217,8 +217,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Finish the game manually
    */
-  async function finish(won: boolean, finalAnswers?: unknown[]) {
-    await handleGameOver(won, finalAnswers)
+  function finish(won: boolean, finalAnswers?: unknown[]) {
+    return handleGameOver(won, finalAnswers)
   }
 
   /**

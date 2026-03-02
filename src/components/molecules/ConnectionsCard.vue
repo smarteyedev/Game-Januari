@@ -2,18 +2,17 @@
   <button
     @click="clickable && $emit('click')"
     :class="[
-      'p-5.75 font-bold transition border-gray-500 border rounded-2xl aspect-video gap-2.5',
+      'min-w-[72px] min-h-[72px] w-full font-bold border-gray-500 border rounded-2xl aspect-video gap-2.5 transition-all',
       stateClass,
       clickable ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
     ]"
   >
-    <UiLabel :label="label" class="font-semibold text-body-xl" />
+    <span class="text-center font-semibold text-body-xs md:text-body-xl">{{ label }}</span>
   </button>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { UiLabel } from '../atoms/label'
 
 const props = defineProps<{
   label: string

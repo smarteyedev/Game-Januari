@@ -59,7 +59,7 @@ function playClick() {
     :disabled="disabled"
     @start="playClick"
     @end="playClick"
-    class="flex flex-wrap justify-center items-center gap-[16px] 2xl:gap-[24px] w-full"
+    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2"
   >
     <DraggableCard
       v-for="c in local"

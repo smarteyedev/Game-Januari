@@ -12,7 +12,7 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen w-full">
+  <div class="flex justify-center items-center min-h-screen w-full overflow-x-hidden">
     <div v-if="loading">
       <UiLoading class="grid place-items-center" />
     </div>

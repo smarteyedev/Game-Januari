@@ -6,7 +6,7 @@ const props = withDefaults(
   defineProps<{
     text?: string
     variant?: 'primary' | 'secondary' | 'plain' | 'danger'
-    size?: 'sm' | 'md' | 'lg' | 'xl'
+    size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     disabled?: boolean
 
     icon?: string
@@ -22,8 +22,9 @@ const props = withDefaults(
 
 const isDisabled = computed(() => props.disabled || props.loading)
 
-function getIconSize(size: 'sm' | 'md' | 'lg' | 'xl') {
+function getIconSize(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') {
   const map = {
+    xs: 14,
     sm: 16,
     md: 18,
     lg: 20,
@@ -34,17 +35,18 @@ function getIconSize(size: 'sm' | 'md' | 'lg' | 'xl') {
 
 const base =
   'inline-flex items-center justify-center font-black ' +
-  'cursor-pointer rounded-[12px] shadow-xl px-6 py-4'
+  'cursor-pointer rounded-[12px] shadow-xl px-6 transition-all'
 
 // const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 
 // const plainHoverEffects = 'hover:border-[3px] hover:shadow-primary-700 hover:border-primary-700'
 
 const sizes = {
-  xl: ' text-[20px] active:text-[24px]',
-  lg: ' text-[18px] active:text-[20px]',
-  md: ' text-[16px] active:text-[18px]',
-  sm: ' text-[14px] active:text-[14px]',
+  xl: 'min-h-[56px] text-[20px] active:text-[24px] active:min-h-[64px]',
+  lg: 'min-h-[48px] text-[18px] active:text-[20px] active:min-h-[56px]',
+  md: 'min-h-[44px] text-[16px] active:text-[18px] active:min-h-[48px]',
+  sm: 'min-h-[40px] text-[14px] active:text-[14px] active:min-h-[44px]',
+  xs: 'min-h-[36px] text-[12px] active:text-[14px] active:min-h-[40px]',
 }
 
 const variants = {
@@ -100,8 +102,13 @@ const textEffects = computed(() => {
   <button :class="classes" :disabled="isDisabled" :aria-disabled="isDisabled">
     <!-- Prepend -->
     <span v-if="props.loading || props.icon" class="mr-2 flex items-center">
-      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" :class="{ 'animate-spin': props.loading }" />
+      <UiIcon
+        :name="props.loading ? 'uil-spinner' : props.icon"
+        :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')"
+        mode="svg"
+        :class="{ 'animate-spin': props.loading }"
+      />
     </span>
 
     <!-- Label -->
@@ -111,8 +118,12 @@ const textEffects = computed(() => {
 
     <!-- Append -->
     <span v-if="props.iconAppend" class="ml-2 flex items-center">
-      <UiAtomsIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" />
+      <UiIcon
+        :name="props.iconAppend"
+        :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')"
+        mode="svg"
+      />
     </span>
   </button>
 </template>

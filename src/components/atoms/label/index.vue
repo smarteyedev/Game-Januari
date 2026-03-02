@@ -33,7 +33,7 @@
 <script lang="ts" setup>
 import { Tooltip } from 'floating-vue'
 import UiAtomsIcon from '../icon/index.vue'
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { ILabelProps, ILabelUi } from '@/components/atoms/label/types.ts'
 import { computed, toRefs } from 'vue'
 

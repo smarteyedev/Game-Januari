@@ -20,7 +20,7 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div class="flex w-full gap-[32px]">
+  <div class="flex flex-col md:flex-row w-full gap-2.5 md:gap-8">
     <DropZone
       v-for="zone in zones"
       :key="String(zone.id)"

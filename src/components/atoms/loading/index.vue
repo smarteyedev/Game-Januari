@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import UiAtomsIcon from '../icon/index.vue'
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { ILoadingProps, ILoadingUi } from '@/components/atoms/loading/types.ts'
 import { computed, toRefs } from 'vue'
 

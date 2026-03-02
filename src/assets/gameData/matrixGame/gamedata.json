@@ -1,0 +1,50 @@
+{
+  "intro": {
+    "id": 1,
+    "title": "Task Automation & AI Agent",
+    "description": "AI Agent membantumu menyelesaikan tugas berulang secara otomatis mulai dari mengelola email hingga membuat laporan dengan lebih cepat dan akurat.",
+    "key_points": [
+      { "icon_name": "tabler:clock-bolt", "description": "Hemat waktu kerja" },
+      { "icon_name": "tabler:bolt-filled", "description": "Tingkatkan produktivitas" },
+      { "icon_name": "ri:creative-commons-zero-fill", "description": "Kurangi kesalahan manual" }
+    ]
+  },
+  "config": {
+    "id": 1,
+    "module_title": "Explore Artificial Intelligence (AI) Tools",
+    "max_time": 180
+  },
+  "content": {
+    "id": 1,
+    "question": "How would you rate your overall experience with our delivery service?",
+    "options": [
+      { "id": 1, "label": "Excellent" },
+      { "id": 2, "label": "Good" },
+      { "id": 3, "label": "Average" },
+      { "id": 4, "label": "Poor" },
+      { "id": 5, "label": "Very Poor" }
+    ],
+    "subquestions": [
+      {
+        "id": 1,
+        "label": "Your interaction with our staff",
+        "answer": 5
+      },
+      {
+        "id": 2,
+        "label": "The cost of delivery",
+        "answer": 4
+      },
+      {
+        "id": 3,
+        "label": "The delivery options offered",
+        "answer": 3
+      },
+      {
+        "id": 4,
+        "label": "The condition of your package",
+        "answer": 5
+      }
+    ]
+  }
+}

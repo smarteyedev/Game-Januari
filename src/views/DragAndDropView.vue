@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
 import type { Blank } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
 import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
 import WordItem from '@/components/games/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
+import Card from '@/components/molecules/Card.vue'
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
@@ -33,6 +34,11 @@ const draggedItem = ref<Blank | null>(null)
 const draggedFromIndex = ref<number | null>(null)
 const draggedFromType = ref<'pool' | 'board' | null>(null)
 
+const lastPointerX = ref(0)
+const lastPointerY = ref(0)
+
+const ghostVisible = ref(false)
+
 // Game state
 const showIntro = ref(true)
 const isChecked = ref(false)
@@ -42,6 +48,8 @@ const correctCount = ref<number | null>(null)
 // Audio
 const audio = new Audio(clickSound)
 
+const isTouchDevice = computed(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
+
 function playClick() {
   if (audio) {
     audio.currentTime = 0
@@ -50,10 +58,13 @@ function playClick() {
   }
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService({
+const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.dragAndDrop,
-})
+  offline: true,
+}
+
+const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -70,12 +81,30 @@ async function fetchLevel() {
   error.value = null
 
   try {
-    const data = await levelRepository.getLevel<{
-      sentence: string
-      blanks: Blank[]
-    }>(MinigameId.DragAndDrop, 1)
+    const data = await levelRepository.getLevel<any>(
+      MinigameId.DragAndDrop,
+      1,
+      gameServiceOptions.offline,
+    )
+    const raw: any = data as any
 
-    gameData.value = data
+    if (raw && raw.content && (raw.content.sentence || raw.content.blanks)) {
+      gameData.value = {
+        sentence: raw.content.sentence,
+        blanks: raw.content.blanks,
+      }
+    } else if (raw && (raw.sentence || raw.blanks)) {
+      gameData.value = raw as any
+    } else if (Array.isArray(raw) && raw.length > 0) {
+      const first = raw[0]
+      gameData.value = {
+        sentence: first.sentence ?? '',
+        blanks: first.blanks ?? [],
+      }
+    } else {
+      gameData.value = raw as any
+    }
+
     loadLevel()
   } catch (err) {
     error.value = err
@@ -131,22 +160,148 @@ function loadLevel() {
 }
 
 // Drag handlers
-function onDragStart(_: DragEvent, item: Blank, index: number, type: 'pool' | 'board') {
+// Pointer / drag start (mouse, pointer or touch)
+const hoveredSlotId = ref<number | null>(null)
+const dragCompleted = ref(false)
+
+function onDragStart(payload: { item: Blank; slotId?: number; clientX: number; clientY: number }) {
   playClick()
-  draggedItem.value = item
-  draggedFromIndex.value = index
-  draggedFromType.value = type
+  draggedItem.value = payload.item
+  draggedFromIndex.value = payload.slotId ?? null
+  draggedFromType.value = payload.slotId != null ? 'board' : 'pool'
+
+  lastPointerX.value = payload.clientX
+  lastPointerY.value = payload.clientY
+
+  ghostLabel.value = payload.item.word
+  dragCompleted.value = false
+  ghostVisible.value = true
+
+  window.addEventListener('pointermove', handlePointerMove)
+  window.addEventListener('pointerup', handlePointerUp)
 }
 
-function onDrop(_: DragEvent, dropSlotId: number) {
+function handlePointerMove(e: PointerEvent) {
+  if (!draggedItem.value) return
+
+  lastPointerX.value = e.clientX
+  lastPointerY.value = e.clientY
+}
+
+function handlePointerUp(e: PointerEvent) {
+  if (!draggedItem.value) return
+
+  const el = document.elementFromPoint(e.clientX, e.clientY) as HTMLElement | null
+  const slotEl = el?.closest('[data-dd-slot]') as HTMLElement | null
+
+  if (slotEl) {
+    const dropId = Number(slotEl.dataset.ddSlot)
+    performDrop(dropId)
+  }
+
+  cleanupDrag()
+}
+
+// Ghost (floating feedback)
+const ghostLabel = ref<string | undefined>(undefined)
+const ghostClass =
+  'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center'
+
+// Computed ghost position strings to ensure correct template typings
+const ghostLeft = computed(() =>
+  lastPointerX.value !== null ? `${lastPointerX.value}px` : '-9999px',
+)
+const ghostTop = computed(() =>
+  lastPointerY.value !== null ? `${lastPointerY.value}px` : '-9999px',
+)
+
+function updateHoveredSlot(x: number, y: number) {
+  const el = document.elementFromPoint(x, y) as HTMLElement | null
+  if (!el) {
+    hoveredSlotId.value = null
+    return
+  }
+  const slotEl = el.closest('[data-dd-slot]') as HTMLElement | null
+  if (slotEl && slotEl.dataset.ddSlot) hoveredSlotId.value = Number(slotEl.dataset.ddSlot)
+  else hoveredSlotId.value = null
+}
+
+function handleGlobalPointerMove(e: PointerEvent) {
+  if (!draggedItem.value) return
+  lastPointerX.value = e.clientX
+  lastPointerY.value = e.clientY
+  updateHoveredSlot(e.clientX, e.clientY)
+}
+
+function handleGlobalPointerUp(e: PointerEvent | TouchEvent) {
+  if (!draggedItem.value) return
+  let x: number | null = null
+  let y: number | null = null
+
+  if ((e as PointerEvent).clientX !== undefined) {
+    x = (e as PointerEvent).clientX
+    y = (e as PointerEvent).clientY
+  } else if ((e as TouchEvent).changedTouches && (e as TouchEvent).changedTouches[0]) {
+    const t = (e as TouchEvent).changedTouches[0]
+    if (t) {
+      x = t.clientX
+      y = t.clientY
+    }
+  }
+
+  if (x !== null && y !== null) {
+    const el = document.elementFromPoint(x, y) as HTMLElement | null
+    const slotEl = el && el.closest ? (el.closest('[data-dd-slot]') as HTMLElement | null) : null
+    if (slotEl && slotEl.dataset.ddSlot) {
+      const dropId = Number(slotEl.dataset.ddSlot)
+      performDrop(dropId)
+    } else {
+      // No slot found: cancel drag
+      draggedItem.value = null
+      draggedFromIndex.value = null
+      draggedFromType.value = null
+    }
+  } else {
+    draggedItem.value = null
+    draggedFromIndex.value = null
+    draggedFromType.value = null
+  }
+
+  hoveredSlotId.value = null
+  ghostVisible.value = false
+  cleanupDrag()
+}
+
+async function cancelDrag() {
+  // Hide ghost immediately and clear label so it cannot re-render
+  ghostVisible.value = false
+  ghostLabel.value = undefined
+
+  // Wait for DOM update to ensure ghost is removed from DOM
+  await nextTick()
+
+  // If drag already completed, do not restore
+  if (!dragCompleted.value) {
+    // If we picked the item up from a board slot, restore it back to that slot
+    if (draggedItem.value && draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
+      slots.value[draggedFromIndex.value] = draggedItem.value
+    }
+  }
+
+  draggedItem.value = null
+  draggedFromIndex.value = null
+  draggedFromType.value = null
+  hoveredSlotId.value = null
+}
+
+function handleGlobalPointerCancel() {
+  cancelDrag()
+}
+
+function performDrop(dropSlotId: number) {
   if (isLocked.value || !draggedItem.value) return
 
   const currentSlotItem = slots.value[dropSlotId]
-  slotCorrectness.value[dropSlotId] = null
-
-  if (draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
-    slotCorrectness.value[draggedFromIndex.value] = null
-  }
 
   if (currentSlotItem) {
     if (draggedFromType.value === 'board') {
@@ -159,6 +314,7 @@ function onDrop(_: DragEvent, dropSlotId: number) {
     }
   } else {
     slots.value[dropSlotId] = draggedItem.value
+
     if (draggedFromType.value === 'pool') {
       items.value = items.value.filter((i) => i.id !== draggedItem.value!.id)
     } else {
@@ -166,10 +322,33 @@ function onDrop(_: DragEvent, dropSlotId: number) {
     }
   }
 
+  // mark drag completed and hide ghost
+  dragCompleted.value = true
+  ghostVisible.value = false
+}
+
+function cleanupDrag() {
   draggedItem.value = null
   draggedFromIndex.value = null
   draggedFromType.value = null
+  ghostVisible.value = false
+  ghostLabel.value = undefined
+
+  window.removeEventListener('pointermove', handlePointerMove)
+  window.removeEventListener('pointerup', handlePointerUp)
 }
+
+onMounted(() => {
+  window.addEventListener('pointermove', handleGlobalPointerMove)
+  window.addEventListener('pointerup', handleGlobalPointerUp as any)
+  window.addEventListener('pointercancel', handleGlobalPointerCancel as any)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('pointermove', handleGlobalPointerMove)
+  window.removeEventListener('pointerup', handleGlobalPointerUp as any)
+  window.removeEventListener('pointercancel', handleGlobalPointerCancel as any)
+})
 
 // Check answers
 async function checkAnswers() {
@@ -242,7 +421,10 @@ onUnmounted(() => {
     @cleared="handleContinue"
   >
     <!-- Sentence Board -->
-    <div class="border-2 rounded-xl p-2.5 text-justify text-primary-700 font-medium text-body-sm">
+
+    <div
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm"
+    >
       <template
         v-for="(part, index) in board"
         :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
@@ -255,9 +437,9 @@ onUnmounted(() => {
           :item="slots[part.id]"
           :slotId="part.id"
           :onDragStart="onDragStart"
+          :isTouchDevice="isTouchDevice"
           :isCorrect="slotCorrectness[part.id]"
           :disabled="isLocked"
-          @drop="onDrop"
         />
       </template>
     </div>
@@ -265,14 +447,31 @@ onUnmounted(() => {
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
       <WordItem
-        v-for="(item, index) in items"
+        v-for="(item, _) in items"
         :key="item.id"
         :item="item"
-        :slotId="index"
         :inSlot="false"
         :disabled="isLocked"
-        @dragstart="(e, item, idx) => onDragStart(e, item, idx ?? 0, 'pool')"
+        @dragstart="onDragStart"
       />
     </div>
   </BaseGame>
+  <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">
+    <Card :label="ghostLabel" :class="ghostClass" />
+  </div>
 </template>
+
+<style scoped>
+.dd-ghost {
+  position: fixed;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  font-weight: 700;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+</style>

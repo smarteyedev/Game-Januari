@@ -10,13 +10,13 @@ const _ = defineProps<{
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-10 w-full text-center">
-    <div class="flex flex-col gap-[8px] max-w-149.25">
-      <p class="text-h4 font-bold">{{ title }}</p>
-      <p class="text-h4 leading-8">{{ description }}</p>
+  <div class="flex flex-col items-center gap-4 md:gap-10 w-full text-center">
+    <div class="flex flex-col gap-2 max-w-149.25">
+      <p class="text-body-md md:text-h4 font-bold">{{ title }}</p>
+      <p class="text-body-md md:text-h4 leading-8">{{ description }}</p>
     </div>
 
-    <div class="flex flex-col gap-4 w-full text-left text-h4">
+    <div class="flex flex-col gap-4 w-full text-left text-body-md md:text-h4">
       <IconLabel
         v-for="(point, index) in key_points ?? []"
         :key="index"

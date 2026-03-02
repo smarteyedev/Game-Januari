@@ -44,10 +44,15 @@ function updateModel(newVal: DragCard[]) {
 </script>
 
 <template>
-  <div :class="['relative w-full px-2.5 py-[16px] rounded-2xl min-w-32 min-h-64', className]">
+  <div
+    :class="[
+      'relative w-full px-2.5 py-4 rounded-lg md:rounded-2xl min-w-32 min-h-14 md:min-h-64',
+      className,
+    ]"
+  >
     <p
       :class="[
-        'font-semibold text-body-xl absolute inset-0 flex items-center justify-center pointer-events-none px-2 text-center',
+        'font-semibold text-body-sm md:text-body-xl absolute inset-0 flex items-center justify-center pointer-events-none px-1 text-center',
         textColorClass,
       ]"
     >
