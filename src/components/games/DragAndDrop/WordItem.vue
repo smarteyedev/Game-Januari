@@ -1,6 +1,8 @@
 <template>
-  <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
-    @dragstart="dragStart" />
+  <div @pointerdown="pointerStart" @touchstart="touchStart($event)">
+    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
+      @dragstart="dragStart" />
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -41,5 +43,21 @@ function dragStart(event: DragEvent) {
     return
   }
   emit('dragstart', event, props.item, props.slotId)
+}
+
+function pointerStart(event: PointerEvent) {
+  if (props.disabled) return
+  emit('dragstart', event as unknown as DragEvent, props.item, props.slotId)
+}
+
+function touchStart(event: TouchEvent) {
+  if (props.disabled) return
+  const t = event.touches && event.touches[0]
+  if (!t) return
+  // Prevent default only when cancelable to avoid console warnings
+  if (event.cancelable) event.preventDefault()
+  // Emit an object with coordinates so the parent can start a touch drag
+  const touchLike = { type: 'touch', clientX: t.clientX, clientY: t.clientY } as unknown as DragEvent
+  emit('dragstart', touchLike, props.item, props.slotId)
 }
 </script>

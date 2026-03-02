@@ -6,6 +6,7 @@ import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
 import WordItem from '@/components/games/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
+import Card from '@/components/molecules/Card.vue'
 import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
@@ -148,11 +149,125 @@ function loadLevel() {
 }
 
 // Drag handlers
-function onDragStart(_: DragEvent, item: Blank, index: number, type: 'pool' | 'board') {
+// Pointer / drag start (mouse, pointer or touch)
+const hoveredSlotId = ref<number | null>(null)
+
+function onDragStart(e: any, item: Blank, index: number, type: 'pool' | 'board') {
   playClick()
   draggedItem.value = item
   draggedFromIndex.value = index
   draggedFromType.value = type
+
+  // If touchstart emitted coordinates, seed last pointer position
+  if (e && typeof e.clientX === 'number' && typeof e.clientY === 'number') {
+    lastPointerX.value = e.clientX
+    lastPointerY.value = e.clientY
+    updateHoveredSlot(e.clientX, e.clientY)
+  }
+  // If dragging from a board slot, remove the item from its slot so it appears to be picked up
+  if (type === 'board' && index !== null && slots.value[index]) {
+    slots.value[index] = null
+  }
+
+  // show ghost
+  ghostLabel.value = item.word
+  ghostVisible.value = true
+}
+
+const lastPointerX = ref<number | null>(null)
+const lastPointerY = ref<number | null>(null)
+
+// Ghost (floating feedback)
+const ghostVisible = ref(false)
+const ghostLabel = ref<string | null>(null)
+const ghostClass = 'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center'
+
+function updateHoveredSlot(x: number, y: number) {
+  const el = document.elementFromPoint(x, y) as HTMLElement | null
+  if (!el) {
+    hoveredSlotId.value = null
+    return
+  }
+  const slotEl = el.closest('[data-dd-slot]') as HTMLElement | null
+  if (slotEl && slotEl.dataset.ddSlot) hoveredSlotId.value = Number(slotEl.dataset.ddSlot)
+  else hoveredSlotId.value = null
+}
+
+function handleGlobalPointerMove(e: PointerEvent) {
+  if (!draggedItem.value) return
+  lastPointerX.value = e.clientX
+  lastPointerY.value = e.clientY
+  updateHoveredSlot(e.clientX, e.clientY)
+}
+
+function handleGlobalTouchMove(e: TouchEvent) {
+  if (!draggedItem.value) return
+  const t = e.touches && e.touches[0]
+  if (!t) return
+  lastPointerX.value = t.clientX
+  lastPointerY.value = t.clientY
+  updateHoveredSlot(t.clientX, t.clientY)
+}
+
+function handleGlobalPointerUp(e: PointerEvent | TouchEvent) {
+  if (!draggedItem.value) return
+  let x: number | null = null
+  let y: number | null = null
+
+  if ((e as PointerEvent).clientX !== undefined) {
+    x = (e as PointerEvent).clientX
+    y = (e as PointerEvent).clientY
+  } else if ((e as TouchEvent).changedTouches && (e as TouchEvent).changedTouches[0]) {
+    const t = (e as TouchEvent).changedTouches[0]
+    x = t.clientX
+    y = t.clientY
+  }
+
+  if (x !== null && y !== null) {
+    const el = document.elementFromPoint(x, y) as HTMLElement | null
+    const slotEl = el && el.closest ? el.closest('[data-dd-slot]') as HTMLElement | null : null
+    if (slotEl && slotEl.dataset.ddSlot) {
+      const dropId = Number(slotEl.dataset.ddSlot)
+      onDrop(null as unknown as DragEvent, dropId)
+    } else {
+      // No slot found: cancel drag
+      draggedItem.value = null
+      draggedFromIndex.value = null
+      draggedFromType.value = null
+    }
+  } else {
+    draggedItem.value = null
+    draggedFromIndex.value = null
+    draggedFromType.value = null
+  }
+
+  hoveredSlotId.value = null
+  ghostVisible.value = false
+}
+
+function cancelDrag() {
+  // If we picked the item up from a board slot, restore it back to that slot
+  if (draggedItem.value && draggedFromType.value === 'board' && draggedFromIndex.value !== null) {
+    slots.value[draggedFromIndex.value] = draggedItem.value
+  }
+
+  draggedItem.value = null
+  draggedFromIndex.value = null
+  draggedFromType.value = null
+  hoveredSlotId.value = null
+  ghostVisible.value = false
+}
+
+function handleGlobalDragEnd() {
+  cancelDrag()
+}
+
+function handleGlobalPointerCancel() {
+  cancelDrag()
+}
+
+function handleGlobalTouchCancel() {
+  cancelDrag()
 }
 
 function onDrop(_: DragEvent, dropSlotId: number) {
@@ -187,6 +302,26 @@ function onDrop(_: DragEvent, dropSlotId: number) {
   draggedFromIndex.value = null
   draggedFromType.value = null
 }
+
+onMounted(() => {
+  window.addEventListener('pointermove', handleGlobalPointerMove)
+  window.addEventListener('pointerup', handleGlobalPointerUp as any)
+  window.addEventListener('pointercancel', handleGlobalPointerCancel as any)
+  window.addEventListener('touchmove', handleGlobalTouchMove as any, { passive: true })
+  window.addEventListener('touchend', handleGlobalPointerUp as any)
+  window.addEventListener('touchcancel', handleGlobalTouchCancel as any)
+  window.addEventListener('dragend', handleGlobalDragEnd as any)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('pointermove', handleGlobalPointerMove)
+  window.removeEventListener('pointerup', handleGlobalPointerUp as any)
+  window.removeEventListener('pointercancel', handleGlobalPointerCancel as any)
+  window.removeEventListener('touchmove', handleGlobalTouchMove as any)
+  window.removeEventListener('touchend', handleGlobalPointerUp as any)
+  window.removeEventListener('touchcancel', handleGlobalTouchCancel as any)
+  window.removeEventListener('dragend', handleGlobalDragEnd as any)
+})
 
 // Check answers
 async function checkAnswers() {
@@ -261,4 +396,23 @@ onUnmounted(() => {
     </div>
 
   </BaseGame>
+  <div v-if="ghostVisible" class="dd-ghost"
+    :style="{ left: (lastPointerX !== null ? lastPointerX + 'px' : '-9999px'), top: (lastPointerY !== null ? lastPointerY + 'px' : '-9999px') }">
+    <Card :label="ghostLabel" :class="ghostClass" :draggable="false" />
+  </div>
 </template>
+
+<style scoped>
+.dd-ghost {
+  position: fixed;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  z-index: 9999;
+  background: rgba(255, 255, 255, 0);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
+  font-weight: 700;
+  color: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+</style>

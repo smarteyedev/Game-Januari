@@ -1,14 +1,14 @@
 <template>
-  <BaseGame title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
+  <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
-    <div v-if="survey" class="flex flex-col items-center justify-center gap-5 md:gap-8">
-      <div v-for="q in survey.questions" :key="q.id">
+
+    <div class="flex flex-col w-full">
+      <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
         <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
           :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
       </div>
-
-
     </div>
+
 
     <template #footer>
       <div class="flex flex-wrap items-center justify-center gap-4.5">

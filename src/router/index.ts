@@ -14,7 +14,7 @@ const router = createRouter({
     { path: '/matrix-game', component: () => import('@/views/MatrixGameView.vue') },
   ],
 })
-
+/*
 router.beforeEach(async () => {
   const session = useSessionStore(pinia)
 
@@ -26,5 +26,6 @@ router.beforeEach(async () => {
     await session.createGuestSession()
   }
 })
+  */
 
 export default router
