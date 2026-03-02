@@ -21,7 +21,7 @@
         "id": 1,
         "pairId": 1,
         "contentType": "text",
-        "value": "Terintegrasi dengan Gmail, Docs, dan Sheets."
+        "value": "Integrasi Gmail, Docs, dan Sheets"
       },
       {
         "id": 2,
@@ -33,7 +33,7 @@
         "id": 3,
         "pairId": 2,
         "contentType": "text",
-        "value": "Digunakan untuk membantu menulis dan memahami kode secara otomatis."
+        "value": "Untuk penulisan dan analisis kode otomatis"
       },
       {
         "id": 4,
@@ -45,7 +45,7 @@
         "id": 5,
         "pairId": 3,
         "contentType": "text",
-        "value": "Digunakan untuk membuat desain, presentasi, dan konten visual dengan cepat."
+        "value": "Untuk pembuatan desain dan konten visual cepat"
       },
       {
         "id": 6,
@@ -57,7 +57,7 @@
         "id": 7,
         "pairId": 4,
         "contentType": "text",
-        "value": "Digunakan untuk menulis email, merangkum dokumen, dan merangkum document berbasis teks."
+        "value": "Untuk penulisan email dan ringkasan dokumen teks"
       },
       {
         "id": 8,
@@ -69,7 +69,7 @@
         "id": 9,
         "pairId": 5,
         "contentType": "text",
-        "value": "Digunakan di WhatsApp untuk tanya jawab dan kolaborasi bot di dalam chat."
+        "value": "Untuk tanya jawab dan kolaborasi bot di WhatsApp"
       },
       {
         "id": 10,
