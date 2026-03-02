@@ -20,11 +20,17 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
     <div class="flex items-center gap-2">
       <!-- Progress -->
       <div class="flex items-center">
-        <UiProgressBar :progress="current" :max="target" :ui="{ color: '#00A3B5' }"
+        <UiProgressBar
+:progress="current"
+:max="target"
+:ui="{ color: '#00A3B5' }"
           class="rounded-full min-w-35 md:min-w-55 min-h-4" />
 
         <!-- Star -->
-        <UiIcon name="mdi:star" size="20" :class="[
+        <UiIcon
+name="mdi:star"
+size="20"
+:class="[
           'shrink-0 transition-all duration-300',
           isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
         ]" />

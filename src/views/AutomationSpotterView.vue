@@ -62,18 +62,11 @@ async function fetchLevel() {
   try {
     // pass offline flag so repository can load local asset when needed
     const offlineData = await levelRepository.getLevel<any>(MinigameId.AutomationSpotter, 1, gameServiceOptions.offline)
-    // Support multiple gamedata.json shapes: new structured object (intro/config/content)
     const raw: any = offlineData as any
-    if (raw && raw.content && (raw.content.question || raw.content.card)) {
-      gameData.value = {
-        question: raw.content.question,
-        card: raw.content.card,
-      }
-    } else if (raw && (raw.question || raw.card)) {
-      gameData.value = raw as any
-    } else {
-      // Fallback: assign whatever was loaded and let loader handle absence
-      gameData.value = raw as any
+    const content = raw?.content ?? raw
+    gameData.value = {
+      question: content?.question ?? '',
+      card: content?.card ?? [],
     }
     loadLevel()
   } catch (err) {

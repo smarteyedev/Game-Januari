@@ -9,7 +9,6 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
-import GameFooter from '@/components/molecules/GameFooter.vue'
 
 // Level fetching
 const loading = ref(false)

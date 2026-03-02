@@ -1,7 +1,7 @@
 <template>
-  <div @pointerdown="pointerStart" @touchstart="touchStart($event)">
-    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled"
-      @dragstart="dragStart" />
+  <div @pointerdown="isTouchDevice ? pointerStart : undefined">
+    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled && !isTouchDevice"
+      @dragstart="!isTouchDevice ? dragStart : undefined" />
   </div>
 </template>
 
@@ -10,11 +10,12 @@ import type { Blank } from '@/domain/types'
 import Card from '@/components/molecules/Card.vue'
 import { computed } from 'vue'
 
-const props = defineProps<{
+const { item, slotId, inSlot, disabled, isTouchDevice } = defineProps<{
   item: Blank
   slotId?: number
   inSlot?: boolean
   disabled: boolean
+  isTouchDevice?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -24,7 +25,7 @@ const emit = defineEmits<{
 const customClass = computed(() => {
   const classes = []
 
-  if (props.inSlot) {
+  if (inSlot) {
     // Style when in a slot
     classes.push('bg-transparent p-0 m-0 rounded-none border-0 min-w-0')
   } else {
@@ -38,26 +39,26 @@ const customClass = computed(() => {
 })
 
 function dragStart(event: DragEvent) {
-  if (props.disabled) {
+  if (disabled) {
     event.preventDefault()
     return
   }
-  emit('dragstart', event, props.item, props.slotId)
+  emit('dragstart', event, item, slotId)
 }
 
 function pointerStart(event: PointerEvent) {
-  if (props.disabled) return
-  emit('dragstart', event as unknown as DragEvent, props.item, props.slotId)
+  if (disabled) return
+  emit('dragstart', event as unknown as DragEvent, item, slotId)
 }
 
 function touchStart(event: TouchEvent) {
-  if (props.disabled) return
+  if (disabled) return
   const t = event.touches && event.touches[0]
   if (!t) return
   // Prevent default only when cancelable to avoid console warnings
   if (event.cancelable) event.preventDefault()
   // Emit an object with coordinates so the parent can start a touch drag
   const touchLike = { type: 'touch', clientX: t.clientX, clientY: t.clientY } as unknown as DragEvent
-  emit('dragstart', touchLike, props.item, props.slotId)
+  emit('dragstart', touchLike, item, slotId)
 }
 </script>

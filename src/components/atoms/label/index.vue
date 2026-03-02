@@ -9,13 +9,7 @@
     <Tooltip v-if="tooltip" placement="right" trigger="hover" v-bind="floatingVueConfig">
       <template #default="slotProps">
         <slot name="tooltip-icon" v-bind="slotProps">
-          <UiAtomsIcon
-            name="mdi-information-outline"
-            width="17"
-            height="17"
-            mode="svg"
-            class="text-gray-400"
-          />
+          <UiAtomsIcon name="mdi-information-outline" width="17" height="17" mode="svg" class="text-gray-400" />
         </slot>
       </template>
 
@@ -33,7 +27,7 @@
 <script lang="ts" setup>
 import { Tooltip } from 'floating-vue'
 import UiAtomsIcon from '../icon/index.vue'
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { ILabelProps, ILabelUi } from '@/components/atoms/label/types.ts'
 import { computed, toRefs } from 'vue'
 

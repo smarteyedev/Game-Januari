@@ -1,13 +1,7 @@
 <template>
   <div class="ui-loading" :style="genStyle">
     <slot name="loading-icon">
-      <UiAtomsIcon
-        name="uil-spinner"
-        width="24"
-        height="24"
-        mode="svg"
-        class="ui-loading__icon animate-spin"
-      />
+      <UiAtomsIcon name="uil-spinner" width="24" height="24" mode="svg" class="ui-loading__icon animate-spin" />
     </slot>
     <slot name="loading-label">
       <div class="ui-loading__label">
@@ -19,7 +13,7 @@
 
 <script setup lang="ts">
 import UiAtomsIcon from '../icon/index.vue'
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { ILoadingProps, ILoadingUi } from '@/components/atoms/loading/types.ts'
 import { computed, toRefs } from 'vue'
 

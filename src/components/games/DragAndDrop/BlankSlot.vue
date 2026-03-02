@@ -6,9 +6,10 @@
       'bg-green-100 border-green-300': isCorrect === true,
       'bg-red-100 border-red-300': isCorrect === false,
       'bg-gray-25 border-gray-500': isCorrect === null,
-    }" @drop.prevent="handleDrop" @dragover.prevent @pointerup="handleDropPointer" @touchend="handleDropTouch($event)">
+    }" @drop.prevent="!isTouchDevice ? handleDrop : undefined" @dragover.prevent="!isTouchDevice"
+    @pointerup="handleDropPointer" @touchend="handleDropTouch($event)">
     <WordItem v-if="item" :key="item?.id" :item="item" :slotId="slotId" :inSlot="true" :disabled="disabled"
-      :noBackground="true" class="bg-transparent"
+      :isTouchDevice="isTouchDevice" :noBackground="true" class="bg-transparent"
       @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')" />
   </div>
 </template>
@@ -23,12 +24,18 @@ const props = defineProps<{
   onDragStart?: (e: DragEvent, item: Blank, slotId: number, type: 'board' | 'pool') => void
   isCorrect: boolean | null | undefined
   disabled: boolean
+  isTouchDevice?: boolean
 }>()
 
 const emit = defineEmits(['drop'])
 
 function handleDrop(event: DragEvent) {
   emit('drop', event, props.slotId)
+}
+
+function handleDragOver(event: DragEvent) {
+  if (props.isTouchDevice) return
+  // preventDefault is already applied by the directive; no further action needed
 }
 
 function handleDropPointer(event: PointerEvent) {

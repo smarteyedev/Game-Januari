@@ -4,7 +4,9 @@
     :class="disabled
       ? 'bg-gray-100 text-gray-700 cursor-not-allowed border-gray-700 shadow-gray-700'
       : 'bg-white hover:bg-gray-100 border-primary-700 shadow-primary-700'
-      " :disabled="disabled" @click="$emit('input', char)">
+      "
+:disabled="disabled"
+@click="$emit('input', char)">
     {{ char }}
   </button>
 </template>

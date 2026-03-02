@@ -24,9 +24,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { levelRepository } from '@/infrastructure'
-import { MinigameId } from '@/utils/constants'
+import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import { MINIGAME_IDS } from '@/utils/constants'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'

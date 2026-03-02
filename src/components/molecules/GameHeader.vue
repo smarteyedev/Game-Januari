@@ -18,7 +18,8 @@ withDefaults(
 
 <template>
   <div class="flex flex-col gap-1.5 w-full">
-    <div id="headerTitle"
+    <div
+id="headerTitle"
       class="flex justify-between md:items-start w-full border-b md:border-b-2 border-gray-100 pb-3 md:pb-2">
       <span class="text-body-md md:text-h4 font-extrabold md:font-bold  text-primary-700">{{ title }}</span>
       <span

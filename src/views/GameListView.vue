@@ -31,15 +31,21 @@ import Background from '@/assets/img/bg.jpg'
           <h2 class="panel-title">2026 — FEBRUARY</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <RouterLink to="connections-game" class="menu-tile">
+            <RouterLink
+to="connections-game"
+class="menu-tile">
               <span class="menu-title">CONNECTIONS</span>
             </RouterLink>
 
-            <RouterLink to="scrambles-game" class="menu-tile">
+            <RouterLink
+to="scrambles-game"
+class="menu-tile">
               <span class="menu-title">SCRAMBLES</span>
             </RouterLink>
 
-            <RouterLink to="matrix-game" class="menu-tile">
+            <RouterLink
+to="matrix-game"
+class="menu-tile">
               <span class="menu-title">MATRIX</span>
             </RouterLink>
           </div>
@@ -50,15 +56,21 @@ import Background from '@/assets/img/bg.jpg'
           <h2 class="panel-title">2026 — JANUARY</h2>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <RouterLink to="automation-spotter" class="menu-tile">
+            <RouterLink
+to="automation-spotter"
+class="menu-tile">
               <span class="menu-title">AUTOMATION SPOTTER</span>
             </RouterLink>
 
-            <RouterLink to="drag-and-drop" class="menu-tile">
+            <RouterLink
+to="drag-and-drop"
+class="menu-tile">
               <span class="menu-title">DRAG & DROP</span>
             </RouterLink>
 
-            <RouterLink to="memory-game" class="menu-tile">
+            <RouterLink
+to="memory-game"
+class="menu-tile">
               <span class="menu-title">MEMORY</span>
             </RouterLink>
           </div>

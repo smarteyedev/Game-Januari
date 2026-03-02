@@ -1,22 +1,10 @@
 <template>
-  <label
-    class="ui-radio"
-    :class="{
-      'ui-radio--disabled': disabled,
-      'ui-radio--readonly': readonly,
-    }"
-    :style="genStyle"
-  >
-    <input
-      v-bind="inputProps"
-      class="ui-radio__input"
-      type="radio"
-      :value="value"
-      :checked="modelValue === value"
-      :disabled="disabled"
-      @click="($event) => (readonly ? $event.preventDefault() : null)"
-      @change="handleChange"
-    />
+  <label class="ui-radio" :class="{
+    'ui-radio--disabled': disabled,
+    'ui-radio--readonly': readonly,
+  }" :style="genStyle">
+    <input v-bind="inputProps" class="ui-radio__input" type="radio" :value="value" :checked="modelValue === value"
+      :disabled="disabled" @click="($event) => (readonly ? $event.preventDefault() : null)" @change="handleChange" />
 
     <slot name="label" v-bind="{ label }">
       <span class="ui-radio__label">{{ label }}</span>
@@ -25,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { toKebabCase } from '@/utils/string.ts'
+import { toKebabCase } from '@/utils/string'
 import type { IRadioProps, IRadioUi } from '@/components/atoms/radio/types.ts'
 import { computed, toRefs } from 'vue'
 
@@ -132,6 +120,7 @@ const handleChange = () => {
 
 /** STATE **/
 .ui-radio--readonly {
+
   &,
   .ui-radio__input,
   .ui-radio__label {

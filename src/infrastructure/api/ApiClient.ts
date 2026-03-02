@@ -92,11 +92,9 @@ export function useApiClient() {
     error.value = null
 
     try {
-      const response = await request<T>(config)
-      if (!response.success) {
-        throw new Error(response.message)
-      }
-      return response.data as T
+      const { success, data, message } = await request<T>(config)
+      if (!success) throw new Error(message)
+      return data as T
     } catch (err) {
       error.value = err
       throw err
