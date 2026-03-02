@@ -1,7 +1,6 @@
 <template>
-  <div @pointerdown="isTouchDevice ? pointerStart : undefined">
-    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" :draggable="!disabled && !isTouchDevice"
-      @dragstart="!isTouchDevice ? dragStart : undefined" />
+  <div @pointerdown="pointerStart" @touchstart.prevent="touchStart" @mousedown="pointerStart">
+    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" />
   </div>
 </template>
 
@@ -10,26 +9,23 @@ import type { Blank } from '@/domain/types'
 import Card from '@/components/molecules/Card.vue'
 import { computed } from 'vue'
 
-const { item, slotId, inSlot, disabled, isTouchDevice } = defineProps<{
+const { item, slotId, inSlot, disabled } = defineProps<{
   item: Blank
   slotId?: number
   inSlot?: boolean
   disabled: boolean
-  isTouchDevice?: boolean
 }>()
 
 const emit = defineEmits<{
-  (e: 'dragstart', event: DragEvent, item: Blank, slotId?: number): void
+  (e: 'dragstart', payload: { item: Blank; slotId?: number; clientX: number; clientY: number }): void
 }>()
 
 const customClass = computed(() => {
-  const classes = []
+  const classes: string[] = []
 
   if (inSlot) {
-    // Style when in a slot
     classes.push('bg-transparent p-0 m-0 rounded-none border-0 min-w-0')
   } else {
-    // Style when in pool
     classes.push(
       'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center',
     )
@@ -38,27 +34,33 @@ const customClass = computed(() => {
   return classes.join(' ')
 })
 
-function dragStart(event: DragEvent) {
-  if (disabled) {
-    event.preventDefault()
-    return
-  }
-  emit('dragstart', event, item, slotId)
+function pointerStart(e: PointerEvent | MouseEvent) {
+  if (disabled) return
+
+  const ev = e as PointerEvent
+  emit('dragstart', {
+    item,
+    slotId,
+    clientX: ev.clientX,
+    clientY: ev.clientY,
+  })
+
+  e.preventDefault()
 }
 
-function pointerStart(event: PointerEvent) {
+function touchStart(e: TouchEvent) {
   if (disabled) return
-  emit('dragstart', event as unknown as DragEvent, item, slotId)
-}
 
-function touchStart(event: TouchEvent) {
-  if (disabled) return
-  const t = event.touches && event.touches[0]
+  const t = (e.touches && e.touches[0]) || (e.changedTouches && e.changedTouches[0])
   if (!t) return
-  // Prevent default only when cancelable to avoid console warnings
-  if (event.cancelable) event.preventDefault()
-  // Emit an object with coordinates so the parent can start a touch drag
-  const touchLike = { type: 'touch', clientX: t.clientX, clientY: t.clientY } as unknown as DragEvent
-  emit('dragstart', touchLike, item, slotId)
+
+  emit('dragstart', {
+    item,
+    slotId,
+    clientX: t.clientX,
+    clientY: t.clientY,
+  })
+
+  e.preventDefault()
 }
 </script>

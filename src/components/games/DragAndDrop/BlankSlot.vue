@@ -6,11 +6,9 @@
       'bg-green-100 border-green-300': isCorrect === true,
       'bg-red-100 border-red-300': isCorrect === false,
       'bg-gray-25 border-gray-500': isCorrect === null,
-    }" @drop.prevent="!isTouchDevice ? handleDrop : undefined" @dragover.prevent="!isTouchDevice"
-    @pointerup="handleDropPointer" @touchend="handleDropTouch($event)">
+    }" @pointerup="handleDropPointer" @touchend="handleDropTouch($event)">
     <WordItem v-if="item" :key="item?.id" :item="item" :slotId="slotId" :inSlot="true" :disabled="disabled"
-      :isTouchDevice="isTouchDevice" :noBackground="true" class="bg-transparent"
-      @dragstart="(e, item, slotId) => onDragStart?.(e, item, slotId ?? 0, 'board')" />
+      :noBackground="true" class="bg-transparent" @dragstart="payload => onDragStart?.(payload)" />
   </div>
 </template>
 
@@ -21,10 +19,10 @@ import WordItem from './WordItem.vue'
 const props = defineProps<{
   item?: Blank | null
   slotId: number
-  onDragStart?: (e: DragEvent, item: Blank, slotId: number, type: 'board' | 'pool') => void
+  onDragStart?: (payload: { item: Blank; slotId?: number; clientX: number; clientY: number }) => void
   isCorrect: boolean | null | undefined
   disabled: boolean
-  isTouchDevice?: boolean
+  isTouchDevice: boolean
 }>()
 
 const emit = defineEmits(['drop'])
