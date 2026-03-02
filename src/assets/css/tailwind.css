@@ -159,7 +159,6 @@
   --color-purple-default: var(--color-purple-500);
   --color-purple: var(--color-purple-default);
 
-<<<<<<< HEAD
   /* accent cream */
   --color-cream-base: #ffeed0;
   --color-cream-10: #fffcf6;
@@ -193,12 +192,6 @@
   --color-danger: var(--color-error-500);
   --color-danger-dark: var(--color-error-900);
 
-=======
-  /* Brand */
-  --color-brand-primary: #e2fef7;
-  --color-shadow: #0000000d;
-
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   /* Font */
   --font-sans: 'Inter', system-ui, sans-serif;
 
@@ -274,6 +267,9 @@
   --radius-xl: 8px;
   --radius-2xl: 10px;
   --radius-3xl: 12px;
+
+  /* Breakpoints */
+  --breakpoint-xs: 480px;
 }
 
 @layer components {
@@ -329,11 +325,7 @@
 
 @layer utilities {
   .text-shadow-flat-sm {
-<<<<<<< HEAD
     text-shadow: 0 3px 0 var(--btn);
-=======
-    text-shadow: 0 3px 0 var(--btn-accent);
->>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
   }
 
   .text-shadow-flat-md {

@@ -40,9 +40,9 @@ const buttonSize = computed(() => {
             :target="target" />
         </div>
         <!-- SUBMIT -->
-        <div class="grow">
+        <div class="grow flex justify-center items-center sm:inline-block">
           <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
-            class="self-center" text="Check">
+            class="self-center " text="Check">
           </UiButton>
         </div>
       </slot>
