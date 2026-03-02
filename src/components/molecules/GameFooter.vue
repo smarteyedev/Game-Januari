@@ -31,11 +31,19 @@ const buttonSize = computed(() => {
 </script>
 
 <template>
+<<<<<<< HEAD
   <div class="w-full flex flex-col sm:flex-row justify-between items-center">
     <!-- LEFT -->
     <div class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
       <slot name="footer-left">
         <div>
+=======
+  <div class="w-full flex flex-col sm:flex-row sm:justify-between items-start sm:items-end">
+    <!-- LEFT -->
+    <div class="flex gap-[36px]">
+      <slot name="footer-left">
+        <div class="w-full sm:w-71.25">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           <ProgressWithIcon
             v-if="showProgress && current !== undefined && target !== undefined"
             :current="current"
@@ -43,6 +51,7 @@ const buttonSize = computed(() => {
           />
         </div>
         <!-- SUBMIT -->
+<<<<<<< HEAD
         <div class="grow">
           <UiButton
             :size="buttonSize"
@@ -54,12 +63,23 @@ const buttonSize = computed(() => {
           >
           </UiButton>
         </div>
+=======
+        <UiButton
+          v-if="!hideSubmit && !isChecked"
+          variant="secondary"
+          size="md"
+          @click="emit('check')"
+          text="Check"
+        >
+        </UiButton>
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
       </slot>
     </div>
 
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4">
       <slot name="footer-right">
+<<<<<<< HEAD
         <UiButton
           :size="buttonSize"
           v-if="hasLost"
@@ -75,6 +95,19 @@ const buttonSize = computed(() => {
           v-if="isWin || hasLost"
           text="Continue"
           variant="primary"
+=======
+        <!-- RETRY
+      <UiButton v-if="hasLost" text="Retry" variant="danger" size="md" @click="emit('retry')">
+      </UiButton>
+       -->
+
+        <!-- CONTINUE -->
+        <UiButton
+          v-if="isWin || hasLost"
+          text="Continue"
+          variant="primary"
+          size="md"
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           @click="emit('cleared')"
         >
         </UiButton>

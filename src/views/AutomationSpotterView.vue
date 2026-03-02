@@ -9,7 +9,10 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+<<<<<<< HEAD
 // local asset will be loaded by levelRepository when offline
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 // Level fetching
 const loading = ref(false)
@@ -35,6 +38,7 @@ const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
 
+<<<<<<< HEAD
 const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
@@ -51,9 +55,15 @@ const isLevelWin = computed(() => {
     Object.keys(checkedMap.value).length === allCards.value.length &&
     Object.values(checkedMap.value).every(Boolean)
   )
+=======
+const { time, _isWon, startGame, finish, reset } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.automationSpotter,
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 })
 const hasLost = computed(() => isChecked.value && !isLevelWin.value)
 
+<<<<<<< HEAD
 // Fetch level
 async function fetchLevel() {
   loading.value = true
@@ -72,6 +82,31 @@ async function fetchLevel() {
       question: content?.question ?? '',
       card: content?.card ?? [],
     }
+=======
+// Computed
+const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
+const isLevelWin = computed(() => {
+  if (!isChecked.value) return false
+  return (
+    Object.keys(checkedMap.value).length === allCards.value.length &&
+    Object.values(checkedMap.value).every(Boolean)
+  )
+})
+const hasLost = computed(() => isChecked.value && !isLevelWin.value)
+
+// Fetch level
+async function fetchLevel() {
+  loading.value = true
+  error.value = null
+
+  try {
+    const data = await levelRepository.getLevel<{
+      question: string
+      card: DragCard[]
+    }>(MinigameId.AutomationSpotter, 1)
+
+    gameData.value = data
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     loadLevel()
   } catch (err) {
     error.value = err

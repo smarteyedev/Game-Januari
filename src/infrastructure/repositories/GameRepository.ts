@@ -48,6 +48,7 @@ export class GameRepository implements IGameRepository {
 
 // Level Repository Implementation
 export class LevelRepository {
+<<<<<<< HEAD
   async getLevel<T extends LevelData>(
     minigameId: MinigameId,
     level: number,
@@ -99,6 +100,9 @@ export class LevelRepository {
       return raw as T
     }
 
+=======
+  async getLevel<T extends LevelData>(minigameId: MinigameId, level: number): Promise<T> {
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     const endpoint = this.getEndpoint(minigameId)
     const response = await httpClient.get<T>(API_ENDPOINTS.MINIGAME_LEVELS(endpoint, level))
     return response.data

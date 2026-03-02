@@ -86,7 +86,11 @@ function handleStart() {
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
     <div
+<<<<<<< HEAD
       class="min-h-screen flex flex-col p-2 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
+=======
+      class="min-h-screen flex flex-col p-6 gap-4 w-full"
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
       :style="{
         backgroundImage: `url(${Background})`,
         backgroundPosition: 'center',
@@ -113,7 +117,11 @@ function handleStart() {
         <!-- Game Content -->
         <div
           v-else
+<<<<<<< HEAD
           class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
+=======
+          class="border-[6px] border-primary-700 flex flex-col items-center gap-[32px] w-full max-w-full p-[20px] rounded-[36px] bg-white"
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
         >
           <slot name="header">
             <GameHeader

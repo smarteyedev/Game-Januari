@@ -9,6 +9,10 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+<<<<<<< HEAD
+=======
+import GameFooter from '@/components/molecules/GameFooter.vue'
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 // Level fetching
 const loading = ref(false)
@@ -38,6 +42,7 @@ function playClick() {
   }
 }
 
+<<<<<<< HEAD
 const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.memory,
@@ -45,6 +50,12 @@ const gameServiceOptions = {
 }
 
 const { time, _isWon, _isLost, startGame, finish, reset } = useGameService(gameServiceOptions)
+=======
+const { time, _isWon, _isLost, startGame, finish, reset } = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.memory,
+})
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 // Fetch level from API
 async function fetchLevel() {
@@ -52,6 +63,7 @@ async function fetchLevel() {
   error.value = null
 
   try {
+<<<<<<< HEAD
     const data = await levelRepository.getLevel<any>(
       MinigameId.Memory,
       1,
@@ -76,6 +88,14 @@ async function fetchLevel() {
       gameData.value = raw as any
     }
 
+=======
+    const data = await levelRepository.getLevel<{
+      id: number
+      card: MemoryCard[]
+    }>(MinigameId.Memory, 1)
+
+    gameData.value = data
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     cards.value = loadLevel()
   } catch (err) {
     error.value = err
@@ -193,9 +213,13 @@ onMounted(() => {
   >
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
+<<<<<<< HEAD
       <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
         Card Turns: {{ turns }}
       </span>
+=======
+      <span class="text-body-md text-primary-700 font-bold"> Card Turns: {{ turns }} </span>
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     </template>
   </BaseGame>
 </template>

@@ -85,11 +85,15 @@ export interface ILevelRepository {
   /**
    * Fetch level data for a specific game
    */
+<<<<<<< HEAD
   getLevel<T extends LevelData>(
     minigameId: MinigameId,
     level: number,
     offline?: boolean,
   ): Promise<T>
+=======
+  getLevel<T extends LevelData>(minigameId: MinigameId, level: number): Promise<T>
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
   /**
    * Get available levels for a game

@@ -76,7 +76,11 @@ const backStyle = computed<CSSProperties>(() => {
 
 <template>
   <div
+<<<<<<< HEAD
     class="min-w-21.5 min-h-24.5 md:min-w-40 md:min-h-47.5 perspective cursor-pointer"
+=======
+    class="aspect-4/5 w-40 perspective cursor-pointer"
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     @click="!flipped && !matched && emit('flip')"
   >
     <div
@@ -104,7 +108,11 @@ const backStyle = computed<CSSProperties>(() => {
           v-else-if="contentType === 'svg'"
           class="w-full h-full flex items-center justify-center"
         >
+<<<<<<< HEAD
           <component :is="LogoComponent" class="w-14 md:w-[128px] h-auto" />
+=======
+          <component :is="LogoComponent" class="w-20 h-auto" />
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
         </div>
 
         <!-- IMAGE CARD -->

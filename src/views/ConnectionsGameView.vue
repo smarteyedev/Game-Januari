@@ -1,7 +1,10 @@
 <template>
   <BaseGame
     title="Connections Game"
+<<<<<<< HEAD
     moduleTitle="Lorem Sipsum"
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     description="Connections game"
     :time="time"
     v-model:showIntro="showIntro"
@@ -10,6 +13,7 @@
     :error="error"
     :retryFn="retryGame"
   >
+<<<<<<< HEAD
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
         <ConnectionsCard
@@ -28,6 +32,25 @@
       >
     </div>
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 place-items-center w-full">
+=======
+    <div
+      class="flex flex-wrap lg:flex-nowrap justify-center gap-[20px] items-center min-w-25 min-h-22.5"
+    >
+      <ConnectionsCard
+        v-for="index in 4"
+        :key="index"
+        class="min-w-50"
+        :label="getSolvedGroup(index - 1)?.label || ''"
+        :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
+        :color="getSolvedColor(index - 1)"
+        :clickable="false"
+      />
+    </div>
+    <div>
+      <span class="text-body-xl font-semibold text-primary-700">Create a group of four</span>
+    </div>
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-[20px] p-2">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
       <ConnectionsCard
         v-for="item in items"
         :key="item.label"
@@ -44,7 +67,11 @@
     <template #footer>
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
+<<<<<<< HEAD
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
+=======
+        <div class="text-primary-700 text-body-xl font-bold">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           <UiLabel
             v-if="wrongCount !== null && !(isWon || isLost)"
             :label="`Wrong, you are ${wrongCount} away to form a correct group`"
@@ -56,9 +83,14 @@
           <UiLabel v-if="isWon" :label="`You win`" />
           <UiLabel v-if="isLost" :label="`you lose`" />
         </div>
+<<<<<<< HEAD
         <div class="flex gap-4">
           <UiButton
             :size="buttonSize"
+=======
+        <div class="flex gap-[16px]">
+          <UiButton
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
             text="Submit"
             variant="primary"
             :disabled="selected.length !== 4 || isWon || isLost"
@@ -68,7 +100,10 @@
 
           <!--Hidden, if lose show restart, if win show continue-->
           <UiButton
+<<<<<<< HEAD
             :size="buttonSize"
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
             text="Restart"
             variant="danger"
             v-if="isLost"
@@ -76,9 +111,15 @@
             :color="'error'"
           >
           </UiButton>
+<<<<<<< HEAD
           <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"> </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
+=======
+          <UiButton text="Continue" v-if="isWon" :color="'success'"> </UiButton>
+        </div>
+        <div class="text-primary-700 font-semibold text-body-md">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>
@@ -90,14 +131,23 @@
 import { computed, onMounted, ref } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
+<<<<<<< HEAD
 import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
+=======
+import gameData from '@/assets/gameData/connection_game.json'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import { UiButton } from '@/components/atoms/button'
 import { shuffle } from '@/utils/shuffle'
+<<<<<<< HEAD
 import { useBreakpoint } from '@/composables/useBreakpoint'
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 type Category = {
   id: string
@@ -138,6 +188,7 @@ const COLOR_POOL = [
   'bg-rose-200',
 ]
 
+<<<<<<< HEAD
 const { isXs, isSm, isMd } = useBreakpoint()
 
 const buttonSize = computed(() => {
@@ -147,6 +198,8 @@ const buttonSize = computed(() => {
   return 'xl'
 })
 
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.connections,
@@ -205,6 +258,7 @@ async function initializeGame() {
   try {
     await startGame()
 
+<<<<<<< HEAD
     const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
     const data: any = raw && raw.content ? raw.content : raw
 
@@ -218,6 +272,17 @@ async function initializeGame() {
     const itemsSrc = data.items || []
     items.value = shuffle(
       itemsSrc.map((item: any) => ({
+=======
+    const data = gameData
+
+    categories.value = data.category
+    assignCategoryColors(data.category)
+
+    categoryLabelMap.value = Object.fromEntries(data.category.map((c: any) => [c.id, c.label]))
+
+    items.value = shuffle(
+      data.items.map((item: any) => ({
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
         label: item.label,
         category: item.category,
         state: 'idle',

@@ -1,7 +1,10 @@
 <template>
   <BaseGame
     title="Scrambles Game"
+<<<<<<< HEAD
     moduleTitle="Lorem Ipsum"
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     :description="question"
     :time="time"
     v-model:showIntro="showIntro"
@@ -10,6 +13,7 @@
     :error="error"
     :retryFn="retryGame"
   >
+<<<<<<< HEAD
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
         <BoxInput :value="userInput" :locked="hints" />
@@ -78,11 +82,64 @@
 
         <UiButton :size="buttonSize" text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
       </div>
+=======
+    <div class="flex flex-col gap-[32px] justify-center items-center">
+      <div class="flex flex-col gap-[20px] justify-center items-center">
+        <BoxInput :value="userInput" :locked="hints" />
+        <UiLabel
+          :label="`You have ${attempts} attempts left`"
+          class="text-primary-700 font-semibold text-body-md"
+        />
+      </div>
+
+      <div v-for="(s, i) in submissions" :key="i" class="flex gap-[20px]">
+        <div
+          v-for="(char, j) in s.value.split('')"
+          :key="j"
+          class="aspect-square min-w-15 min-h-15 grid place-items-center border-[3px] rounded-3xl shadow-xl text-h3 font-bold select-none transition"
+          :class="{
+            // Correct guess (green styled)
+            'bg-green-50 text-primary-500 border-tosca-700 shadow-tosca-700': s.correct,
+
+            // Wrong guess (muted + strike feeling)
+            'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
+          }"
+        >
+          {{ char }}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col justify-center items-center gap-[20px]">
+      <div class="flex gap-[20px]">
+        <CharacterKey
+          v-for="{ c, i } in answerChars"
+          :key="`${c}-${i}`"
+          :char="c"
+          :disabled="isCharDisabled(c) || !isPlaying"
+          @input="onCharInput"
+        />
+      </div>
+      <div class="flex gap-4.5">
+        <UiButton text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+        </UiButton>
+        <UiButton text="Submit" @click="submitAnswer" :disabled="!isPlaying"> </UiButton>
+
+        <UiButton text="Restart" v-if="isLose" variant="danger" @click="restartGame"> </UiButton>
+
+        <UiButton text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+      </div>
+    </div>
+
+    <template #footer>
+      <span></span>
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     </template>
   </BaseGame>
 </template>
 
 <script setup lang="ts">
+<<<<<<< HEAD
 import { onMounted, ref, computed, useTemplateRef, nextTick } from 'vue'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
@@ -94,6 +151,19 @@ import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
 import introData from '@/assets/gameData/intro.json'
 import { useBreakpoint } from '@/composables/useBreakpoint'
+=======
+import { onMounted, ref, computed } from 'vue'
+import BoxInput from '@/components/atoms/BoxInput.vue'
+import CharacterKey from '@/components/atoms/CharacterKey.vue'
+import UiButton from '@/components/atoms/button/index.vue'
+import gameData from '@/assets/gameData/scrambles.json'
+import { shuffle } from '@/utils/shuffle'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameService } from '@/application'
+import introData from '@/assets/gameData/intro.json'
+import { UiLabel } from '@/components/atoms/label'
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 type Submission = {
   value: string
@@ -124,6 +194,7 @@ const userInput = ref<(string | null)[]>([])
 const submissions = ref<Submission[]>([])
 const hints = ref<(string | null)[]>([])
 
+<<<<<<< HEAD
 const { isXs, isSm, isMd } = useBreakpoint()
 
 const buttonSize = computed(() => {
@@ -146,6 +217,17 @@ async function initializeGame() {
 
     question.value = data.question || ''
     answer.value = (data.answer || '').toUpperCase()
+=======
+// Fetch game data and start game
+async function initializeGame() {
+  loading.value = true
+  error.value = null
+
+  try {
+    const data = gameData
+    question.value = data.question
+    answer.value = data.answer.toUpperCase()
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
     hints.value = Array(answer.value.length).fill(null)
     userInput.value = Array(answer.value.length).fill(null)

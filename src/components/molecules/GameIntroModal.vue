@@ -5,8 +5,11 @@ import type { IntroData } from '@/domain/types'
 import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal'
+<<<<<<< HEAD
 import { useBreakpoint } from '@/composables/useBreakpoint'
 import { computed } from 'vue'
+=======
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
 
 interface Props {
   title: string
@@ -76,7 +79,11 @@ const iconSizeClass = computed(() => {
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex justify-center items-center w-full">
+<<<<<<< HEAD
         <div :class="iconSizeClass">
+=======
+        <div class="w-31 h-33.25">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
           <UnknownIcon />
         </div>
       </div>
@@ -87,7 +94,11 @@ const iconSizeClass = computed(() => {
     </template>
 
     <!-- BODY -->
+<<<<<<< HEAD
     <div class="flex-1 overflow-y-auto px-10 pt-6 flex justify-center">
+=======
+    <div class="flex-1 overflow-y-auto px-10 pt-[24px] flex justify-center">
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
       <GameIntro
         v-if="introData"
         :title="introData.title"
@@ -100,7 +111,17 @@ const iconSizeClass = computed(() => {
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
+<<<<<<< HEAD
         <UiButton text="Mulai Game" variant="primary" :size="buttonSize" @click="onStart" />
+=======
+        <UiButton
+          text="Mulai Game"
+          variant="primary"
+          size="lg"
+          class="w-40.5 h-11"
+          @click="onStart"
+        />
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
       </div>
     </template>
   </UiModal>

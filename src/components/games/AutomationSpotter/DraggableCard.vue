@@ -26,7 +26,11 @@ const customClass = computed(() => {
   } else {
     // When in source pool
     classes.push(
+<<<<<<< HEAD
       'bg-gray-50 p-1.5 md:px-[12px] md:py-[10px] gap-2px border border-gray-200 rounded-[8px] text-center text-[10px] md:text-body-xs font-semibold  min-w-[96px] md:min-w-[128px]',
+=======
+      'bg-gray-50 px-[12px] py-[10px] gap-2px border border-gray-200 rounded-[8px] text-center text-body-xs font-semibold  min-w-[96px] md:min-w-[128px]',
+>>>>>>> 6831fc723e8333367ce0adcb4c9165009771c466
     )
   }
 
