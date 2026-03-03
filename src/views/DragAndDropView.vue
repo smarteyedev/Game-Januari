@@ -11,6 +11,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
 
 // Level fetching
 const loading = ref(false)
@@ -44,6 +45,7 @@ const showIntro = ref(true)
 const isChecked = ref(false)
 const isWin = ref(false)
 const correctCount = ref<number | null>(null)
+const attempts = ref(0)
 
 // Audio
 const audio = new Audio(clickSound)
@@ -64,7 +66,7 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
+const { time, _isWon, startGame, finish, retry } = useGameService(gameServiceOptions)
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -140,7 +142,7 @@ function parseSentence(sentence: string) {
 function loadLevel() {
   if (!gameData.value) return
 
-  reset()
+  retry()
   board.value = parseSentence(gameData.value.sentence)
   slots.value = {}
   slotCorrectness.value = {}
@@ -188,6 +190,7 @@ function handlePointerMove(e: PointerEvent) {
   lastPointerY.value = e.clientY
 }
 
+const MAX_TIME = 180
 function handlePointerUp(e: PointerEvent) {
   if (!draggedItem.value) return
 
@@ -366,8 +369,11 @@ async function checkAnswers() {
   isWin.value = won
   isLocked.value = true
 
+
   if (won) {
-    await finish(true)
+    const total = totalSlots.value
+    const totalScore = computeScore({ total, correct: count, timeUsed: MAX_TIME - time.value, attempts: attempts.value, maxTime: gameServiceOptions.maxTime })
+    await finish(true, undefined, totalScore)
   }
 }
 
@@ -377,6 +383,7 @@ function handleContinue() {
 
 // Retry game
 function retryGame() {
+  attempts.value += 1
   loadLevel()
 }
 

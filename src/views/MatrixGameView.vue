@@ -40,6 +40,7 @@ import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
+import { computeScore } from '@/application/services/ScoringService'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
@@ -52,7 +53,8 @@ type Survey = { title: string; options: Option[]; questions: Question[] }
 const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
-
+const attempts = ref(0)
+const MAX_TIME = 180
 const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.matrix,
@@ -145,8 +147,13 @@ const submit = async () => {
   })
 
   score.value = correct
-
   const won = correct === survey.value.questions.length
+  const totalScore = computeScore(
+    { total: survey.value.questions.length, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: 180 },
+    {},
+  )
+
+  score.value = totalScore
 
   await finish(
     won,
@@ -154,6 +161,7 @@ const submit = async () => {
       questionId: q.id,
       answer: answers.value[q.id],
     })),
+    totalScore,
   )
 }
 
@@ -163,6 +171,7 @@ const restart = async () => {
     answers.value[q.id] = undefined
   })
   score.value = null
+  attempts.value += 1
   await retry()
 }
 

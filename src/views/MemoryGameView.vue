@@ -9,6 +9,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
 
 // Level fetching
 const loading = ref(false)
@@ -43,8 +44,8 @@ const gameServiceOptions = {
   minigameId: MINIGAME_IDS.memory,
   offline: true,
 }
-
-const { time, _isWon, _isLost, startGame, finish, reset } = useGameService(gameServiceOptions)
+const MAX_TIME = 180
+const { time, _isWon, _isLost, startGame, finish, retry } = useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -119,7 +120,13 @@ async function flipCard(card: MemoryCard) {
     firstCard = null
 
     if (allMatched.value) {
-      await finish(true)
+      const totalPairs = cards.value.length / 2
+      const scoringAttempts = turns.value / 2
+      if (scoringAttempts >= 10) {
+        scoringAttempts - 10
+      }
+      const totalScore = computeScore({ total: totalPairs, correct: totalPairs, attempts: scoringAttempts, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      await finish(true, undefined, totalScore)
     }
   } else {
     lock = true
@@ -134,6 +141,7 @@ async function flipCard(card: MemoryCard) {
 
 // Game state
 const showIntro = ref(true)
+const attempts = ref(0)
 
 // Computed states
 const allMatched = computed(
@@ -156,13 +164,14 @@ async function start() {
   await startGame()
 }
 
-// Reset game
+// retry game
 function retryGame() {
+  attempts.value += 1
   cards.value = loadLevel()
   firstCard = null
   lock = false
   turns.value = 0
-  reset()
+  retry()
 }
 
 // Lifecycle

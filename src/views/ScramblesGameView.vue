@@ -74,6 +74,7 @@ import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
+import { computeScore } from '@/application/services/ScoringService'
 import introData from '@/assets/gameData/intro.json'
 import { useBreakpoint } from '@/composables/useBreakpoint'
 
@@ -82,11 +83,13 @@ type Submission = {
   correct: boolean
 }
 
+const MAX_TIME = 180
 const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
-  maxTime: 180,
+  maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.scrambles,
   offline: true,
 })
+
 
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
@@ -217,7 +220,9 @@ async function submitAnswer() {
   })
 
   if (correct) {
-    await finish(true)
+    const attemptsUsed = MAX_ATTEMPTS - attempts.value + 1
+    const totalScore = computeScore({ total: 1, correct: isWin ? 1 : 0, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: MAX_TIME })
+    await finish(true, undefined, totalScore)
     return
   }
 
@@ -228,7 +233,8 @@ async function submitAnswer() {
     hints.value = answer.value.split('')
     userInput.value = Array(answer.value.length).fill(null)
     submissions.value.push({ value: answer.value, correct: true })
-    await finish(false)
+    const totalScore = computeScore({ total: 1, correct: 0, attempts: MAX_ATTEMPTS - attempts.value + 1, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    await finish(false, undefined, totalScore)
   }
 
   // reveal one random hint
@@ -251,10 +257,6 @@ async function submitAnswer() {
   }
 
   userInput.value = Array(answer.value.length).fill(null)
-
-  if (attempts.value <= 0) {
-    await finish(false)
-  }
 }
 
 function getRandomLetter(exclude: Set<string>): string {

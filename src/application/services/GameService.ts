@@ -10,6 +10,7 @@ import { GameState, type MinigameId, type GameResult } from '@/domain/types'
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
+import { getFeedback } from './ScoringService'
 
 export type GameServiceOptions = {
   /** Maximum time in seconds for the game */
@@ -47,7 +48,7 @@ export type GameServiceReturn = {
   // Game actions
   startGame: () => Promise<void>
   submitScore: (score: number, answers?: unknown[]) => Promise<void>
-  finish: (won: boolean, finalAnswers?: unknown[]) => Promise<void>
+  finish: (won: boolean, finalAnswers?: unknown[], finalScore?: number) => Promise<void>
   reset: () => void
   retry: () => Promise<void>
 
@@ -100,12 +101,12 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Handle game over - win or lose
    */
-  async function handleGameOver(won: boolean, finalAnswers?: unknown[]) {
+  async function handleGameOver(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
     stopTimer()
     game.value.setSubmitting()
 
     _didWin.value = won
-    const score = won ? 100 : 0
+    const resolvedScore = typeof finalScore === 'number' ? finalScore : (won ? 100 : 0)
 
     if (finalAnswers) {
       game.value.answers.push(...finalAnswers)
@@ -113,10 +114,10 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
     // Auto submit if enabled
     if (autoSubmit) {
-      await submitScore(score, game.value.answers)
+      await submitScore(resolvedScore, game.value.answers)
     }
 
-    game.value.finish(won, score, finalAnswers)
+    game.value.finish(won, resolvedScore, finalAnswers)
 
     // Call callbacks
     const result: GameResult = {
@@ -195,7 +196,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
    */
   async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
     if (offline) {
-      console.log('Offline mode → score:', finalScore)
+      console.log('Offline mode → score: ' + finalScore + '\nfeedack: ' + getFeedback(finalScore))
       return
     }
 
@@ -217,8 +218,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Finish the game manually
    */
-  function finish(won: boolean, finalAnswers?: unknown[]) {
-    return handleGameOver(won, finalAnswers)
+  function finish(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
+    return handleGameOver(won, finalAnswers, finalScore)
   }
 
   /**

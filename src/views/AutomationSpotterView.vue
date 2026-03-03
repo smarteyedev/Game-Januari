@@ -9,6 +9,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
 // local asset will be loaded by levelRepository when offline
 
 // Level fetching
@@ -39,46 +40,14 @@ const SCORING_TIME_TOLERANCE = 30
 const answerWeight = 0.7
 const timeWeight = 0.3
 
-function calculateScore() {
-  const total = allCards.value.length
-  const correct = Object.values(checkedMap.value).filter(Boolean).length
-
-  const maxTime = gameServiceOptions.maxTime
-  const timeUsed = time.value
-
-  // ---- Answer Percent ----
-  const baseCorrectPercent = (correct / total) * 100
-  const attemptFactor = Math.max(0, 1 - 0.1 * (attempts.value - 1))
-  const correctPercent = baseCorrectPercent * attemptFactor
-
-  // ---- Time Percent ----
-  const rawTimePercent =
-    (((maxTime + (total * SCORING_TIME_TOLERANCE)) - timeUsed) / maxTime) * 100
-
-  const timePercent = Math.min(100, rawTimePercent)
-
-  // ---- Final Score ----
-  const totalScore =
-    (correctPercent * answerWeight) +
-    (timePercent * timeWeight)
-
-  console.log({
-    correctPercent,
-    rawTimePercent,
-    timePercent,
-    totalScore
-  })
-
-  return totalScore
-}
-
 const gameServiceOptions = {
   maxTime: 180,
   minigameId: MINIGAME_IDS.automationSpotter,
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
+const MAX_TIME = 180
+const { time, _isWon, startGame, finish, retry } = useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
@@ -122,7 +91,7 @@ async function fetchLevel() {
 function loadLevel() {
   if (!gameData.value) return
 
-  reset()
+  retry()
   question.value = gameData.value.question
   allCards.value = shuffle(gameData.value.card.map((c) => ({ ...c, matched: false })))
   sourceCards.value = [...allCards.value]
@@ -151,14 +120,20 @@ async function checkAnswers() {
 
   checkedMap.value = result
   isChecked.value = true
-  attempts.value += 1
+
 
   if (
     Object.values(result).every(Boolean) &&
     Object.keys(result).length === allCards.value.length
   ) {
-    await finish(true)
-    calculateScore()
+    const total = allCards.value.length
+    const correct = Object.values(checkedMap.value).filter(Boolean).length
+    const totalScore = computeScore(
+      { total, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: gameServiceOptions.maxTime },
+      { timeTolerance: SCORING_TIME_TOLERANCE, answerWeight, timeWeight },
+    )
+
+    await finish(true, undefined, totalScore)
   }
 }
 
@@ -168,6 +143,7 @@ function handleContinue() {
 
 // Retry game
 function retryGame() {
+  attempts.value += 1
   loadLevel()
 }
 

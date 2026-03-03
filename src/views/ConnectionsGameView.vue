@@ -56,6 +56,7 @@ import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
+import { computeScore } from '@/application/services/ScoringService'
 import introData from '@/assets/gameData/intro.json'
 import { UiButton } from '@/components/atoms/button'
 import { shuffle } from '@/utils/shuffle'
@@ -109,6 +110,7 @@ const buttonSize = computed(() => {
   return 'xl'
 })
 
+const MAX_TIME = 180
 const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.connections,
@@ -238,7 +240,11 @@ async function submitSelection() {
 
     if (attemptsLeft.value <= 0) {
       revealAllGroups()
-      await finish(false)
+      const total = categories.value.length
+      const correct = solvedGroups.value.length
+      const attemptsUsed = maxAttempts - attemptsLeft.value + 1
+      const totalScore = computeScore({ total, correct, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      await finish(false, undefined, totalScore)
     }
 
     return
@@ -264,7 +270,9 @@ async function submitSelection() {
 
   // win condition
   if (solvedGroups.value.length === categories.value.length) {
-    await finish(true)
+    const total = categories.value.length
+    const totalScore = computeScore({ total, correct: solvedGroups.value.length, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    await finish(true, undefined, totalScore)
   }
 }
 
