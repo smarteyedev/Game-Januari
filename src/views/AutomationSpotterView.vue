@@ -34,6 +34,43 @@ const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
+const attempts = ref(0)
+const SCORING_TIME_TOLERANCE = 30
+const answerWeight = 0.7
+const timeWeight = 0.3
+
+function calculateScore() {
+  const total = allCards.value.length
+  const correct = Object.values(checkedMap.value).filter(Boolean).length
+
+  const maxTime = gameServiceOptions.maxTime
+  const timeUsed = time.value
+
+  // ---- Answer Percent ----
+  const baseCorrectPercent = (correct / total) * 100
+  const attemptFactor = Math.max(0, 1 - 0.1 * (attempts.value - 1))
+  const correctPercent = baseCorrectPercent * attemptFactor
+
+  // ---- Time Percent ----
+  const rawTimePercent =
+    (((maxTime + (total * SCORING_TIME_TOLERANCE)) - timeUsed) / maxTime) * 100
+
+  const timePercent = Math.min(100, rawTimePercent)
+
+  // ---- Final Score ----
+  const totalScore =
+    (correctPercent * answerWeight) +
+    (timePercent * timeWeight)
+
+  console.log({
+    correctPercent,
+    rawTimePercent,
+    timePercent,
+    totalScore
+  })
+
+  return totalScore
+}
 
 const gameServiceOptions = {
   maxTime: 180,
@@ -114,12 +151,14 @@ async function checkAnswers() {
 
   checkedMap.value = result
   isChecked.value = true
+  attempts.value += 1
 
   if (
     Object.values(result).every(Boolean) &&
     Object.keys(result).length === allCards.value.length
   ) {
     await finish(true)
+    calculateScore()
   }
 }
 
