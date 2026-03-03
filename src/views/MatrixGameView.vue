@@ -11,9 +11,10 @@
     <template #footer>
       <div class="flex flex-wrap items-center justify-center gap-4.5">
         <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-        <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" :disabled="!isLose">
+        <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" v-if="isLose" :disabled="!isLose">
         </UiButton>
-        <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" :disabled="!isWin">
+        <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" v-if="isWin"
+          :disabled="!isWin">
         </UiButton>
       </div>
     </template>

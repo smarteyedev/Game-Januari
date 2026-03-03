@@ -36,7 +36,8 @@
       <div class="flex gap-2.5">
         <UiButton :size="buttonSize" text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
         </UiButton>
-        <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
+        <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" v-if="!isLose && !isWin"
+          :disabled="!isPlaying">
         </UiButton>
 
         <UiButton :size="buttonSize" text="Restart" v-if="isLose" variant="danger" @click="restartGame">
