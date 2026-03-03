@@ -33,17 +33,32 @@
     </div>
 
     <template #footer>
-      <div class="flex gap-2.5">
+      <div v-if="!isXs" class="flex gap-2.5">
         <UiButton :size="buttonSize" text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
         </UiButton>
-        <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" v-if="!isLose && !isWin"
-          :disabled="!isPlaying">
+        <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
         </UiButton>
 
         <UiButton :size="buttonSize" text="Restart" v-if="isLose" variant="danger" @click="restartGame">
         </UiButton>
 
         <UiButton :size="buttonSize" text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+      </div>
+      <div v-else class="flex flex-col gap-2.5 w-full justify-center items-center">
+        <div class="flex gap-2.5 w-full justify-center items-center">
+          <UiButton class="w-full" :size="buttonSize" text="Delete" variant="danger" @click="deleteChar"
+            :disabled="!isPlaying">
+          </UiButton>
+          <UiButton class="w-full" :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
+          </UiButton>
+        </div>
+        <div class="flex w-full justify-center items-center">
+          <UiButton class="w-full" :size="buttonSize" text="Restart" v-if="isLose" variant="danger"
+            @click="restartGame">
+          </UiButton>
+
+          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+        </div>
       </div>
     </template>
   </BaseGame>

@@ -9,13 +9,26 @@
     </div>
 
     <template #footer>
-      <div class="flex flex-wrap items-center justify-center gap-4.5">
+      <div v-if="!isXs" class="flex flex-wrap items-center justify-center gap-4">
         <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
         <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" v-if="isLose" :disabled="!isLose">
         </UiButton>
         <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" v-if="isWin"
           :disabled="!isWin">
         </UiButton>
+      </div>
+      <div v-else class="flex flex-col items-center justify-center gap-4 w-full">
+        <div class="flex gap-2.5 items-center justify-center w-full">
+          <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying" class="w-full"></UiButton>
+        </div>
+        <div class="flex gap-2.5 items-center justify-center w-full">
+          <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" class="w-full"
+            :disabled="!isLose">
+          </UiButton>
+          <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" class="w-full"
+            :disabled="!isWin">
+          </UiButton>
+        </div>
       </div>
     </template>
   </BaseGame>
