@@ -121,19 +121,20 @@ async function checkAnswers() {
   checkedMap.value = result
   isChecked.value = true
 
-
-  if (
+  const isPerfect =
     Object.values(result).every(Boolean) &&
     Object.keys(result).length === allCards.value.length
-  ) {
+
+  if (isPerfect) {
     const total = allCards.value.length
     const correct = Object.values(checkedMap.value).filter(Boolean).length
     const totalScore = computeScore(
       { total, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: gameServiceOptions.maxTime },
       { timeTolerance: SCORING_TIME_TOLERANCE, answerWeight, timeWeight },
     )
-
     await finish(true, undefined, totalScore)
+  } else {
+    await finish(false) // ← this stops timer
   }
 }
 
