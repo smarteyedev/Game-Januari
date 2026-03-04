@@ -8,7 +8,7 @@ const props = withDefaults(
     variant?: 'primary' | 'secondary' | 'plain' | 'danger'
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     disabled?: boolean
-
+    iconSize?: number
     icon?: string
     iconAppend?: string
     loading?: boolean
@@ -33,9 +33,17 @@ function getIconSize(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') {
   return map[size ?? 'xl']
 }
 
+const squareSizes = {
+  xl: 'h-[56px] w-[56px]',
+  lg: 'h-[48px] w-[48px]',
+  md: 'h-[44px] w-[44px]',
+  sm: 'h-[40px] w-[40px]',
+  xs: 'h-[36px] w-[36px]',
+}
+
 const base =
   'inline-flex items-center justify-center font-black ' +
-  'cursor-pointer rounded-[12px] shadow-xl px-6 transition-all'
+  'cursor-pointer rounded-[12px] shadow-xl transition-all'
 
 // const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 
@@ -81,9 +89,14 @@ const disabledStyles = {
 
 const classes = computed(() => [
   base,
-  sizes[props.size ?? 'xl'],
-  // !props.disabled ? baseHoverEffects : '',
-  // !props.disabled && props.variant === 'plain' ? plainHoverEffects : '',
+
+  props.square
+    ? squareSizes[props.size ?? 'xl']
+    : [
+      sizes[props.size ?? 'xl'],
+      'px-6', // only add padding when NOT square
+    ],
+
   props.disabled
     ? props.variant === 'plain'
       ? disabledStyles.plain
@@ -101,9 +114,11 @@ const textEffects = computed(() => {
 <template>
   <button :class="classes" :disabled="isDisabled" :aria-disabled="isDisabled">
     <!-- Prepend -->
-    <span v-if="props.loading || props.icon" class="mr-2 flex items-center">
-      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" :class="{ 'animate-spin': props.loading }" />
+    <span v-if="props.loading || props.icon" class="flex items-center">
+      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon"
+        :width="props.iconSize ?? getIconSize(props.size ?? 'xl')"
+        :height="props.iconSize ?? getIconSize(props.size ?? 'xl')" mode="svg"
+        :class="{ 'animate-spin': props.loading }" />
     </span>
 
     <!-- Label -->

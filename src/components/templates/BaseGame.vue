@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { type Slot } from 'vue'
+import { onMounted, onUnmounted, ref, type Slot } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData } from '@/domain/types'
 import { toTimeMmss } from '@/utils/string'
-import DisplayLabel from '../atoms/DisplayLabel.vue'
+import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 
 interface BaseGameProps {
@@ -81,18 +81,44 @@ function handleStart() {
   emit('update:showIntro', false)
   emit('start')
 }
+
+const gameWrapper = ref<HTMLElement | null>(null)
+const isFullscreen = ref(false)
+
+function toggleFullscreen() {
+  const el = gameWrapper.value
+  if (!el) return
+
+  if (!document.fullscreenElement) {
+    el.requestFullscreen()
+  } else {
+    document.exitFullscreen()
+  }
+}
+
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
+onMounted(() => {
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
+})
 </script>
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div class="min-h-screen flex flex-col p-2 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
+    <div ref="gameWrapper" class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
       backgroundImage: `url(${Background})`,
       backgroundPosition: 'center',
       backgroundSize: 'cover',
       backgroundRepeat: 'no-repeat',
     }">
       <!-- Topbar (always visible) -->
-      <DisplayLabel v-if="moduleTitle" :text="moduleTitle" class="z-60" />
+      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
