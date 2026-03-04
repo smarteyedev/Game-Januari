@@ -80,7 +80,7 @@ const iconSizeClass = computed(() => {
     <!-- BODY -->
     <div class="flex-1 overflow-y-auto px-10 pt-6 flex justify-center">
       <GameIntro v-if="introData" :title="introData.title" :description="introData.description"
-        :key_points="introData.key_points" class="w-full max-w-149.25" />
+        :key_points="introData.key_points" class="w-full" />
     </div>
 
     <!-- FOOTER -->

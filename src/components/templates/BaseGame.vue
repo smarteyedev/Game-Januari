@@ -7,6 +7,7 @@ import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData } from '@/domain/types'
 import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
+import GameResultModal from '../molecules/GameResultModal.vue'
 
 /**
  * BaseGame Component Props
@@ -33,6 +34,7 @@ interface BaseGameProps {
   retryFn?: () => void
   /** Whether to show the intro modal */
   showIntro?: boolean
+  showResult?: boolean
   /** Data for the intro modal */
   introData?: IntroData
   /** Current progress value (for progress bar) */
@@ -64,6 +66,7 @@ const props = withDefaults(defineProps<BaseGameProps>(), {
   maxTime: 180,
   loading: false,
   showIntro: false,
+  showResult: false,
   showProgress: false,
   isChecked: false,
   isWin: false,
@@ -127,12 +130,7 @@ onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 
-const checked = ref(false)
 
-function toggleCheck() {
-  checked.value = true
-  emit('check')
-}
 
 </script>
 
@@ -146,12 +144,17 @@ function toggleCheck() {
     }">
       <!-- Topbar (always visible) -->
       <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen" :current="currentProgress"
-        :target="targetProgress" :isChecked="checked" />
+        :target="targetProgress" :isChecked="isChecked" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
+
         <!-- Intro Modal -->
         <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
+          @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
+          @start="handleStart" containerPosition="relative" />
+
+        <GameResultModal v-if="showResult" :modelValue="showResult"
           @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
           @start="handleStart" containerPosition="relative" />
 
@@ -166,7 +169,7 @@ function toggleCheck() {
 
           <slot name="footer">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="toggleCheck"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
               @retry="emit('retry')" @cleared="emit('cleared')">
               <template #footer-left>
                 <slot name="footer-left" />
