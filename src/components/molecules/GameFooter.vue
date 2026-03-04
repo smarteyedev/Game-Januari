@@ -31,9 +31,9 @@ const buttonSize = computed(() => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col sm:flex-row justify-between items-center">
+  <div class="w-full flex flex-col md:flex-row justify-between items-center">
     <!-- LEFT -->
-    <div class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
+    <div v-if="!isXs && !isSm" class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
       <slot name="footer-left">
         <div>
           <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
@@ -55,7 +55,7 @@ const buttonSize = computed(() => {
         </UiButton>
 
         <!-- CONTINUE -->
-        <UiButton :size="buttonSize" v-if="isWin || hasLost" text="Continue" variant="primary" @click="emit('cleared')">
+        <UiButton v-if="isXs || isSm" :size="buttonSize" text="Continue" variant="primary" @click="emit('check')">
         </UiButton>
       </slot>
     </div>

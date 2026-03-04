@@ -6,16 +6,17 @@
         {{ text }}
       </span>
     </div>
-    <!--
     <div class="flex w-full md:w-fit gap-2.5">
-      <RouterLink to="/" class="flex w-full">
-        <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24" :square="true"
-          icon="ri:home-5-fill" class="grow" />
-      </RouterLink>
+
+      <UiButton v-if="isXs || isSm" :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24"
+        :square="true" icon="ri:home-5-fill" />
+      <UiButton v-if="(isXs || isSm) && isChecked" :size="!isXs && !isSm ? 'md' : 'xs'" variant="primary"
+        text="View Summary" class="grow w-full" />
+      <UiButton v-if="(isXs || isSm) && !isChecked" :size="!isXs && !isSm ? 'md' : 'xs'" variant="secondary"
+        :text="`Progress: ${current?.toFixed(0) || 0}/${target?.toFixed(0) || 100}`" class="grow w-full" />
       <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24" :square="true"
-        icon="ic:outline-fullscreen" @click="$emit('toggle-fullscreen')" class="grow w-full" />
+        icon="ic:outline-fullscreen" @click="$emit('toggle-fullscreen')" />
     </div>
-    -->
   </div>
 </template>
 
@@ -27,6 +28,9 @@ const { isXs, isSm } = useBreakpoint()
 
 defineProps<{
   text?: string
+  current?: number
+  target?: number
+  isChecked?: boolean
 }>()
 
 defineEmits<{

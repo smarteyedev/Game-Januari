@@ -5,8 +5,6 @@ import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData } from '@/domain/types'
-import { toTimeMmss } from '@/utils/string'
-import { UI_CONFIG } from '@/utils/constants'
 import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 
@@ -128,6 +126,14 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
+
+const checked = ref(false)
+
+function toggleCheck() {
+  checked.value = true
+  emit('check')
+}
+
 </script>
 
 <template>
@@ -139,7 +145,8 @@ onUnmounted(() => {
       backgroundRepeat: 'no-repeat',
     }">
       <!-- Topbar (always visible) -->
-      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen" />
+      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen" :current="currentProgress"
+        :target="targetProgress" :isChecked="checked" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
@@ -159,7 +166,7 @@ onUnmounted(() => {
 
           <slot name="footer">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="toggleCheck"
               @retry="emit('retry')" @cleared="emit('cleared')">
               <template #footer-left>
                 <slot name="footer-left" />
