@@ -1,13 +1,15 @@
 /**
- * Domain Layer Exports
- * Centralized exports for the domain layer
+ * Domain Layer - Barrel exports
+ * Re-exports all domain modules for convenient imports
  */
 
 // Entities
-export { Game, type GameData } from './entities/Game'
+export { Game } from './entities/Game'
+export type { GameData } from './entities/Game'
 
 // Types
 export * from './types'
 
 // Interfaces
 export * from './interfaces'
+

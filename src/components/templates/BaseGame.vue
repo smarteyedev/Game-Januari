@@ -6,47 +6,52 @@ import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData } from '@/domain/types'
 import { toTimeMmss } from '@/utils/string'
+import { UI_CONFIG } from '@/utils/constants'
 import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 
+/**
+ * BaseGame Component Props
+ * Base template component for all game views
+ */
 interface BaseGameProps {
-  /** Game title */
+  /** Module/category title displayed in the top action bar */
   moduleTitle?: string
-  /** Game title */
+  /** Game title displayed in the header */
   title: string
-  /** Game description */
+  /** Game description/instructions */
   description?: string
-  /** Game description */
+  /** Current question or prompt to display */
   question?: string
-  /** Current time in seconds */
+  /** Current time remaining in seconds */
   time: number
-  /** Maximum time in seconds */
+  /** Maximum time allowed in seconds (default: 180) */
   maxTime?: number
-  /** Loading state */
+  /** Whether the game is currently loading */
   loading?: boolean
-  /** Error state */
+  /** Error object if game failed to load */
   error?: unknown
-  /** Retry function for error state */
+  /** Function to call when retry button is clicked */
   retryFn?: () => void
-  /** Whether the intro modal should show */
+  /** Whether to show the intro modal */
   showIntro?: boolean
-  /** Intro modal data */
+  /** Data for the intro modal */
   introData?: IntroData
-  /** Current progress value */
+  /** Current progress value (for progress bar) */
   currentProgress?: number
-  /** Target progress value */
+  /** Target progress value (for progress bar) */
   targetProgress?: number
-  /** Whether to show progress bar */
+  /** Whether to show the progress bar */
   showProgress?: boolean
-  /** Whether the game is checked/done */
+  /** Whether the game has been checked/submitted */
   isChecked?: boolean
-  /** Whether the game is won */
+  /** Whether the player won the game */
   isWin?: boolean
-  /** Whether the game is lost */
+  /** Whether the player lost the game */
   hasLost?: boolean
-  /** Whether to hide submit button */
+  /** Whether to hide the submit/check button */
   hideSubmit?: boolean
-  /** Function to format time display */
+  /** Custom time formatter function */
   formatTime?: (seconds: number) => string
   /** Custom slots configuration */
   slots?: {
@@ -56,7 +61,7 @@ interface BaseGameProps {
   }
 }
 
-withDefaults(defineProps<BaseGameProps>(), {
+const props = withDefaults(defineProps<BaseGameProps>(), {
   description: '',
   maxTime: 180,
   loading: false,
@@ -66,17 +71,25 @@ withDefaults(defineProps<BaseGameProps>(), {
   isWin: false,
   hasLost: false,
   hideSubmit: false,
-  formatTime: (s: number) => toTimeMmss(s),
 })
 
 const emit = defineEmits<{
+  /** Emit when check/submit button is clicked */
   (e: 'check'): void
+  /** Emit when retry button is clicked */
   (e: 'retry'): void
+  /** Emit when game is cleared/completed */
   (e: 'cleared'): void
+  /** Emit when game starts (after intro) */
   (e: 'start'): void
+  /** Emit when intro visibility should change */
   (e: 'update:showIntro', value: boolean): void
 }>()
 
+/**
+ * Handle start button click
+ * Closes intro modal and emits start event
+ */
 function handleStart() {
   emit('update:showIntro', false)
   emit('start')
@@ -85,17 +98,25 @@ function handleStart() {
 const gameWrapper = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 
+/**
+ * Toggle fullscreen mode for the game wrapper
+ */
 function toggleFullscreen() {
   const el = gameWrapper.value
   if (!el) return
 
   if (!document.fullscreenElement) {
-    el.requestFullscreen()
+    el.requestFullscreen().catch((err) => {
+      console.warn('Failed to enter fullscreen:', err)
+    })
   } else {
     document.exitFullscreen()
   }
 }
 
+/**
+ * Handle fullscreen change event
+ */
 function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }

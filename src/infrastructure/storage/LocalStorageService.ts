@@ -4,9 +4,17 @@
  */
 
 import type { IStorageService } from '@/domain/interfaces'
+import { logger } from '../logging'
+
+// ============================================================================
+// Constants
+// ============================================================================
 
 const STORAGE_PREFIX = 'gbl_game_'
 
+/**
+ * LocalStorage Service - Provides type-safe localStorage operations
+ */
 export class LocalStorageService implements IStorageService {
   private prefix: string
 
@@ -14,37 +22,61 @@ export class LocalStorageService implements IStorageService {
     this.prefix = prefix
   }
 
+  /**
+   * Get full storage key with prefix
+   */
   private getKey(key: string): string {
     return `${this.prefix}${key}`
   }
 
+  /**
+   * Get value from storage
+   */
   get<T>(key: string): T | null {
     try {
       const item = localStorage.getItem(this.getKey(key))
       if (item === null) return null
       return JSON.parse(item) as T
     } catch (error) {
-      console.error(`Error reading from storage: ${key}`, error)
+      logger.error(
+        `Error reading from storage: ${key}`,
+        error instanceof Error ? error : new Error(String(error)),
+      )
       return null
     }
   }
 
+  /**
+   * Set value in storage
+   */
   set<T>(key: string, value: T): void {
     try {
       localStorage.setItem(this.getKey(key), JSON.stringify(value))
     } catch (error) {
-      console.error(`Error writing to storage: ${key}`, error)
+      logger.error(
+        `Error writing to storage: ${key}`,
+        error instanceof Error ? error : new Error(String(error)),
+      )
     }
   }
 
+  /**
+   * Remove value from storage
+   */
   remove(key: string): void {
     try {
       localStorage.removeItem(this.getKey(key))
     } catch (error) {
-      console.error(`Error removing from storage: ${key}`, error)
+      logger.error(
+        `Error removing from storage: ${key}`,
+        error instanceof Error ? error : new Error(String(error)),
+      )
     }
   }
 
+  /**
+   * Clear all values with the configured prefix
+   */
   clear(): void {
     try {
       const keys = Object.keys(localStorage)
@@ -53,8 +85,12 @@ export class LocalStorageService implements IStorageService {
           localStorage.removeItem(key)
         }
       })
+      logger.info('Storage cleared', { prefix: this.prefix })
     } catch (error) {
-      console.error('Error clearing storage', error)
+      logger.error(
+        'Error clearing storage',
+        error instanceof Error ? error : new Error(String(error)),
+      )
     }
   }
 }

@@ -160,3 +160,6 @@ export interface MemoryCard {
   flipped?: boolean
   matched?: boolean
 }
+
+// Re-export game data types for convenience
+export * from './gameData'

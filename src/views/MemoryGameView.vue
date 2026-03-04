@@ -121,10 +121,11 @@ async function flipCard(card: MemoryCard) {
 
     if (allMatched.value) {
       const totalPairs = cards.value.length / 2
-      const scoringAttempts = turns.value / 2
-      if (scoringAttempts >= 10) {
-        scoringAttempts - 10
-      }
+      let scoringAttempts = turns.value / 2
+
+      const FREE_ATTEMPTS = 5
+
+      scoringAttempts = Math.max(0, scoringAttempts - FREE_ATTEMPTS)
       const totalScore = computeScore({ total: totalPairs, correct: totalPairs, attempts: scoringAttempts, timeUsed: MAX_TIME - time.value, maxTime: 180 })
       await finish(true, undefined, totalScore)
     }
