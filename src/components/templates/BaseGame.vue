@@ -5,11 +5,10 @@ import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { FailureResultData, IntroData, SuccessResultData } from '@/domain/types'
-import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 import GameResultModal from '../molecules/GameResultModal.vue'
 import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
-import { gameRepository } from '@/infrastructure'
+import TopActionBar from '../molecules/TopActionBar.vue'
 
 /**
  * BaseGame Component Props
@@ -168,8 +167,27 @@ onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 
-const successResult = ref<SuccessResultData | null>(null)
-const failureResult = ref<FailureResultData | null>(null)
+const successResult = ref<SuccessResultData | undefined>()
+const failureResult = ref<FailureResultData | undefined>()
+
+// Local control for summary modal
+const showSummaryLocal = ref(false)
+const summaryData = ref<SuccessResultData | FailureResultData | undefined>()
+
+function handleViewSummary() {
+  // prefer success result if available
+  summaryData.value = successResult.value ?? failureResult.value
+  // close result modal then open summary modal
+  showResultLocal.value = !showResultLocal.value
+  showSummaryLocal.value = !showSummaryLocal.value
+}
+
+// when the summary modal closes, reopen the result modal if result data exists
+watch(showSummaryLocal, (val) => {
+  if (!val && (successResult.value || failureResult.value)) {
+    showResultLocal.value = true
+  }
+})
 
 function handleCheck() {
   // Delegate check handling to parent/game view; game service will populate result data
@@ -178,13 +196,13 @@ function handleCheck() {
 
 // Initialize local result refs from incoming props and update on changes
 watch(() => props.successResult, (val) => {
-  successResult.value = val ?? null
+  successResult.value = val ?? undefined
   if (successResult.value) showResultLocal.value = true
   console.debug('BaseGame: successResult prop changed', { value: successResult.value })
 })
 
 watch(() => props.failureResult, (val) => {
-  failureResult.value = val ?? null
+  failureResult.value = val ?? undefined
   if (failureResult.value) showResultLocal.value = true
   console.debug('BaseGame: failureResult prop changed', { value: failureResult.value })
 })
@@ -200,13 +218,15 @@ watch(() => props.failureResult, (val) => {
       backgroundRepeat: 'no-repeat',
     }">
       <!-- Topbar (always visible) -->
-      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen" :current="currentProgress"
-        :target="targetProgress" :isChecked="isChecked" />
+      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen"
+        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress"
+        :isChecked="isChecked" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
 
         <!-- Intro Modal -->
+
         <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
           @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
           @start="handleStart" containerPosition="relative" />
@@ -215,8 +235,8 @@ watch(() => props.failureResult, (val) => {
           :failureResult="failureResult" v-model:modelValue="showResultLocal" @continue="handleCleared"
           @retry="handleRetry" containerPosition="relative" />
 
-        <GameResultSummaryModal v-else-if="props.showSummary" :resultSummary="props.resultSummary"
-          v-model:modelValue="props.showSummary" containerPosition="relative" />
+        <GameResultSummaryModal v-else-if="showSummaryLocal" :resultSummary="summaryData"
+          v-model:modelValue="showSummaryLocal" containerPosition="relative" @toggle-summary="handleViewSummary" />
 
         <!-- Game Content -->
         <div v-else

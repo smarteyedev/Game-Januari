@@ -5,7 +5,7 @@ import { UiIcon } from '../icon'
 const props = withDefaults(
   defineProps<{
     text?: string
-    variant?: 'primary' | 'secondary' | 'plain' | 'danger'
+    variant?: 'primary' | 'secondary' | 'plain' | 'danger' | 'ghost'
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     disabled?: boolean
     iconSize?: number
@@ -66,6 +66,10 @@ const variants = {
     'border-primary-700 shadow-primary-700 font-black',
 
   plain: 'bg-cream-10 border-0 text-white ' + '[--btn-accent:var(--color-primary-700)]',
+
+  ghost:
+    'bg-transparent border-0 shadow-none p-0 ' +
+    'text-current hover:opacity-70 active:opacity-50',
 }
 
 const disabledStyles = {
@@ -82,10 +86,12 @@ const disabledStyles = {
 const classes = computed(() => [
   base,
 
-  [
-    sizes[props.size ?? 'xl'],
-    props.square ? 'aspect-square px-0' : 'px-6',
-  ],
+  props.variant !== 'ghost'
+    ? [
+      sizes[props.size ?? 'xl'],
+      props.square ? 'aspect-square px-0' : 'px-6',
+    ]
+    : '',
 
   props.disabled
     ? props.variant === 'plain'

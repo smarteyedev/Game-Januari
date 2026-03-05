@@ -1,30 +1,25 @@
 <script setup lang="ts">
 import UiModal from '@/components/molecules/modal/index.vue'
-import GameIntro from '../molecules/GameIntro.vue'
-import type { FailureResultData, IntroData, SuccessResultData, SummaryData } from '@/domain/types'
-import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
-import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal'
 import { useBreakpoint } from '@/composables/useBreakpoint'
 import { computed } from 'vue'
-import FailedIcon from '../atoms/svg/FailedIcon.vue'
-import SuccessIcon from '../atoms/svg/SuccessIcon.vue'
-import GameResult from './GameResult.vue'
 import GameResultSummary from './GameResultSummary.vue'
 
 interface Props {
-    resultSummary?: SummaryData
     modelValue: boolean
     containerPosition: TContainerPosition
+    resultSummary?: any
 }
 
 interface Emits {
     (e: 'update:modelValue', value: boolean): void
     (e: 'close'): void
+    (e: 'toggle-summary'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
     containerPosition: 'fixed',
+    resultSummary: undefined,
 })
 const emit = defineEmits<Emits>()
 
@@ -63,8 +58,8 @@ const iconSizeClass = computed(() => {
         }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
 
         <!-- BODY -->
-        <div class="flex-1 overflow-y-auto px-10 pt-6 flex justify-center">
-            <GameResultSummary />
+        <div class="flex-1 overflow-y-auto flex justify-center">
+            <GameResultSummary :resultSummary="props.resultSummary" @toggle-summary="emit('toggle-summary')" />
         </div>
 
     </UiModal>

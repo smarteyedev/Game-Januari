@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { useBreakpoint } from '@/composables/useBreakpoint';
-import { UiButton } from './button';
+import { UiButton } from '@/components/atoms/button';
 import { useRouter } from 'vue-router';
 
 const { isXs, isSm } = useBreakpoint()
