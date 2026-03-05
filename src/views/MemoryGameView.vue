@@ -45,7 +45,7 @@ const gameServiceOptions = {
   offline: true,
 }
 const MAX_TIME = 180
-const { time, _isWon, _isLost, startGame, finish, retry } = useGameService(gameServiceOptions)
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -185,8 +185,8 @@ onMounted(() => {
   <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
     :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="180" :loading="loading"
     :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[2]" :isWin="_isWon"
-    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" @start="start" @retry="retryGame"
-    @cleared="handleContinue">
+    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" :successResult="successResultData"
+    :failureResult="failureResultData" @start="start" @retry="retryGame" @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer-left>
       <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">

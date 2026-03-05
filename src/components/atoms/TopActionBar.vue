@@ -9,7 +9,7 @@
     <div class="flex w-full md:w-fit gap-2.5">
 
       <UiButton v-if="isXs || isSm" :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24"
-        :square="true" icon="ri:home-5-fill" />
+        :square="true" icon="ri:home-5-fill" @click="goToHome" />
       <UiButton v-if="isChecked" :size="!isXs && !isSm ? 'md' : 'xs'" variant="primary" text="View Summary"
         class="grow w-full md:grow-0 md:w-fit" @click="$emit('toggle-summary')" />
       <UiButton v-if="(isXs || isSm) && !isChecked" :size="!isXs && !isSm ? 'md' : 'xs'" variant="secondary"
@@ -23,6 +23,7 @@
 <script setup lang="ts">
 import { useBreakpoint } from '@/composables/useBreakpoint';
 import { UiButton } from './button';
+import { useRouter } from 'vue-router';
 
 const { isXs, isSm } = useBreakpoint()
 
@@ -37,4 +38,10 @@ defineEmits<{
   (e: 'toggle-fullscreen'): void
   (e: 'toggle-summary'): void
 }>()
+
+const router = useRouter()
+
+function goToHome() {
+  router.push('/')
+}
 </script>

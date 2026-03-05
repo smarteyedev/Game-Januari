@@ -130,6 +130,11 @@ export interface FailureResultData {
   tips: string,
 }
 
+export interface GameResultResponse {
+  success: SuccessResultData
+  failure: FailureResultData
+}
+
 export interface SummaryData {
   performance: string,
   analysis: string,

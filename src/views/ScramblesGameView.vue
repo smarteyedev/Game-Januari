@@ -1,6 +1,7 @@
 <template>
   <BaseGame title="Scrambles Game" moduleTitle="Lorem Ipsum" :description="question" :time="time"
-    v-model:showIntro="showIntro" :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame">
+    v-model:showIntro="showIntro" :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame"
+    :isWin="isWin" :hasLost="isLose" :successResult="successResultData" :failureResult="failureResultData">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
         <BoxInput :value="userInput" :locked="hints" />
@@ -84,7 +85,7 @@ type Submission = {
 }
 
 const MAX_TIME = 180
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData, failureResultData } = useGameService({
   maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.scrambles,
   offline: true,

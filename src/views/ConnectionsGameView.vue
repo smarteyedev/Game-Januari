@@ -1,6 +1,7 @@
 <template>
   <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
-    v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame">
+    v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame"
+    :isWin="isWon" :hasLost="isLost" :successResult="successResult" :failureResult="failureResult">
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
         <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
@@ -111,11 +112,13 @@ const buttonSize = computed(() => {
 })
 
 const MAX_TIME = 180
-const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
+const gameService = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.connections,
   offline: true,
 })
+
+const { time, _isWon, _isLost, startGame, finish, retry } = gameService
 
 const loading = ref(true)
 const error = ref<unknown>(null)
@@ -123,6 +126,10 @@ const showIntro = ref(true)
 
 const isWon = computed(() => _isWon.value)
 const isLost = computed(() => _isLost.value)
+
+// Computed properties to unwrap refs for BaseGame props
+const successResult = computed(() => gameService.successResultData.value)
+const failureResult = computed(() => gameService.failureResultData.value)
 
 const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])

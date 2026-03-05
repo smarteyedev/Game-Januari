@@ -66,7 +66,7 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, retry } = useGameService(gameServiceOptions)
+const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -374,6 +374,9 @@ async function checkAnswers() {
     const total = totalSlots.value
     const totalScore = computeScore({ total, correct: count, timeUsed: MAX_TIME - time.value, attempts: attempts.value, maxTime: gameServiceOptions.maxTime })
     await finish(true, undefined, totalScore)
+  } else {
+    // mark as finished/lost so GameService can fetch failure result data
+    await finish(false)
   }
 }
 
@@ -408,7 +411,8 @@ onUnmounted(() => {
     :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
     :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
     :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
-    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue">
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue"
+    :successResult="successResultData" :failureResult="failureResultData">
     <!-- Sentence Board -->
 
     <div

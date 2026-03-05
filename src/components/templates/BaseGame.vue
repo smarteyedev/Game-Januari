@@ -9,6 +9,7 @@ import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 import GameResultModal from '../molecules/GameResultModal.vue'
 import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
+import { gameRepository } from '@/infrastructure'
 
 /**
  * BaseGame Component Props
@@ -38,8 +39,6 @@ interface BaseGameProps {
   showResult?: boolean
   /** Data for the intro modal */
   introData?: IntroData
-  successResult?: SuccessResultData
-  failureResult?: FailureResultData
   /** Current progress value (for progress bar) */
   currentProgress?: number
   /** Target progress value (for progress bar) */
@@ -47,6 +46,12 @@ interface BaseGameProps {
   /** Whether to show the progress bar */
   showProgress?: boolean
   showSummary?: boolean
+  /** Result summary data */
+  resultSummary?: any
+  /** Success result data provided by game service */
+  successResult?: SuccessResultData | null
+  /** Failure result data provided by game service */
+  failureResult?: FailureResultData | null
   /** Whether the game has been checked/submitted */
   isChecked?: boolean
   /** Whether the player won the game */
@@ -76,6 +81,8 @@ const props = withDefaults(defineProps<BaseGameProps>(), {
   isWin: false,
   hasLost: false,
   hideSubmit: false,
+  successResult: null,
+  failureResult: null,
 })
 
 // Local control for showing result modal when game is checked
@@ -83,6 +90,16 @@ const showResultLocal = ref<boolean>(props.showResult ?? false)
 
 watch(() => props.isChecked, (val) => {
   if (val) showResultLocal.value = true
+})
+
+// Also show result modal when game is won or lost
+watch(() => props.isWin, (val) => {
+  // Only open when we also have result data available
+  if (val && (props.successResult || props.failureResult)) showResultLocal.value = true
+})
+
+watch(() => props.hasLost, (val) => {
+  if (val && (props.successResult || props.failureResult)) showResultLocal.value = true
 })
 
 const emit = defineEmits<{
@@ -151,7 +168,26 @@ onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 
+const successResult = ref<SuccessResultData | null>(null)
+const failureResult = ref<FailureResultData | null>(null)
 
+function handleCheck() {
+  // Delegate check handling to parent/game view; game service will populate result data
+  emit('check')
+}
+
+// Initialize local result refs from incoming props and update on changes
+watch(() => props.successResult, (val) => {
+  successResult.value = val ?? null
+  if (successResult.value) showResultLocal.value = true
+  console.debug('BaseGame: successResult prop changed', { value: successResult.value })
+})
+
+watch(() => props.failureResult, (val) => {
+  failureResult.value = val ?? null
+  if (failureResult.value) showResultLocal.value = true
+  console.debug('BaseGame: failureResult prop changed', { value: failureResult.value })
+})
 
 </script>
 
@@ -180,7 +216,7 @@ onUnmounted(() => {
           @retry="handleRetry" containerPosition="relative" />
 
         <GameResultSummaryModal v-else-if="props.showSummary" :resultSummary="props.resultSummary"
-          v-model:modelValue="props.showSummary" containerPosition="relative" @ />
+          v-model:modelValue="props.showSummary" containerPosition="relative" />
 
         <!-- Game Content -->
         <div v-else
@@ -193,7 +229,7 @@ onUnmounted(() => {
 
           <slot name="footer">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="emit('check')"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck()"
               @retry="emit('retry')" @cleared="emit('cleared')">
               <template #footer-left>
                 <slot name="footer-left" />

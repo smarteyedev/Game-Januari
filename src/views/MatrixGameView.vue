@@ -1,6 +1,7 @@
 <template>
   <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
-    v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame">
+    v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame"
+    :successResult="successResultData" :failureResult="failureResultData">
     <div class="flex flex-col w-full">
       <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
         <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
@@ -55,7 +56,7 @@ const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
 const attempts = ref(0)
 const MAX_TIME = 180
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData, failureResultData } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.matrix,
   offline: true,

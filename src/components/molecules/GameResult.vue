@@ -1,15 +1,15 @@
 <template>
-    <div class="flex flex-col">
+    <div class="flex flex-col gap-4 text-primary-700 text-body-xs md:text-body-md">
         <div>
-            <span>{{ success ? successResult?.description : failureResult?.description }}</span>
+            <span class="font-extrabold ">{{ success ? successResult?.description : failureResult?.description }}</span>
         </div>
         <div>
-            <span>{{ success ? 'Kekuatan Anda' : 'Kegagalan Anda' }}</span>
-            <p>{{ success ? successResult?.power : failureResult?.failure }}</p>
+            <span class="font-extrabold ">{{ success ? 'Kekuatan Anda' : 'Kegagalan Anda' }}</span>
+            <p class="font-semibold">{{ success ? successResult?.power : failureResult?.failure }}</p>
         </div>
         <div>
-            <span>{{ success ? 'Kegagalan Anda' : 'Tips' }}</span>
-            <p>{{ success ? successResult?.improvement : failureResult?.tips }}</p>
+            <span class="font-extrabold ">{{ success ? 'Kegagalan Anda' : 'Tips' }}</span>
+            <p class="font-semibold">{{ success ? successResult?.improvement : failureResult?.tips }}</p>
         </div>
     </div>
 </template>

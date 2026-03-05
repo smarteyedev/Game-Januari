@@ -12,6 +12,7 @@ import {
   type LevelDataArrayResponse,
   type LevelDataRootArrayResponse,
   type LevelDataKeyedResponse,
+  type GameResultResponse,
 } from '@/domain/types'
 import { httpClient } from '../api/ApiClient'
 import { API_ENDPOINTS } from '@/utils/constants'
@@ -48,6 +49,14 @@ export class GameRepository implements IGameRepository {
 
   async getGameSession(sessionId: string, authToken: string): Promise<GameSession> {
     const response = await httpClient.get<GameSession>(`/api/v1/hpl/session/${sessionId}`, {
+      headers: { Authorization: `Bearer ${authToken}` },
+    })
+
+    return response.data
+  }
+
+  async getGameResult(sessionId: string, authToken: string): Promise<GameResultResponse> {
+    const response = await httpClient.get<GameResultResponse>(`/api/v1/hpl/session/${sessionId}/result`, {
       headers: { Authorization: `Bearer ${authToken}` },
     })
 

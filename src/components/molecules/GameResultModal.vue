@@ -14,7 +14,7 @@ import GameResult from './GameResult.vue'
 interface Props {
     success: boolean
     successResult?: SuccessResultData
-    failedResult?: FailureResultData
+    failureResult?: FailureResultData
     modelValue: boolean
     containerPosition: TContainerPosition
 }
@@ -56,10 +56,10 @@ const buttonSize = computed(() => {
 })
 
 const iconSizeClass = computed(() => {
-    if (isXs.value) return 'w-16 h-16'
-    if (isSm.value) return 'w-20 h-20'
-    if (isMd.value) return 'w-24 h-24'
-    return 'w-31 h-33.25'
+    if (isXs.value) return 'w-15 h-15'
+    if (isSm.value) return 'w-18.5 h-18.5'
+    if (isMd.value) return 'w-21 h-21'
+    return 'w-24.5 h-24.5'
 })
 </script>
 
@@ -76,12 +76,13 @@ const iconSizeClass = computed(() => {
         }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
         <!-- HEADER ICON -->
         <template #header-title>
-            <div class="flex fle-col justify-center items-center w-full">
-                <div :class="iconSizeClass">
-                    <SuccessIcon v-if="success" />
-                    <FailedIcon v-else />
-                </div>
-                <p>{{ success ? 'SUCCESSFUL' : 'FAILED' }}</p>
+            <div class="flex flex-col justify-center items-center w-full gap-0">
+                <SuccessIcon :class="iconSizeClass" v-if="success" />
+                <FailedIcon :class="iconSizeClass" v-else />
+
+                <p class="text-body-lg font-extrabold text-primary-700 md:text-h3">{{ success ? 'SUCCESSFUL' :
+                    'FAILED'
+                }}</p>
             </div>
         </template>
 
@@ -90,8 +91,8 @@ const iconSizeClass = computed(() => {
         </template>
 
         <!-- BODY -->
-        <div class="flex-1 overflow-y-auto px-10 pt-6 flex justify-center">
-            <GameResult :success="success" :successResult="successResult" :failedResult="failedResult" />
+        <div class="flex-1 overflow-y-auto px-10 flex justify-center">
+            <GameResult :success="success" :successResult="successResult" :failureResult="failureResult" />
         </div>
 
         <!-- FOOTER -->

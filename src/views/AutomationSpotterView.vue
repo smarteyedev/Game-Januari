@@ -47,7 +47,7 @@ const gameServiceOptions = {
 }
 
 const MAX_TIME = 180
-const { time, _isWon, startGame, finish, retry } = useGameService(gameServiceOptions)
+const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
@@ -175,7 +175,7 @@ onUnmounted(() => {
     :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
     :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
     :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
-    @cleared="handleContinue">
+    @cleared="handleContinue" :successResult="successResultData" :failureResult="failureResultData">
     <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
       @moved="onMoved" />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />

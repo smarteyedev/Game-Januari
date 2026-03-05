@@ -6,12 +6,13 @@
 import { ref, computed } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { Game } from '@/domain/entities/Game'
-import { GameState, type MinigameId, type GameResult } from '@/domain/types'
+import { GameState, type MinigameId, type GameResult, type GameResultResponse, type SuccessResultData, type FailureResultData } from '@/domain/types'
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
 import { getFeedback } from './ScoringService'
 import { logger } from '@/infrastructure/logging'
+import dummyResultData from '@/assets/gameData/dummyResult.json'
 
 // ============================================================================
 // Types
@@ -59,6 +60,10 @@ export type GameServiceReturn = {
 
   // Session store
   session: ReturnType<typeof useSessionStore>
+
+  // Result data for modal
+  successResultData: Ref<SuccessResultData | undefined>
+  failureResultData: Ref<FailureResultData | undefined>
 }
 
 // ============================================================================
@@ -117,9 +122,47 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   const _canSubmit = computed(() => _isPlaying.value || _isFinished.value)
   const _didWin = ref(false)
 
+  // Result data for modal
+  const successResultData = ref<SuccessResultData | undefined>(undefined)
+  const failureResultData = ref<FailureResultData | undefined>(undefined)
+
   // ==========================================================================
   // Private Methods
   // ==========================================================================
+
+  /**
+   * Fetch game result data from API or use offline dummy data
+   */
+  async function fetchGameResultData(won: boolean): Promise<{ success?: SuccessResultData; failure?: FailureResultData }> {
+    const session = sessionRepository.getCurrentSession()
+    
+    if (offline || !session || !game.value.sessionId) {
+      // Use offline dummy data
+      logger.info('Using offline dummy result data', { won })
+      const dummyData = dummyResultData as GameResultResponse
+      return won 
+        ? { success: dummyData.success }
+        : { failure: dummyData.failure }
+    }
+
+    try {
+      // Fetch from API
+      const resultData = await gameRepository.getGameResult(
+        game.value.sessionId,
+        session.accessToken,
+      )
+      logger.info('Fetched game result data from API', { won, sessionId: game.value.sessionId })
+      return won 
+        ? { success: resultData.success }
+        : { failure: resultData.failure }
+    } catch (err) {
+      logger.error('Failed to fetch game result from API, using offline data', err)
+      const dummyData = dummyResultData as GameResultResponse
+      return won 
+        ? { success: dummyData.success }
+        : { failure: dummyData.failure }
+    }
+  }
 
   /**
    * Handle game over - win or lose
@@ -138,6 +181,16 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     // Auto submit if enabled
     if (autoSubmit) {
       await submitScore(resolvedScore, game.value.answers)
+    }
+
+    // Fetch result data from API or use offline dummy data
+    const resultData = await fetchGameResultData(won)
+    if (resultData.success) {
+      successResultData.value = resultData.success
+    }
+    if (resultData.failure) {
+      failureResultData.value = resultData.failure
+      logger.debug('useGameService: set failureResultData', { minigameId, failure: resultData.failure })
     }
 
     game.value.finish(won, resolvedScore, finalAnswers)
@@ -304,6 +357,10 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
     // Session
     session,
+
+    // Result data for modal
+    successResultData,
+    failureResultData,
   }
 }
 
