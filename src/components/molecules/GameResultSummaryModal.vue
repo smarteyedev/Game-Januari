@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import UiModal from '@/components/molecules/modal/index.vue'
 import GameIntro from '../molecules/GameIntro.vue'
-import type { FailureResultData, IntroData, SuccessResultData } from '@/domain/types'
+import type { FailureResultData, IntroData, SuccessResultData, SummaryData } from '@/domain/types'
 import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal'
@@ -10,11 +10,10 @@ import { computed } from 'vue'
 import FailedIcon from '../atoms/svg/FailedIcon.vue'
 import SuccessIcon from '../atoms/svg/SuccessIcon.vue'
 import GameResult from './GameResult.vue'
+import GameResultSummary from './GameResultSummary.vue'
 
 interface Props {
-    success: boolean
-    successResult?: SuccessResultData
-    failedResult?: FailureResultData
+    resultSummary?: SummaryData
     modelValue: boolean
     containerPosition: TContainerPosition
 }
@@ -22,8 +21,6 @@ interface Props {
 interface Emits {
     (e: 'update:modelValue', value: boolean): void
     (e: 'close'): void
-    (e: 'continue'): void
-    (e: 'retry'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,16 +31,6 @@ const emit = defineEmits<Emits>()
 const onClose = () => {
     emit('update:modelValue', false)
     emit('close')
-}
-
-const onContinue = () => {
-    emit('continue')
-    emit('update:modelValue', false)
-}
-
-const onRetry = () => {
-    emit('retry')
-    emit('update:modelValue', false)
 }
 
 const { isXs, isSm, isMd } = useBreakpoint()
@@ -74,32 +61,11 @@ const iconSizeClass = computed(() => {
             display: 'flex',
             flexDirection: 'column',
         }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
-        <!-- HEADER ICON -->
-        <template #header-title>
-            <div class="flex fle-col justify-center items-center w-full">
-                <div :class="iconSizeClass">
-                    <SuccessIcon v-if="success" />
-                    <FailedIcon v-else />
-                </div>
-                <p>{{ success ? 'SUCCESSFUL' : 'FAILED' }}</p>
-            </div>
-        </template>
-
-        <template #close-btn>
-            <span class="hidden" />
-        </template>
 
         <!-- BODY -->
         <div class="flex-1 overflow-y-auto px-10 pt-6 flex justify-center">
-            <GameResult :success="success" :successResult="successResult" :failedResult="failedResult" />
+            <GameResultSummary />
         </div>
 
-        <!-- FOOTER -->
-        <template #footer>
-            <div class="flex justify-center shrink-0">
-                <UiButton v-if="success" text="Continue" variant="primary" :size="buttonSize" @click="onContinue" />
-                <UiButton v-else text="Retry" variant="danger" :size="buttonSize" @click="onRetry" />
-            </div>
-        </template>
     </UiModal>
 </template>

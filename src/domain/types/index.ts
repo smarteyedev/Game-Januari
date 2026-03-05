@@ -111,6 +111,31 @@ export interface ApiError {
 // ============================================================================
 // GAME SPECIFIC TYPES
 // ============================================================================
+export interface SummaryData {
+  performance: string,
+  analysis: string,
+  insight: string,
+  recomendation: string
+}
+
+export interface SuccessResultData {
+  description: string,
+  power: string,
+  improvement: string,
+}
+
+export interface FailureResultData {
+  description: string,
+  failure: string,
+  tips: string,
+}
+
+export interface SummaryData {
+  performance: string,
+  analysis: string,
+  insight: string,
+  recomendation: string
+}
 
 export interface Keypoint {
   icon_name?: string

@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, type Slot } from 'vue'
+import { onMounted, onUnmounted, ref, watch, type Slot } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
-import type { IntroData } from '@/domain/types'
+import type { FailureResultData, IntroData, SuccessResultData } from '@/domain/types'
 import TopActionBar from '../atoms/TopActionBar.vue'
 import Background from '@/assets/img/bg.jpg'
 import GameResultModal from '../molecules/GameResultModal.vue'
+import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
 
 /**
  * BaseGame Component Props
@@ -37,12 +38,15 @@ interface BaseGameProps {
   showResult?: boolean
   /** Data for the intro modal */
   introData?: IntroData
+  successResult?: SuccessResultData
+  failureResult?: FailureResultData
   /** Current progress value (for progress bar) */
   currentProgress?: number
   /** Target progress value (for progress bar) */
   targetProgress?: number
   /** Whether to show the progress bar */
   showProgress?: boolean
+  showSummary?: boolean
   /** Whether the game has been checked/submitted */
   isChecked?: boolean
   /** Whether the player won the game */
@@ -74,6 +78,13 @@ const props = withDefaults(defineProps<BaseGameProps>(), {
   hideSubmit: false,
 })
 
+// Local control for showing result modal when game is checked
+const showResultLocal = ref<boolean>(props.showResult ?? false)
+
+watch(() => props.isChecked, (val) => {
+  if (val) showResultLocal.value = true
+})
+
 const emit = defineEmits<{
   /** Emit when check/submit button is clicked */
   (e: 'check'): void
@@ -94,6 +105,16 @@ const emit = defineEmits<{
 function handleStart() {
   emit('update:showIntro', false)
   emit('start')
+}
+
+function handleRetry() {
+  showResultLocal.value = false
+  emit('retry')
+}
+
+function handleCleared() {
+  showResultLocal.value = false
+  emit('cleared')
 }
 
 const gameWrapper = ref<HTMLElement | null>(null)
@@ -154,9 +175,12 @@ onUnmounted(() => {
           @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
           @start="handleStart" containerPosition="relative" />
 
-        <GameResultModal v-if="showResult" :modelValue="showResult"
-          @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
-          @start="handleStart" containerPosition="relative" />
+        <GameResultModal v-else-if="showResultLocal" :success="isWin" :successResult="successResult"
+          :failureResult="failureResult" v-model:modelValue="showResultLocal" @continue="handleCleared"
+          @retry="handleRetry" containerPosition="relative" />
+
+        <GameResultSummaryModal v-else-if="props.showSummary" :resultSummary="props.resultSummary"
+          v-model:modelValue="props.showSummary" containerPosition="relative" @ />
 
         <!-- Game Content -->
         <div v-else
