@@ -219,8 +219,8 @@ watch(() => props.failureResult, (val) => {
     }">
       <!-- Topbar (always visible) -->
       <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen"
-        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress"
-        :isChecked="isChecked" />
+        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress" :isChecked="isChecked"
+        :isShown="showSummaryLocal" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
