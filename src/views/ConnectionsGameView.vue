@@ -1,7 +1,8 @@
 <template>
   <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isWin="isWon" :hasLost="isLost" :successResult="successResult" :failureResult="failureResult">
+    :isWin="isWon" :hasLost="isLost" :isChecked="isChecked" :successResult="successResult"
+    :failureResult="failureResult">
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
         <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
@@ -19,7 +20,7 @@
 
     <!-- Control Buttons -->
 
-    <template #footer>
+    <template #footer="{ onCleared, onCheck, onRetry }">
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
@@ -36,10 +37,12 @@
           </UiButton>
 
           <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton :size="buttonSize" text="Restart" variant="danger" v-if="isLost" @click="restartGame"
-            :color="'error'">
+          <UiButton :size="buttonSize" text="Restart" variant="danger" v-if="isLost"
+            @click="() => { restartGame(); onCleared && onCleared(); }" :color="'error'">
           </UiButton>
-          <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"> </UiButton>
+          <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"
+            @click="() => onCleared && onCleared()">
+          </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
@@ -135,6 +138,8 @@ const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])
 const items = ref<Item[]>([])
 const selected = ref<Item[]>([])
+
+const isChecked = ref(false)
 const categoryLabelMap = ref<Record<string, string>>({})
 const solvedGroups = ref<SolvedGroup[]>([])
 const maxAttempts = 4
@@ -154,13 +159,23 @@ function countAway(items: Item[]) {
   return 4 - maxSame
 }
 
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
 function colorFromCategory(id: string) {
   let hash = 0
   for (let i = 0; i < id.length; i++) {
     hash = id.charCodeAt(i) + ((hash << 5) - hash)
   }
+
   return COLOR_POOL[Math.abs(hash) % COLOR_POOL.length]!
 }
+
+function handleContinue() {
+  emit('cleared')
+}
+
 
 function assignCategoryColors(categories: { id: string }[]) {
   categories.forEach((cat) => {
@@ -174,6 +189,7 @@ async function initializeGame() {
   error.value = null
 
   try {
+    isChecked.value = false
     await startGame()
 
     const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
@@ -251,6 +267,7 @@ async function submitSelection() {
       const correct = solvedGroups.value.length
       const attemptsUsed = maxAttempts - attemptsLeft.value + 1
       const totalScore = computeScore({ total, correct, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      isChecked.value = true
       await finish(false, undefined, totalScore)
     }
 

@@ -1,7 +1,8 @@
 <template>
   <BaseGame title="Scrambles Game" moduleTitle="Lorem Ipsum" :description="question" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isWin="isWin" :hasLost="isLose" :successResult="successResultData" :failureResult="failureResultData">
+    :isWin="isWin" :hasLost="isLose" :isChecked="isChecked" :successResult="successResultData"
+    :failureResult="failureResultData">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
         <BoxInput :value="userInput" :locked="hints" />
@@ -33,17 +34,18 @@
       </div>
     </div>
 
-    <template #footer>
+    <template #footer="{ onCleared, onCheck, onRetry }">
       <div v-if="!isXs" class="flex gap-2.5">
         <UiButton :size="buttonSize" text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
         </UiButton>
         <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
         </UiButton>
 
-        <UiButton :size="buttonSize" text="Restart" v-if="isLose" variant="danger" @click="restartGame">
+        <UiButton :size="buttonSize" text="Restart" v-if="isLose" variant="danger"
+          @click="() => { restartGame(); onCleared && onCleared(); }">
         </UiButton>
 
-        <UiButton :size="buttonSize" text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+        <UiButton :size="buttonSize" text="Continue" v-if="isWin" @click="() => onCleared && onCleared()"> </UiButton>
       </div>
       <div v-else class="flex flex-col gap-2.5 w-full justify-center items-center">
         <div class="flex gap-2.5 w-full justify-center items-center">
@@ -55,10 +57,11 @@
         </div>
         <div class="flex w-full justify-center items-center">
           <UiButton class="w-full" :size="buttonSize" text="Restart" v-if="isLose" variant="danger"
-            @click="restartGame">
+            @click="() => { restartGame(); onCleared && onCleared(); }">
           </UiButton>
 
-          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin" @click="continueGame"> </UiButton>
+          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin"
+            @click="() => onCleared && onCleared()"> </UiButton>
         </div>
       </div>
     </template>
@@ -99,6 +102,7 @@ const isPlaying = computed(() => _isPlaying.value)
 const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
+const isChecked = ref(false)
 
 const MAX_ATTEMPTS = 4
 const JUNK_LETTERS = 3 // increase to make it evil
@@ -136,6 +140,7 @@ async function initializeGame() {
     hints.value = Array(answer.value.length).fill(null)
     userInput.value = Array(answer.value.length).fill(null)
 
+    isChecked.value = false
     await startGame()
   } catch (err) {
     error.value = err
@@ -223,6 +228,7 @@ async function submitAnswer() {
   if (correct) {
     const attemptsUsed = MAX_ATTEMPTS - attempts.value + 1
     const totalScore = computeScore({ total: 1, correct: isWin ? 1 : 0, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: MAX_TIME })
+    isChecked.value = true
     await finish(true, undefined, totalScore)
     return
   }
@@ -235,6 +241,7 @@ async function submitAnswer() {
     userInput.value = Array(answer.value.length).fill(null)
     submissions.value.push({ value: answer.value, correct: true })
     const totalScore = computeScore({ total: 1, correct: 0, attempts: MAX_ATTEMPTS - attempts.value + 1, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    isChecked.value = true
     await finish(false, undefined, totalScore)
   }
 
@@ -277,10 +284,19 @@ async function restartGame() {
   submissions.value = []
   hints.value = Array(answer.value.length).fill(null)
   userInput.value = Array(answer.value.length).fill(null)
+  isChecked.value = false
   await retry()
 }
 
 function continueGame() {
-  restartGame()
+  handleContinue()
+}
+
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
+function handleContinue() {
+  emit('cleared')
 }
 </script>

@@ -247,10 +247,10 @@ watch(() => props.failureResult, (val) => {
 
           <slot />
 
-          <slot name="footer">
+          <slot name="footer" :onCheck="handleCheck" :onRetry="handleRetry" :onCleared="handleCleared">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck()"
-              @retry="emit('retry')" @cleared="emit('cleared')">
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
+              @retry="handleRetry" @cleared="handleCleared">
               <template #footer-left>
                 <slot name="footer-left" />
               </template>

@@ -1,7 +1,7 @@
 <template>
   <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame"
-    :successResult="successResultData" :failureResult="failureResultData">
+    :isChecked="isChecked" :successResult="successResultData" :failureResult="failureResultData">
     <div class="flex flex-col w-full">
       <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
         <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
@@ -9,13 +9,14 @@
       </div>
     </div>
 
-    <template #footer>
+    <template #footer="{ onCleared, onCheck, onRetry }">
       <div v-if="!isXs" class="flex flex-wrap items-center justify-center gap-4">
         <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-        <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" v-if="isLose" :disabled="!isLose">
+        <UiButton :size="buttonSize" @click="() => { restart(); onCleared && onCleared(); }" text="Restart"
+          variant="danger" v-if="isLose" :disabled="!isLose">
         </UiButton>
-        <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" v-if="isWin"
-          :disabled="!isWin">
+        <UiButton :size="buttonSize" @click="() => onCleared && onCleared()" text="Continue" color="success"
+          v-if="isWin" :disabled="!isWin">
         </UiButton>
       </div>
       <div v-else class="flex flex-col items-center justify-center gap-4 w-full">
@@ -23,11 +24,11 @@
           <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying" class="w-full"></UiButton>
         </div>
         <div class="flex gap-2.5 items-center justify-center w-full">
-          <UiButton :size="buttonSize" @click="restart" text="Restart" variant="danger" class="w-full"
-            :disabled="!isLose">
+          <UiButton :size="buttonSize" @click="() => { restart(); onCleared && onCleared(); }" text="Restart"
+            variant="danger" class="w-full" :disabled="!isLose">
           </UiButton>
-          <UiButton :size="buttonSize" @click="continueQuiz" text="Continue" color="success" class="w-full"
-            :disabled="!isWin">
+          <UiButton :size="buttonSize" @click="() => onCleared && onCleared()" text="Continue" color="success"
+            class="w-full" :disabled="!isWin">
           </UiButton>
         </div>
       </div>
@@ -65,6 +66,7 @@ const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResu
 const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
+const isChecked = ref(false)
 
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
@@ -91,6 +93,7 @@ async function initializeGame() {
         answers.value[q.id] = undefined
       })
     }
+    isChecked.value = false
     await startGame()
   } catch (err) {
     error.value = err
@@ -156,6 +159,8 @@ const submit = async () => {
 
   score.value = totalScore
 
+  isChecked.value = true
+
   await finish(
     won,
     survey.value.questions.map((q) => ({
@@ -173,10 +178,19 @@ const restart = async () => {
   })
   score.value = null
   attempts.value += 1
+  isChecked.value = false
   await retry()
 }
 
 const continueQuiz = () => {
-  alert('Continue to next step')
+  handleContinue()
+}
+
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
+function handleContinue() {
+  emit('cleared')
 }
 </script>
