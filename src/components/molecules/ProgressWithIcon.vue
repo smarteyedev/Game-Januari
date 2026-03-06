@@ -14,7 +14,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
 <template>
   <div class="flex flex-col gap-1.5">
     <p class="text-body-xs font-bold text-primary-700">
-      You got {{ current }} out of {{ target }} points
+      You got {{ current }} out of {{ target }} correct
     </p>
 
     <div class="flex items-center gap-2">

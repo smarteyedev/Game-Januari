@@ -12,12 +12,14 @@ defineProps<{
   isWin?: boolean
   hasLost?: boolean
   hideSubmit?: boolean
+  showResult?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'check'): void
   (e: 'retry'): void
   (e: 'cleared'): void
+  (e: 'open-result'): void
 }>()
 
 const { isXs, isSm, isMd } = useBreakpoint()
@@ -51,11 +53,10 @@ const buttonSize = computed(() => {
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4">
       <slot name="footer-right">
-        <UiButton :size="buttonSize" v-if="hasLost" text="Retry" variant="danger" @click="emit('retry')">
+        <!-- CONTINUE / VIEW RESULT -->
+        <UiButton v-if="isChecked" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
         </UiButton>
-
-        <!-- CONTINUE -->
-        <UiButton v-if="isXs || isSm" :size="buttonSize" text="Continue" variant="primary" @click="emit('check')">
+        <UiButton v-else-if="isXs || isSm" :size="buttonSize" text="Continue" variant="primary" @click="emit('check')">
         </UiButton>
       </slot>
     </div>

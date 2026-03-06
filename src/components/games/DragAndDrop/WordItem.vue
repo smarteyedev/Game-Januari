@@ -26,6 +26,10 @@ const emit = defineEmits<{
 const customClass = computed(() => {
   const classes: string[] = []
 
+  if (!disabled) {
+    classes.push('cursor-grab')
+  }
+
   if (inSlot) {
     classes.push('bg-transparent p-0 m-0 rounded-none border-0 min-w-0')
   } else {

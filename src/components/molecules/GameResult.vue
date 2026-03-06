@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col gap-4 text-primary-700 text-body-xs md:text-body-md">
+    <div class="flex flex-col gap-4 text-primary-700 text-body-xs md:text-h4">
         <div>
             <span class="font-extrabold ">{{ success ? successResult?.description : failureResult?.description }}</span>
         </div>

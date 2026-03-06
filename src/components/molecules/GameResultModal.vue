@@ -71,18 +71,18 @@ const iconSizeClass = computed(() => {
             borderRadius: '40px',
             background: '#FFFCF6',
             maxHeight: '85vh',
+            gap: '20px',
             display: 'flex',
             flexDirection: 'column',
         }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
         <!-- HEADER ICON -->
         <template #header-title>
-            <div class="flex flex-col justify-center items-center w-full gap-0">
+            <div class="flex flex-col justify-center items-center w-full gap-2">
                 <SuccessIcon :class="iconSizeClass" v-if="success" />
                 <FailedIcon :class="iconSizeClass" v-else />
-
-                <p class="text-body-lg font-extrabold text-primary-700 md:text-h3">{{ success ? 'SUCCESSFUL' :
+                <p class="text-body-lg font-extrabold text-primary-700 md:text-h2">{{ success ? 'SUCCESSFUL' :
                     'FAILED'
-                }}</p>
+                    }}</p>
             </div>
         </template>
 
@@ -91,7 +91,7 @@ const iconSizeClass = computed(() => {
         </template>
 
         <!-- BODY -->
-        <div class="flex-1 overflow-y-auto px-10 flex justify-center">
+        <div class="flex-1 overflow-y-auto flex justify-center">
             <GameResult :success="success" :successResult="successResult" :failureResult="failureResult" />
         </div>
 

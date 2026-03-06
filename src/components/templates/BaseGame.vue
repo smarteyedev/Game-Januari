@@ -87,18 +87,43 @@ const props = withDefaults(defineProps<BaseGameProps>(), {
 // Local control for showing result modal when game is checked
 const showResultLocal = ref<boolean>(props.showResult ?? false)
 
+// when progress bar is displayed, we want to wait a moment so the animation
+// can finish before showing the result popup.  Otherwise the dialog opens
+// immediately which looks jarring.  Use a small constant that a bit longer than the
+// CSS transition duration used by the progress component (≈300ms).
+const RESULT_MODAL_DELAY = 1000
+
+// hold reference to an active timeout so repeated calls don't stack delays
+let resultTimer: number | undefined
+
+function openResultModal(useDelay = true) {
+  if (resultTimer) {
+    clearTimeout(resultTimer)
+    resultTimer = undefined
+  }
+
+  if (useDelay && props.showProgress) {
+    resultTimer = window.setTimeout(() => {
+      showResultLocal.value = true
+      resultTimer = undefined
+    }, RESULT_MODAL_DELAY)
+  } else {
+    showResultLocal.value = true
+  }
+}
+
 watch(() => props.isChecked, (val) => {
-  if (val) showResultLocal.value = true
+  if (val) openResultModal(true) // delay
 })
 
 // Also show result modal when game is won or lost
 watch(() => props.isWin, (val) => {
   // Only open when we also have result data available
-  if (val && (props.successResult || props.failureResult)) showResultLocal.value = true
+  if (val && (props.successResult || props.failureResult)) openResultModal()
 })
 
 watch(() => props.hasLost, (val) => {
-  if (val && (props.successResult || props.failureResult)) showResultLocal.value = true
+  if (val && (props.successResult || props.failureResult)) openResultModal()
 })
 
 const emit = defineEmits<{
@@ -174,18 +199,33 @@ const failureResult = ref<FailureResultData | undefined>()
 const showSummaryLocal = ref(false)
 const summaryData = ref<SuccessResultData | FailureResultData | undefined>()
 
+function handleOpenResult() {
+  // ensure latest result data is synced
+  successResult.value = props.successResult ?? undefined
+  failureResult.value = props.failureResult ?? undefined
+
+  openResultModal(false)
+}
+
 function handleViewSummary() {
   // prefer success result if available
   summaryData.value = successResult.value ?? failureResult.value
-  // close result modal then open summary modal
-  showResultLocal.value = !showResultLocal.value
-  showSummaryLocal.value = !showSummaryLocal.value
+
+  // If summary is currently shown, close both modals to go back to game content
+  if (showSummaryLocal.value) {
+    showSummaryLocal.value = false
+    showResultLocal.value = false
+  } else {
+    // Otherwise, close result modal and open summary modal
+    showResultLocal.value = false
+    showSummaryLocal.value = true
+  }
 }
 
-// when the summary modal closes, reopen the result modal if result data exists
+// when the summary modal closes, go back to game content (don't reopen result modal)
 watch(showSummaryLocal, (val) => {
-  if (!val && (successResult.value || failureResult.value)) {
-    showResultLocal.value = true
+  if (!val) {
+    showResultLocal.value = false
   }
 })
 
@@ -197,13 +237,13 @@ function handleCheck() {
 // Initialize local result refs from incoming props and update on changes
 watch(() => props.successResult, (val) => {
   successResult.value = val ?? undefined
-  if (successResult.value) showResultLocal.value = true
+  if (successResult.value) openResultModal()
   console.debug('BaseGame: successResult prop changed', { value: successResult.value })
 })
 
 watch(() => props.failureResult, (val) => {
   failureResult.value = val ?? undefined
-  if (failureResult.value) showResultLocal.value = true
+  if (failureResult.value) openResultModal()
   console.debug('BaseGame: failureResult prop changed', { value: failureResult.value })
 })
 
@@ -250,7 +290,7 @@ watch(() => props.failureResult, (val) => {
           <slot name="footer" :onCheck="handleCheck" :onRetry="handleRetry" :onCleared="handleCleared">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
               :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
-              @retry="handleRetry" @cleared="handleCleared">
+              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult()">
               <template #footer-left>
                 <slot name="footer-left" />
               </template>
