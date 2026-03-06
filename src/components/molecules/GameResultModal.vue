@@ -24,6 +24,7 @@ interface Emits {
     (e: 'close'): void
     (e: 'continue'): void
     (e: 'retry'): void
+    (e: 'cleared'): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,7 +38,7 @@ const onClose = () => {
 }
 
 const onContinue = () => {
-    emit('continue')
+    emit('cleared')
     emit('update:modelValue', false)
 }
 
@@ -82,7 +83,7 @@ const iconSizeClass = computed(() => {
                 <FailedIcon :class="iconSizeClass" v-else />
                 <p class="text-body-lg font-extrabold text-primary-700 md:text-h2">{{ success ? 'SUCCESSFUL' :
                     'FAILED'
-                    }}</p>
+                }}</p>
             </div>
         </template>
 

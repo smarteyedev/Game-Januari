@@ -2,7 +2,7 @@
   <BaseGame title="Scrambles Game" moduleTitle="Lorem Ipsum" :description="question" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame"
     :isWin="isWin" :hasLost="isLose" :isChecked="isChecked" :successResult="successResultData"
-    :failureResult="failureResultData">
+    :failureResult="failureResultData" @retry="handleRetry" @cleared="handleContinue">
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
         <BoxInput :value="userInput" :locked="hints" />
@@ -34,18 +34,16 @@
       </div>
     </div>
 
-    <template #footer="{ onCleared, onCheck, onRetry }">
+    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
       <div v-if="!isXs" class="flex gap-2.5">
         <UiButton :size="buttonSize" text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
         </UiButton>
         <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
         </UiButton>
 
-        <UiButton :size="buttonSize" text="Restart" v-if="isLose" variant="danger"
-          @click="() => { restartGame(); onCleared && onCleared(); }">
+        <UiButton :size="buttonSize" text="Continue" v-if="isWin || isLose"
+          @click="() => onOpenResult && onOpenResult()">
         </UiButton>
-
-        <UiButton :size="buttonSize" text="Continue" v-if="isWin" @click="() => onCleared && onCleared()"> </UiButton>
       </div>
       <div v-else class="flex flex-col gap-2.5 w-full justify-center items-center">
         <div class="flex gap-2.5 w-full justify-center items-center">
@@ -56,12 +54,8 @@
           </UiButton>
         </div>
         <div class="flex w-full justify-center items-center">
-          <UiButton class="w-full" :size="buttonSize" text="Restart" v-if="isLose" variant="danger"
-            @click="() => { restartGame(); onCleared && onCleared(); }">
-          </UiButton>
-
-          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin"
-            @click="() => onCleared && onCleared()"> </UiButton>
+          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin || isLose"
+            @click="() => onOpenResult && onOpenResult()"> </UiButton>
         </div>
       </div>
     </template>
@@ -298,5 +292,10 @@ const emit = defineEmits<{
 
 function handleContinue() {
   emit('cleared')
+}
+
+// Handle retry from result modal
+function handleRetry() {
+  restartGame()
 }
 </script>

@@ -1,13 +1,26 @@
 {
   "success": {
-    "description": "Selamat! Anda telah menyelesaikan semua tantangan dengan sangat baik.",
-    "power": "Kemampuan analisis dan pemecahan masalah Anda sangat kuat. Anda dapat mengidentifikasi pola dengan cepat dan tepat.",
-    "improvement": "Untuk meningkatkan performa, coba kurangi waktu berpikir pada setiap pertanyaan. Latih kecepatan berpikir Anda dengan lebih banyak latihan."
+    "reviewpoint": [
+      {
+        "point": "Analisis Kebutuhan Otomatisasi",
+        "review": "Anda menunjukkan pemahaman yang sangat baik dalam mengidentifikasi proses yang dapat diotomatisasi."
+      },
+      {
+        "point": "Efisiensi Workflow",
+        "review": "Kemampuan Anda dalam mengoptimalkan alur kerja sangat impresif."
+      }
+    ]
   },
   "failure": {
-    "description": "Jangan berkecil hati! Setiap kegagalan adalah kesempatan untuk belajar dan berkembang.",
-    "failure": "Waktu Anda habis sebelum menyelesaikan semua tantangan. Hal ini menunjukkan perlu adanya peningkatan dalam kecepatan berpikir dan pengambilan keputusan.",
-    "tips": "Fokus pada latihan speed thinking. Cobapecahkan masalah sederhana dengan waktu terbatas untuk melatih kecepatan berpikir Anda."
+    "reviewpoint": [
+      {
+        "point": "Analisis Kebutuhan Otomatisasi",
+        "review": "Anda perlu lebih baik dalam mengidentifikasi proses yang dapat diotomatisasi."
+      },
+      {
+        "point": "Efisiensi Workflow",
+        "review": "Coba lagi untuk mengoptimalkan alur kerja Anda."
+      }
+    ]
   }
 }
-

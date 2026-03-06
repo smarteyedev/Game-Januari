@@ -1,7 +1,8 @@
 <template>
   <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isChecked="isChecked" :successResult="successResultData" :failureResult="failureResultData">
+    :isChecked="isChecked" :successResult="successResultData" :failureResult="failureResultData" @retry="handleRetry"
+    @cleared="handleContinue">
     <div class="flex flex-col w-full">
       <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
         <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
@@ -9,14 +10,11 @@
       </div>
     </div>
 
-    <template #footer="{ onCleared, onCheck, onRetry }">
+    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
       <div v-if="!isXs" class="flex flex-wrap items-center justify-center gap-4">
         <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
-        <UiButton :size="buttonSize" @click="() => { restart(); onCleared && onCleared(); }" text="Restart"
-          variant="danger" v-if="isLose" :disabled="!isLose">
-        </UiButton>
-        <UiButton :size="buttonSize" @click="() => onCleared && onCleared()" text="Continue" color="success"
-          v-if="isWin" :disabled="!isWin">
+        <UiButton :size="buttonSize" @click="() => onOpenResult && onOpenResult()" text="Continue" color="success"
+          v-if="isWin || isLose" :disabled="!isWin && !isLose">
         </UiButton>
       </div>
       <div v-else class="flex flex-col items-center justify-center gap-4 w-full">
@@ -24,11 +22,8 @@
           <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying" class="w-full"></UiButton>
         </div>
         <div class="flex gap-2.5 items-center justify-center w-full">
-          <UiButton :size="buttonSize" @click="() => { restart(); onCleared && onCleared(); }" text="Restart"
-            variant="danger" class="w-full" :disabled="!isLose">
-          </UiButton>
-          <UiButton :size="buttonSize" @click="() => onCleared && onCleared()" text="Continue" color="success"
-            class="w-full" :disabled="!isWin">
+          <UiButton :size="buttonSize" @click="() => onOpenResult && onOpenResult()" text="Continue" color="success"
+            class="w-full" :disabled="!isWin && !isLose">
           </UiButton>
         </div>
       </div>
@@ -192,5 +187,10 @@ const emit = defineEmits<{
 
 function handleContinue() {
   emit('cleared')
+}
+
+// Handle retry from result modal
+function handleRetry() {
+  restart()
 }
 </script>

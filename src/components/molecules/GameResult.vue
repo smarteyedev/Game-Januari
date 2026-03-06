@@ -1,15 +1,11 @@
 <template>
-    <div class="flex flex-col gap-4 text-primary-700 text-body-xs md:text-h4">
-        <div>
-            <span class="font-extrabold ">{{ success ? successResult?.description : failureResult?.description }}</span>
-        </div>
-        <div>
-            <span class="font-extrabold ">{{ success ? 'Kekuatan Anda' : 'Kegagalan Anda' }}</span>
-            <p class="font-semibold">{{ success ? successResult?.power : failureResult?.failure }}</p>
-        </div>
-        <div>
-            <span class="font-extrabold ">{{ success ? 'Kegagalan Anda' : 'Tips' }}</span>
-            <p class="font-semibold">{{ success ? successResult?.improvement : failureResult?.tips }}</p>
+    <div class="flex flex-col gap-4 text-primary-700 text-body-xs md:text-h4 w-full">
+        <div v-if="success ? successResult?.reviewpoint?.length : failureResult?.reviewpoint?.length">
+            <div v-for="(item, index) in (success ? successResult?.reviewpoint : failureResult?.reviewpoint)"
+                :key="index" class="mb-4">
+                <span class="font-extrabold">{{ item.point }}</span>
+                <p class="font-semibold">{{ item.review }}</p>
+            </div>
         </div>
     </div>
 </template>

@@ -2,7 +2,7 @@
   <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame"
     :isWin="isWon" :hasLost="isLost" :isChecked="isChecked" :successResult="successResult"
-    :failureResult="failureResult">
+    :failureResult="failureResult" @retry="handleRetry" @cleared="handleContinue">
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
         <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
@@ -20,7 +20,7 @@
 
     <!-- Control Buttons -->
 
-    <template #footer="{ onCleared, onCheck, onRetry }">
+    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
@@ -36,12 +36,9 @@
             :disabled="selected.length !== 4 || isWon || isLost" @click="submitSelection">
           </UiButton>
 
-          <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton :size="buttonSize" text="Restart" variant="danger" v-if="isLost"
-            @click="() => { restartGame(); onCleared && onCleared(); }" :color="'error'">
-          </UiButton>
-          <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"
-            @click="() => onCleared && onCleared()">
+          <!--Show continue button after submit/check, regardless of win or lose-->
+          <UiButton :size="buttonSize" text="Continue" v-if="isWon || isLost" :color="'success'"
+            @click="() => onOpenResult && onOpenResult()">
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
@@ -176,6 +173,10 @@ function handleContinue() {
   emit('cleared')
 }
 
+// Handle retry from result modal
+function handleRetry() {
+  restartGame()
+}
 
 function assignCategoryColors(categories: { id: string }[]) {
   categories.forEach((cat) => {

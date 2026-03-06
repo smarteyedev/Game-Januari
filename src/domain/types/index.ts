@@ -111,33 +111,26 @@ export interface ApiError {
 // ============================================================================
 // GAME SPECIFIC TYPES
 // ============================================================================
-export interface ReviewPoint {
+export interface Reviewpoint {
   point: string,
   review: string
 }
 
 export interface SummaryData {
-  reviewPoints: ReviewPoint[]
+  reviewpoint: Reviewpoint[]
 }
 
 export interface SuccessResultData {
-  reviewPoints: ReviewPoint[]
+  reviewpoint: Reviewpoint[]
 }
 
 export interface FailureResultData {
-  reviewPoints: ReviewPoint[]
+  reviewpoint: Reviewpoint[]
 }
 
 export interface GameResultResponse {
   success: SuccessResultData
   failure: FailureResultData
-}
-
-export interface SummaryData {
-  performance: string,
-  analysis: string,
-  insight: string,
-  recomendation: string
 }
 
 export interface Keypoint {
