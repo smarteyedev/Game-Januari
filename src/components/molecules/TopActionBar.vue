@@ -1,18 +1,16 @@
 <template>
-  <div class="flex flex-col md:flex-row justify-between gap-3.5">
+  <div class="flex flex-col justify-between gap-3.5">
     <div v-if="text"
-      class="justify-center items-center flex w-full md:w-fit text-body-xs md:text-body-xl rounded-3xl font-black text-primary-700 border-[3px] border-primary-700 bg-white px-9 py-2 shadow-xl shadow-primary-700">
+      class="justify-center items-center flex w-full text-body-xs md:text-body-xl rounded-3xl font-black text-primary-700 border-[3px] border-primary-700 bg-white px-9 py-2 shadow-xl shadow-primary-700">
       <span class="text-center">
         {{ text }}
       </span>
     </div>
-    <div class="flex w-full md:w-fit gap-2.5">
-
-      <UiButton v-if="isXs || isSm" :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24"
-        :square="true" icon="ri:home-5-fill" @click="goToHome" />
-      <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" variant="primary" text="View Summary"
-        class="grow w-full md:grow-0 md:w-fit" @click="$emit('toggle-summary')" :disabled="!isChecked" />
-
+    <div class="flex w-full gap-2.5">
+      <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24" :square="true"
+        icon="ri:home-5-fill" @click="goToHome" />
+      <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" variant="primary" text="View Summary" class="grow w-full"
+        @click="$emit('toggle-summary')" :disabled="!isChecked" />
       <UiButton :size="!isXs && !isSm ? 'md' : 'xs'" :icon-size="!isXs && !isSm ? 32 : 24" :square="true"
         icon="ic:outline-fullscreen" @click="$emit('toggle-fullscreen')" />
     </div>

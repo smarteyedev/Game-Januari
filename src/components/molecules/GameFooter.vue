@@ -35,14 +35,14 @@ const buttonSize = computed(() => {
 <template>
   <div class="w-full flex flex-col md:flex-row justify-between items-center">
     <!-- LEFT -->
-    <div v-if="!isXs && !isSm" class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
+    <div class="w-full md:flex  flex-col sm:flex-row justify-center gap-2 md:gap-4 self-start">
       <slot name="footer-left">
         <div>
           <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
             :target="target" />
         </div>
         <!-- SUBMIT -->
-        <div class="grow flex justify-center items-center sm:inline-block">
+        <div v-if="!isXs && !isSm" class="grow flex justify-center items-center sm:inline-block">
           <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
             class="self-center " text="Check">
           </UiButton>
@@ -51,7 +51,7 @@ const buttonSize = computed(() => {
     </div>
 
     <!-- RIGHT -->
-    <div class="flex items-end gap-3 sm:gap-4">
+    <div class="flex items-end gap-3 sm:gap-4 mt-2 md:mt-0">
       <slot name="footer-right">
         <!-- CONTINUE / VIEW RESULT -->
         <UiButton v-if="isChecked" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
