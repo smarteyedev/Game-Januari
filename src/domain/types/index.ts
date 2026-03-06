@@ -111,6 +111,27 @@ export interface ApiError {
 // ============================================================================
 // GAME SPECIFIC TYPES
 // ============================================================================
+export interface Reviewpoint {
+  point: string,
+  review: string
+}
+
+export interface SummaryData {
+  reviewpoint: Reviewpoint[]
+}
+
+export interface SuccessResultData {
+  reviewpoint: Reviewpoint[]
+}
+
+export interface FailureResultData {
+  reviewpoint: Reviewpoint[]
+}
+
+export interface GameResultResponse {
+  success: SuccessResultData
+  failure: FailureResultData
+}
 
 export interface Keypoint {
   icon_name?: string
@@ -160,3 +181,6 @@ export interface MemoryCard {
   flipped?: boolean
   matched?: boolean
 }
+
+// Re-export game data types for convenience
+export * from './gameData'

@@ -9,6 +9,9 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
+import { UiButton } from '@/components/atoms/button'
+import { useBreakpoint } from '@/composables/useBreakpoint'
 
 // Level fetching
 const loading = ref(false)
@@ -34,7 +37,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
@@ -43,8 +46,8 @@ const gameServiceOptions = {
   minigameId: MINIGAME_IDS.memory,
   offline: true,
 }
-
-const { time, _isWon, _isLost, startGame, finish, reset } = useGameService(gameServiceOptions)
+const MAX_TIME = 180
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -119,7 +122,14 @@ async function flipCard(card: MemoryCard) {
     firstCard = null
 
     if (allMatched.value) {
-      await finish(true)
+      const totalPairs = cards.value.length / 2
+      let scoringAttempts = turns.value / 2
+
+      const FREE_ATTEMPTS = 5
+
+      scoringAttempts = Math.max(0, scoringAttempts - FREE_ATTEMPTS)
+      const totalScore = computeScore({ total: totalPairs, correct: totalPairs, attempts: scoringAttempts, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      await finish(true, undefined, totalScore)
     }
   } else {
     lock = true
@@ -134,6 +144,7 @@ async function flipCard(card: MemoryCard) {
 
 // Game state
 const showIntro = ref(true)
+const attempts = ref(0)
 
 // Computed states
 const allMatched = computed(
@@ -144,6 +155,7 @@ const gameOver = computed(() => _isLost.value || (_isWon.value && allMatched.val
 // Emit for session tracking
 const emit = defineEmits<{
   (e: 'cleared'): void
+  (e: 'open-result'): void
 }>()
 
 function handleContinue() {
@@ -156,46 +168,47 @@ async function start() {
   await startGame()
 }
 
-// Reset game
+// retry game
 function retryGame() {
+  attempts.value += 1
   cards.value = loadLevel()
   firstCard = null
   lock = false
   turns.value = 0
-  reset()
+  retry()
 }
 
 // Lifecycle
 onMounted(() => {
   fetchLevel()
 })
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[2]"
-    :isWin="_isWon"
-    :hasLost="_isLost"
-    :hideSubmit="true"
-    :isChecked="allMatched"
-    @start="start"
-    @retry="retryGame"
-    @cleared="handleContinue"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[2]" :isWin="_isWon"
+    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" :successResult="successResultData"
+    :failureResult="failureResultData" @start="start" @retry="retryGame" @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
-    <template #footer-left>
-      <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
-        Card Turns: {{ turns }}
-      </span>
+    <template #footer>
+      <div class="flex flex-col xs:flex-row justify-between w-full items-center">
+        <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
+          Card Turns: {{ turns }}
+        </span>
+        <UiButton v-if="allMatched || time <= 0" :size="buttonSize" text="Continue" variant="primary"
+          @click="emit('open-result')">
+        </UiButton>
+      </div>
     </template>
   </BaseGame>
 </template>

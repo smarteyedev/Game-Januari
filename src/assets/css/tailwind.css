@@ -267,6 +267,9 @@
   --radius-xl: 8px;
   --radius-2xl: 10px;
   --radius-3xl: 12px;
+
+  /* Breakpoints */
+  --breakpoint-xs: 480px;
 }
 
 @layer components {
@@ -350,6 +353,32 @@
     -webkit-text-stroke-linejoin: round;
     paint-order: stroke fill;
     filter: drop-shadow(0px var(--text-shadow, 4px) 0 var(--btn));
+  }
+
+  .text-cartoon-sm {
+    --text-stroke: 4px;
+    --text-shadow: 3px;
+  }
+
+  .text-cartoon-md {
+    --text-stroke: 5px;
+    --text-shadow: 4px;
+  }
+
+  .text-cartoon-lg {
+    --text-stroke: 6px;
+    --text-shadow: 6px;
+  }
+
+  .text-cartoon {
+    font-weight: 900;
+    line-height: 1;
+    word-spacing: -1px;
+    color: var(--color-white);
+    -webkit-text-stroke: var(--text-stroke, 5px) var(--btn-accent);
+    -webkit-text-stroke-linejoin: round;
+    paint-order: stroke fill;
+    filter: drop-shadow(0px var(--text-shadow, 4px) 0 var(--btn-accent));
   }
 
   .text-cartoon-sm {

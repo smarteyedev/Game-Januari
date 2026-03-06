@@ -11,19 +11,35 @@ import axios, {
 } from 'axios'
 import { ref } from 'vue'
 import type { ApiResponse, ApiError } from '@/domain/types'
+import { logger } from '../logging'
+
+// ============================================================================
+// Configuration
+// ============================================================================
+
+/** API Configuration */
+interface ApiConfig {
+  baseURL: string
+  timeout: number
+}
+
+/** Default API configuration */
+const DEFAULT_CONFIG: ApiConfig = {
+  baseURL: import.meta.env.DEV ? '' : (import.meta.env.VITE_API_BASE_URL as string) || '',
+  timeout: 15000,
+}
 
 // Environment-based configuration
-const getBaseURL = (): string => {
-  if (import.meta.env.DEV) {
-    return ''
-  }
-  return import.meta.env.VITE_API_BASE_URL || ''
-}
+const getBaseURL = (): string => DEFAULT_CONFIG.baseURL
+
+// ============================================================================
+// API Client Setup
+// ============================================================================
 
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: getBaseURL(),
-  timeout: 15000,
+  timeout: DEFAULT_CONFIG.timeout,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -36,27 +52,48 @@ apiClient.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    logger.debug('API Request', {
+      method: config.method,
+      url: config.url,
+      hasAuth: !!token,
+    })
     return config
   },
-  (error) => Promise.reject(error),
+  (error) => {
+    logger.error('API Request Error', error)
+    return Promise.reject(error)
+  },
 )
 
 // Response interceptor - centralized error handling
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    logger.debug('API Response', {
+      status: response.status,
+      url: response.config.url,
+    })
+    return response
+  },
   (error: AxiosError<ApiResponse<unknown>>) => {
     // Handle API errors consistently
     if (error.response?.data) {
+      const responseData = error.response.data as unknown as Record<string, unknown>
       const apiError: ApiError = {
         code: error.response.status.toString(),
-        message: error.response.data.message || 'An error occurred',
-        details: (error.response.data as any)?.error?.details,
+        message: (responseData?.message as string) || 'An error occurred',
+        details: responseData?.error as string,
       }
+      logger.error('API Error Response', error, { apiError })
       return Promise.reject(apiError)
     }
+    logger.error('API Network Error', error)
     return Promise.reject(error)
   },
 )
+
+// ============================================================================
+// HTTP Client Functions
+// ============================================================================
 
 // Request maker function
 export async function request<T = unknown>(config: AxiosRequestConfig): Promise<ApiResponse<T>> {
@@ -82,7 +119,14 @@ export const httpClient = {
     request<T>({ ...config, method: 'DELETE', url }),
 }
 
-// Vue Composable for API calls with loading state
+// ============================================================================
+// Vue Composable for API Calls
+// ============================================================================
+
+/**
+ * Composable for making API calls with loading state
+ * Provides reactive loading and error states
+ */
 export function useApiClient() {
   const loading = ref(false)
   const error = ref<unknown>(null)
@@ -93,10 +137,17 @@ export function useApiClient() {
 
     try {
       const { success, data, message } = await request<T>(config)
-      if (!success) throw new Error(message)
+      if (!success) {
+        const err = new Error(message)
+        logger.error('API Response Error', err, { config })
+        throw err
+      }
       return data as T
     } catch (err) {
       error.value = err
+      logger.error('API Request Failed', err instanceof Error ? err : new Error(String(err)), {
+        config,
+      })
       throw err
     } finally {
       loading.value = false
@@ -120,4 +171,7 @@ export function useApiClient() {
   }
 }
 
+// Export API client instance and config
+export { apiClient, DEFAULT_CONFIG }
+export type { ApiConfig }
 export default apiClient

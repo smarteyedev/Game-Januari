@@ -2,7 +2,7 @@
 
 ## Description
 
-Prototipe Game Based Learning Januari 2026.
+Prototipe Minigame Game Based Learning 2026.
 
 ---
 

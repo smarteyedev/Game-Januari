@@ -1,0 +1,26 @@
+{
+  "success": {
+    "reviewpoint": [
+      {
+        "point": "Analisis Kebutuhan Otomatisasi",
+        "review": "Anda menunjukkan pemahaman yang sangat baik dalam mengidentifikasi proses yang dapat diotomatisasi."
+      },
+      {
+        "point": "Efisiensi Workflow",
+        "review": "Kemampuan Anda dalam mengoptimalkan alur kerja sangat impresif."
+      }
+    ]
+  },
+  "failure": {
+    "reviewpoint": [
+      {
+        "point": "Analisis Kebutuhan Otomatisasi",
+        "review": "Anda perlu lebih baik dalam mengidentifikasi proses yang dapat diotomatisasi."
+      },
+      {
+        "point": "Efisiensi Workflow",
+        "review": "Coba lagi untuk mengoptimalkan alur kerja Anda."
+      }
+    ]
+  }
+}

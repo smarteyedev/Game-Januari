@@ -12,12 +12,14 @@ defineProps<{
   isWin?: boolean
   hasLost?: boolean
   hideSubmit?: boolean
+  showResult?: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'check'): void
   (e: 'retry'): void
   (e: 'cleared'): void
+  (e: 'open-result'): void
 }>()
 
 const { isXs, isSm, isMd } = useBreakpoint()
@@ -31,52 +33,30 @@ const buttonSize = computed(() => {
 </script>
 
 <template>
-  <div class="w-full flex flex-col sm:flex-row justify-between items-center">
+  <div class="w-full flex flex-col md:flex-row justify-between items-center">
     <!-- LEFT -->
-    <div class="w-full flex flex-col sm:flex-row justify-center gap-2 md:gap-9 self-start">
+    <div class="w-full md:flex  flex-col sm:flex-row justify-center gap-2 md:gap-4 self-start">
       <slot name="footer-left">
         <div>
-          <ProgressWithIcon
-            v-if="showProgress && current !== undefined && target !== undefined"
-            :current="current"
-            :target="target"
-          />
+          <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
+            :target="target" />
         </div>
         <!-- SUBMIT -->
-        <div class="grow">
-          <UiButton
-            :size="buttonSize"
-            v-if="!hideSubmit && !isChecked"
-            variant="secondary"
-            @click="emit('check')"
-            class="self-center"
-            text="Check"
-          >
+        <div v-if="!isXs && !isSm" class="grow flex justify-center items-center sm:inline-block">
+          <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
+            class="self-center " text="Check">
           </UiButton>
         </div>
       </slot>
     </div>
 
     <!-- RIGHT -->
-    <div class="flex items-end gap-3 sm:gap-4">
+    <div class="flex items-end gap-3 sm:gap-4 mt-2 md:mt-0">
       <slot name="footer-right">
-        <UiButton
-          :size="buttonSize"
-          v-if="hasLost"
-          text="Retry"
-          variant="danger"
-          @click="emit('retry')"
-        >
+        <!-- CONTINUE / VIEW RESULT -->
+        <UiButton v-if="isChecked" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
         </UiButton>
-
-        <!-- CONTINUE -->
-        <UiButton
-          :size="buttonSize"
-          v-if="isWin || hasLost"
-          text="Continue"
-          variant="primary"
-          @click="emit('cleared')"
-        >
+        <UiButton v-else-if="isXs || isSm" :size="buttonSize" text="Continue" variant="primary" @click="emit('check')">
         </UiButton>
       </slot>
     </div>

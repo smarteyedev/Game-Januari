@@ -5,10 +5,10 @@ import { UiIcon } from '../icon'
 const props = withDefaults(
   defineProps<{
     text?: string
-    variant?: 'primary' | 'secondary' | 'plain' | 'danger'
+    variant?: 'primary' | 'secondary' | 'plain' | 'danger' | 'ghost'
     size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl'
     disabled?: boolean
-
+    iconSize?: number
     icon?: string
     iconAppend?: string
     loading?: boolean
@@ -34,19 +34,18 @@ function getIconSize(size: 'xs' | 'sm' | 'md' | 'lg' | 'xl') {
 }
 
 const base =
-  'inline-flex items-center justify-center font-black ' +
-  'cursor-pointer rounded-[12px] shadow-xl px-6 transition-all'
+  'inline-flex items-center justify-center font-black cursor-pointer rounded-[12px] shadow-xl transition-all'
 
 // const baseHoverEffects = 'hover:-translate-y-[2px] active:translate-y-[6px] active:shadow-none'
 
 // const plainHoverEffects = 'hover:border-[3px] hover:shadow-primary-700 hover:border-primary-700'
 
 const sizes = {
-  xl: 'min-h-[56px] text-[20px] active:text-[24px] active:min-h-[64px]',
-  lg: 'min-h-[48px] text-[18px] active:text-[20px] active:min-h-[56px]',
-  md: 'min-h-[44px] text-[16px] active:text-[18px] active:min-h-[48px]',
-  sm: 'min-h-[40px] text-[14px] active:text-[14px] active:min-h-[44px]',
-  xs: 'min-h-[36px] text-[12px] active:text-[14px] active:min-h-[40px]',
+  xl: 'h-[56px] text-[20px] active:text-[24px] active:h-[64px]',
+  lg: 'h-[48px] text-[18px] active:text-[20px] active:h-[56px]',
+  md: 'h-[44px] text-[16px] active:text-[18px] active:h-[48px]',
+  sm: 'h-[40px] text-[14px] active:text-[14px] active:h-[44px]',
+  xs: 'h-[36px] text-[12px] active:text-[14px] active:h-[40px]',
 }
 
 const variants = {
@@ -63,9 +62,13 @@ const variants = {
   secondary:
     'bg-cream-10 border-[3px] text-primary-700 ' +
     '[--btn-accent:var(--color-primary-700)] ' +
-    'border-primary-700 shadow-primary-700',
+    'border-primary-700 shadow-primary-700 font-black',
 
   plain: 'bg-cream-10 border-0 text-white ' + '[--btn-accent:var(--color-primary-700)]',
+
+  ghost:
+    'bg-transparent border-0 shadow-none p-0 ' +
+    'text-current hover:opacity-70 active:opacity-50',
 }
 
 const disabledStyles = {
@@ -81,9 +84,14 @@ const disabledStyles = {
 
 const classes = computed(() => [
   base,
-  sizes[props.size ?? 'xl'],
-  // !props.disabled ? baseHoverEffects : '',
-  // !props.disabled && props.variant === 'plain' ? plainHoverEffects : '',
+
+  props.variant !== 'ghost'
+    ? [
+      sizes[props.size ?? 'xl'],
+      props.square ? 'aspect-square px-0' : 'px-6',
+    ]
+    : '',
+
   props.disabled
     ? props.variant === 'plain'
       ? disabledStyles.plain
@@ -101,14 +109,11 @@ const textEffects = computed(() => {
 <template>
   <button :class="classes" :disabled="isDisabled" :aria-disabled="isDisabled">
     <!-- Prepend -->
-    <span v-if="props.loading || props.icon" class="mr-2 flex items-center">
-      <UiIcon
-        :name="props.loading ? 'uil-spinner' : props.icon"
-        :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')"
-        mode="svg"
-        :class="{ 'animate-spin': props.loading }"
-      />
+    <span v-if="props.loading || props.icon" class="flex items-center">
+      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon"
+        :width="props.iconSize ?? getIconSize(props.size ?? 'xl')"
+        :height="props.iconSize ?? getIconSize(props.size ?? 'xl')" mode="svg"
+        :class="{ 'animate-spin': props.loading }" />
     </span>
 
     <!-- Label -->
@@ -118,12 +123,8 @@ const textEffects = computed(() => {
 
     <!-- Append -->
     <span v-if="props.iconAppend" class="ml-2 flex items-center">
-      <UiIcon
-        :name="props.iconAppend"
-        :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')"
-        mode="svg"
-      />
+      <UiIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')" mode="svg" />
     </span>
   </button>
 </template>

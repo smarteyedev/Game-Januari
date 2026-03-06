@@ -11,6 +11,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
 
 // Level fetching
 const loading = ref(false)
@@ -44,6 +45,7 @@ const showIntro = ref(true)
 const isChecked = ref(false)
 const isWin = ref(false)
 const correctCount = ref<number | null>(null)
+const attempts = ref(0)
 
 // Audio
 const audio = new Audio(clickSound)
@@ -54,7 +56,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
@@ -64,7 +66,7 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
+const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Computed
 const hasLost = computed(() => isChecked.value && !isWin.value)
@@ -140,7 +142,7 @@ function parseSentence(sentence: string) {
 function loadLevel() {
   if (!gameData.value) return
 
-  reset()
+  retry()
   board.value = parseSentence(gameData.value.sentence)
   slots.value = {}
   slotCorrectness.value = {}
@@ -188,6 +190,7 @@ function handlePointerMove(e: PointerEvent) {
   lastPointerY.value = e.clientY
 }
 
+const MAX_TIME = 180
 function handlePointerUp(e: PointerEvent) {
   if (!draggedItem.value) return
 
@@ -314,7 +317,6 @@ function performDrop(dropSlotId: number) {
     }
   } else {
     slots.value[dropSlotId] = draggedItem.value
-
     if (draggedFromType.value === 'pool') {
       items.value = items.value.filter((i) => i.id !== draggedItem.value!.id)
     } else {
@@ -367,8 +369,14 @@ async function checkAnswers() {
   isWin.value = won
   isLocked.value = true
 
+
   if (won) {
-    await finish(true)
+    const total = totalSlots.value
+    const totalScore = computeScore({ total, correct: count, timeUsed: MAX_TIME - time.value, attempts: attempts.value, maxTime: gameServiceOptions.maxTime })
+    await finish(true, undefined, totalScore)
+  } else {
+    // mark as finished/lost so GameService can fetch failure result data
+    await finish(false)
   }
 }
 
@@ -378,6 +386,7 @@ function handleContinue() {
 
 // Retry game
 function retryGame() {
+  attempts.value += 1
   loadLevel()
 }
 
@@ -398,62 +407,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[1]"
-    :isWin="_isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="correctCount ?? 0"
-    :targetProgress="totalSlots"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
+    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
+    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
+    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue"
+    :successResult="successResultData" :failureResult="failureResultData">
     <!-- Sentence Board -->
 
     <div
-      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm"
-    >
-      <template
-        v-for="(part, index) in board"
-        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
-      >
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
+      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isTouchDevice="isTouchDevice"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-        />
+        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+          :isTouchDevice="isTouchDevice" :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-        v-for="(item, _) in items"
-        :key="item.id"
-        :item="item"
-        :inSlot="false"
-        :disabled="isLocked"
-        @dragstart="onDragStart"
-      />
+      <WordItem v-for="(item, _) in items" :key="item.id" :item="item" :inSlot="false" :disabled="isLocked"
+        @dragstart="onDragStart" />
     </div>
   </BaseGame>
   <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">

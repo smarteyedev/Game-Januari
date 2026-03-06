@@ -6,10 +6,17 @@
 import { ref, computed } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { Game } from '@/domain/entities/Game'
-import { GameState, type MinigameId, type GameResult } from '@/domain/types'
+import { GameState, type MinigameId, type GameResult, type GameResultResponse, type SuccessResultData, type FailureResultData } from '@/domain/types'
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
+import { getFeedback } from './ScoringService'
+import { logger } from '@/infrastructure/logging'
+import dummyResultData from '@/assets/gameData/dummyResult.json'
+
+// ============================================================================
+// Types
+// ============================================================================
 
 export type GameServiceOptions = {
   /** Maximum time in seconds for the game */
@@ -47,17 +54,35 @@ export type GameServiceReturn = {
   // Game actions
   startGame: () => Promise<void>
   submitScore: (score: number, answers?: unknown[]) => Promise<void>
-  finish: (won: boolean, finalAnswers?: unknown[]) => Promise<void>
+  finish: (won: boolean, finalAnswers?: unknown[], finalScore?: number) => Promise<void>
   reset: () => void
   retry: () => Promise<void>
 
   // Session store
   session: ReturnType<typeof useSessionStore>
+
+  // Result data for modal
+  successResultData: Ref<SuccessResultData | undefined>
+  failureResultData: Ref<FailureResultData | undefined>
 }
 
+// ============================================================================
+// Constants
+// ============================================================================
+
+const DEFAULT_MAX_TIME = 180
+
+// ============================================================================
+// Main Function
+// ============================================================================
+
+/**
+ * Game Service - Manages game lifecycle and state
+ * Provides reactive game state, timer management, and score submission
+ */
 export function useGameService(options: GameServiceOptions): GameServiceReturn {
   const {
-    maxTime = 180,
+    maxTime = DEFAULT_MAX_TIME,
     minigameId,
     offline = false,
     onWin,
@@ -97,15 +122,57 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   const _canSubmit = computed(() => _isPlaying.value || _isFinished.value)
   const _didWin = ref(false)
 
+  // Result data for modal
+  const successResultData = ref<SuccessResultData | undefined>(undefined)
+  const failureResultData = ref<FailureResultData | undefined>(undefined)
+
+  // ==========================================================================
+  // Private Methods
+  // ==========================================================================
+
+  /**
+   * Fetch game result data from API or use offline dummy data
+   */
+  async function fetchGameResultData(won: boolean): Promise<{ success?: SuccessResultData; failure?: FailureResultData }> {
+    const session = sessionRepository.getCurrentSession()
+    
+    if (offline || !session || !game.value.sessionId) {
+      // Use offline dummy data
+      logger.info('Using offline dummy result data', { won })
+      const dummyData = dummyResultData as GameResultResponse
+      return won 
+        ? { success: dummyData.success }
+        : { failure: dummyData.failure }
+    }
+
+    try {
+      // Fetch from API
+      const resultData = await gameRepository.getGameResult(
+        game.value.sessionId,
+        session.accessToken,
+      )
+      logger.info('Fetched game result data from API', { won, sessionId: game.value.sessionId })
+      return won 
+        ? { success: resultData.success }
+        : { failure: resultData.failure }
+    } catch (err) {
+      logger.error('Failed to fetch game result from API, using offline data', err)
+      const dummyData = dummyResultData as GameResultResponse
+      return won 
+        ? { success: dummyData.success }
+        : { failure: dummyData.failure }
+    }
+  }
+
   /**
    * Handle game over - win or lose
    */
-  async function handleGameOver(won: boolean, finalAnswers?: unknown[]) {
+  async function handleGameOver(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
     stopTimer()
     game.value.setSubmitting()
 
     _didWin.value = won
-    const score = won ? 100 : 0
+    const resolvedScore = typeof finalScore === 'number' ? finalScore : (won ? 100 : 0)
 
     if (finalAnswers) {
       game.value.answers.push(...finalAnswers)
@@ -113,10 +180,20 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
     // Auto submit if enabled
     if (autoSubmit) {
-      await submitScore(score, game.value.answers)
+      await submitScore(resolvedScore, game.value.answers)
     }
 
-    game.value.finish(won, score, finalAnswers)
+    // Fetch result data from API or use offline dummy data
+    const resultData = await fetchGameResultData(won)
+    if (resultData.success) {
+      successResultData.value = resultData.success
+    }
+    if (resultData.failure) {
+      failureResultData.value = resultData.failure
+      logger.debug('useGameService: set failureResultData', { minigameId, failure: resultData.failure })
+    }
+
+    game.value.finish(won, resolvedScore, finalAnswers)
 
     // Call callbacks
     const result: GameResult = {
@@ -128,27 +205,26 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     }
 
     if (won) {
+      logger.info('Game won', { minigameId, score: resolvedScore, timeMs: result.timeMs })
       onWin?.(result)
     } else {
+      logger.info('Game lost', { minigameId, timeMs: result.timeMs })
       onLose?.()
     }
 
     onSubmit?.(result)
   }
 
-  /**
-   * Calculate score based on time remaining TODO
-   
-  function calculateScore(): number {
-    const timeBonus = Math.floor(time.value / 10)
-    return Math.min(100, 50 + timeBonus)
-  }
-    */
+  // ==========================================================================
+  // Public Methods
+  // ==========================================================================
 
   /**
    * Start a new game
    */
   async function startGame() {
+    logger.debug('Starting game', { minigameId, offline, maxTime })
+
     if (offline) {
       // if offline or no backend simulate launched game
       game.value = new Game({
@@ -160,13 +236,16 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
       game.value.launch('offline-session')
       game.value.start()
       startTimer()
+      logger.info('Game started in offline mode', { minigameId })
       return
     }
 
     // normal with backend flow
     const session = sessionRepository.getCurrentSession()
     if (!session) {
-      throw new Error('No guest session available')
+      const error = new Error('No guest session available')
+      logger.error('Failed to start game', error, { minigameId })
+      throw error
     }
 
     game.value = new Game({
@@ -182,12 +261,15 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     )
 
     if (!response?.sessionId) {
-      throw new Error('launchGame did not return sessionId')
+      const error = new Error('launchGame did not return sessionId')
+      logger.error('Failed to launch game', error, { minigameId })
+      throw error
     }
 
     game.value.launch(response.sessionId)
     game.value.start()
     startTimer()
+    logger.info('Game started with backend', { minigameId, sessionId: response.sessionId })
   }
 
   /**
@@ -195,13 +277,14 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
    */
   async function submitScore(finalScore: number, finalAnswers?: unknown[]) {
     if (offline) {
-      console.log('Offline mode → score:', finalScore)
+      const feedback = getFeedback(finalScore)
+      logger.info(`Offline mode → score: ${finalScore}, feedback: ${feedback}`)
       return
     }
 
     const session = sessionRepository.getCurrentSession()
     if (!session || !game.value.sessionId) {
-      console.warn('No active game session to submit')
+      logger.warn('No active game session to submit')
       return
     }
 
@@ -212,13 +295,19 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
       (maxTime - time.value) * 1000,
       session.accessToken,
     )
+
+    logger.info('Score submitted', {
+      sessionId: game.value.sessionId,
+      score: finalScore,
+      timeMs: (maxTime - time.value) * 1000,
+    })
   }
 
   /**
    * Finish the game manually
    */
-  function finish(won: boolean, finalAnswers?: unknown[]) {
-    return handleGameOver(won, finalAnswers)
+  function finish(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
+    return handleGameOver(won, finalAnswers, finalScore)
   }
 
   /**
@@ -229,6 +318,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     time.value = maxTime
     _didWin.value = false
     game.value.reset()
+    logger.debug('Game reset', { minigameId })
   }
 
   /**
@@ -267,7 +357,12 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
     // Session
     session,
+
+    // Result data for modal
+    successResultData,
+    failureResultData,
   }
 }
 
 export default useGameService
+

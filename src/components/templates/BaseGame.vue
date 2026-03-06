@@ -1,52 +1,65 @@
 <script setup lang="ts">
-import { type Slot } from 'vue'
+import { onMounted, onUnmounted, ref, watch, type Slot } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
-import type { IntroData } from '@/domain/types'
-import { toTimeMmss } from '@/utils/string'
-import DisplayLabel from '../atoms/DisplayLabel.vue'
+import type { FailureResultData, IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
+import GameResultModal from '../molecules/GameResultModal.vue'
+import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
+import TopActionBar from '../molecules/TopActionBar.vue'
 
+/**
+ * BaseGame Component Props
+ * Base template component for all game views
+ */
 interface BaseGameProps {
-  /** Game title */
+  /** Module/category title displayed in the top action bar */
   moduleTitle?: string
-  /** Game title */
+  /** Game title displayed in the header */
   title: string
-  /** Game description */
+  /** Game description/instructions */
   description?: string
-  /** Game description */
+  /** Current question or prompt to display */
   question?: string
-  /** Current time in seconds */
+  /** Current time remaining in seconds */
   time: number
-  /** Maximum time in seconds */
+  /** Maximum time allowed in seconds (default: 180) */
   maxTime?: number
-  /** Loading state */
+  /** Whether the game is currently loading */
   loading?: boolean
-  /** Error state */
+  /** Error object if game failed to load */
   error?: unknown
-  /** Retry function for error state */
+  /** Function to call when retry button is clicked */
   retryFn?: () => void
-  /** Whether the intro modal should show */
+  /** Whether to show the intro modal */
   showIntro?: boolean
-  /** Intro modal data */
+  showResult?: boolean
+  /** Data for the intro modal */
   introData?: IntroData
-  /** Current progress value */
+  /** Current progress value (for progress bar) */
   currentProgress?: number
-  /** Target progress value */
+  /** Target progress value (for progress bar) */
   targetProgress?: number
-  /** Whether to show progress bar */
+  /** Whether to show the progress bar */
   showProgress?: boolean
-  /** Whether the game is checked/done */
+  showSummary?: boolean
+  /** Result summary data */
+  resultSummary?: any
+  /** Success result data provided by game service */
+  successResult?: SuccessResultData | null
+  /** Failure result data provided by game service */
+  failureResult?: FailureResultData | null
+  /** Whether the game has been checked/submitted */
   isChecked?: boolean
-  /** Whether the game is won */
+  /** Whether the player won the game */
   isWin?: boolean
-  /** Whether the game is lost */
+  /** Whether the player lost the game */
   hasLost?: boolean
-  /** Whether to hide submit button */
+  /** Whether to hide the submit/check button */
   hideSubmit?: boolean
-  /** Function to format time display */
+  /** Custom time formatter function */
   formatTime?: (seconds: number) => string
   /** Custom slots configuration */
   slots?: {
@@ -56,89 +69,229 @@ interface BaseGameProps {
   }
 }
 
-withDefaults(defineProps<BaseGameProps>(), {
+const props = withDefaults(defineProps<BaseGameProps>(), {
   description: '',
   maxTime: 180,
   loading: false,
   showIntro: false,
+  showResult: false,
   showProgress: false,
   isChecked: false,
   isWin: false,
   hasLost: false,
   hideSubmit: false,
-  formatTime: (s: number) => toTimeMmss(s),
+  successResult: null,
+  failureResult: null,
+})
+
+// Local control for showing result modal when game is checked
+const showResultLocal = ref<boolean>(props.showResult ?? false)
+
+// when progress bar is displayed, we want to wait a moment so the animation
+// can finish before showing the result popup.  Otherwise the dialog opens
+// immediately which looks jarring.  Use a small constant that a bit longer than the
+// CSS transition duration used by the progress component (≈300ms).
+const RESULT_MODAL_DELAY = 1000
+
+// hold reference to an active timeout so repeated calls don't stack delays
+let resultTimer: number | undefined
+
+function openResultModal(useDelay = true) {
+  if (resultTimer) {
+    clearTimeout(resultTimer)
+    resultTimer = undefined
+  }
+
+  if (useDelay && props.showProgress) {
+    resultTimer = window.setTimeout(() => {
+      showResultLocal.value = true
+      resultTimer = undefined
+    }, RESULT_MODAL_DELAY)
+  } else {
+    showResultLocal.value = true
+  }
+}
+
+watch(() => props.isChecked, (val) => {
+  if (val) openResultModal(true) // delay
+})
+
+// Also show result modal when game is won or lost
+watch(() => props.isWin, (val) => {
+  // Only open when we also have result data available
+  if (val && (props.successResult || props.failureResult)) openResultModal()
+})
+
+watch(() => props.hasLost, (val) => {
+  if (val && (props.successResult || props.failureResult)) openResultModal()
 })
 
 const emit = defineEmits<{
+  /** Emit when check/submit button is clicked */
   (e: 'check'): void
+  /** Emit when retry button is clicked */
   (e: 'retry'): void
+  /** Emit when game is cleared/completed */
   (e: 'cleared'): void
+  /** Emit when game starts (after intro) */
   (e: 'start'): void
+  /** Emit when intro visibility should change */
   (e: 'update:showIntro', value: boolean): void
 }>()
 
+/**
+ * Handle start button click
+ * Closes intro modal and emits start event
+ */
 function handleStart() {
   emit('update:showIntro', false)
   emit('start')
 }
+
+function handleRetry() {
+  showResultLocal.value = false
+  emit('retry')
+}
+
+function handleCleared() {
+  showResultLocal.value = false
+  emit('cleared')
+}
+
+const gameWrapper = ref<HTMLElement | null>(null)
+const isFullscreen = ref(false)
+
+/**
+ * Toggle fullscreen mode for the game wrapper
+ */
+function toggleFullscreen() {
+  const el = gameWrapper.value
+  if (!el) return
+
+  if (!document.fullscreenElement) {
+    el.requestFullscreen().catch((err) => {
+      console.warn('Failed to enter fullscreen:', err)
+    })
+  } else {
+    document.exitFullscreen()
+  }
+}
+
+/**
+ * Handle fullscreen change event
+ */
+function handleFullscreenChange() {
+  isFullscreen.value = !!document.fullscreenElement
+}
+
+onMounted(() => {
+  document.addEventListener('fullscreenchange', handleFullscreenChange)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('fullscreenchange', handleFullscreenChange)
+})
+
+const successResult = ref<SuccessResultData | undefined>()
+const failureResult = ref<FailureResultData | undefined>()
+
+// Local control for summary modal
+const showSummaryLocal = ref(false)
+const summaryData = ref<SuccessResultData | FailureResultData | undefined>()
+
+function handleOpenResult() {
+  // ensure latest result data is synced
+  successResult.value = props.successResult ?? undefined
+  failureResult.value = props.failureResult ?? undefined
+
+  openResultModal(false)
+}
+
+function handleViewSummary() {
+  // prefer success result if available
+  summaryData.value = successResult.value ?? failureResult.value
+
+  // If summary is currently shown, close both modals to go back to game content
+  if (showSummaryLocal.value) {
+    showSummaryLocal.value = false
+    showResultLocal.value = false
+  } else {
+    // Otherwise, close result modal and open summary modal
+    showResultLocal.value = false
+    showSummaryLocal.value = true
+  }
+}
+
+// when the summary modal closes, go back to game content (don't reopen result modal)
+watch(showSummaryLocal, (val) => {
+  if (!val) {
+    showResultLocal.value = false
+  }
+})
+
+function handleCheck() {
+  // Delegate check handling to parent/game view; game service will populate result data
+  emit('check')
+}
+
+// Initialize local result refs from incoming props and update on changes
+watch(() => props.successResult, (val) => {
+  successResult.value = val ?? undefined
+  if (successResult.value) openResultModal()
+  console.debug('BaseGame: successResult prop changed', { value: successResult.value })
+})
+
+watch(() => props.failureResult, (val) => {
+  failureResult.value = val ?? undefined
+  if (failureResult.value) openResultModal()
+  console.debug('BaseGame: failureResult prop changed', { value: failureResult.value })
+})
+
 </script>
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div
-      class="min-h-screen flex flex-col p-2 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
-      :style="{
-        backgroundImage: `url(${Background})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-      }"
-    >
+    <div ref="gameWrapper" class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
+      backgroundImage: `url(${Background})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+    }">
       <!-- Topbar (always visible) -->
-      <DisplayLabel v-if="moduleTitle" :text="moduleTitle" class="z-60" />
+      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen"
+        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress" :isChecked="isChecked"
+        :isShown="showSummaryLocal" />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
+
         <!-- Intro Modal -->
-        <GameIntroModal
-          v-if="showIntro && introData"
-          :modelValue="showIntro"
-          @update:modelValue="emit('update:showIntro', $event)"
-          :title="title"
-          :introData="introData"
-          @start="handleStart"
-          containerPosition="relative"
-        />
+
+        <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
+          @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
+          @start="handleStart" containerPosition="relative" />
+
+        <GameResultModal v-else-if="showResultLocal" :success="isWin" :successResult="successResult"
+          :failureResult="failureResult" v-model:modelValue="showResultLocal" @continue="handleCleared"
+          @retry="handleRetry" containerPosition="relative" />
+
+        <GameResultSummaryModal v-else-if="showSummaryLocal" :resultSummary="summaryData"
+          v-model:modelValue="showSummaryLocal" containerPosition="relative" @toggle-summary="handleViewSummary" />
 
         <!-- Game Content -->
-        <div
-          v-else
-          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
-        >
+        <div v-else
+          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700">
           <slot name="header">
-            <GameHeader
-              :title="title"
-              :description="description"
-              :question="question"
-              :time="time"
-            />
+            <GameHeader :title="title" :description="description" :question="question" :time="time" />
           </slot>
 
           <slot />
 
-          <slot name="footer">
-            <GameFooter
-              :current="currentProgress"
-              :target="targetProgress"
-              :showProgress="showProgress"
-              :isChecked="isChecked"
-              :isWin="isWin"
-              :hasLost="hasLost"
-              :hideSubmit="hideSubmit"
-              @check="emit('check')"
-              @retry="emit('retry')"
-              @cleared="emit('cleared')"
-            >
+          <slot name="footer" :onCheck="handleCheck" :onRetry="handleRetry" :onCleared="handleCleared"
+            :onOpenResult="handleOpenResult">
+            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
+              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult()">
               <template #footer-left>
                 <slot name="footer-left" />
               </template>

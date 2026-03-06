@@ -1,4 +1,4 @@
-export type TModalSize = 'xs' | 'sm' | 'md' | 'lg' | 'full'
+
 export type TModalFooterPosition = 'left' | 'center' | 'right'
 export type TModalPosition =
   | 'top-left'
@@ -34,7 +34,6 @@ export type TContainerPosition = 'fixed' | 'absolute' | 'relative'
 
 export interface IModalProps {
   title?: string
-  size?: TModalSize
   position?: TModalPosition
   preventClose?: boolean
   footer?: IModalFooter

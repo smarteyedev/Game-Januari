@@ -9,6 +9,7 @@ import introData from '@/assets/gameData/intro.json'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
+import { computeScore } from '@/application/services/ScoringService'
 // local asset will be loaded by levelRepository when offline
 
 // Level fetching
@@ -34,6 +35,10 @@ const checkedMap = ref<Record<number, boolean>>({})
 const isChecked = ref(false)
 const question = ref('')
 const showIntro = ref(true)
+const attempts = ref(0)
+const SCORING_TIME_TOLERANCE = 30
+const answerWeight = 0.7
+const timeWeight = 0.3
 
 const gameServiceOptions = {
   maxTime: 180,
@@ -41,7 +46,8 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, reset } = useGameService(gameServiceOptions)
+const MAX_TIME = 180
+const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
@@ -85,7 +91,7 @@ async function fetchLevel() {
 function loadLevel() {
   if (!gameData.value) return
 
-  reset()
+  retry()
   question.value = gameData.value.question
   allCards.value = shuffle(gameData.value.card.map((c) => ({ ...c, matched: false })))
   sourceCards.value = [...allCards.value]
@@ -115,11 +121,20 @@ async function checkAnswers() {
   checkedMap.value = result
   isChecked.value = true
 
-  if (
+  const isPerfect =
     Object.values(result).every(Boolean) &&
     Object.keys(result).length === allCards.value.length
-  ) {
-    await finish(true)
+
+  if (isPerfect) {
+    const total = allCards.value.length
+    const correct = Object.values(checkedMap.value).filter(Boolean).length
+    const totalScore = computeScore(
+      { total, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: gameServiceOptions.maxTime },
+      { timeTolerance: SCORING_TIME_TOLERANCE, answerWeight, timeWeight },
+    )
+    await finish(true, undefined, totalScore)
+  } else {
+    await finish(false) // ← this stops timer
   }
 }
 
@@ -129,6 +144,7 @@ function handleContinue() {
 
 // Retry game
 function retryGame() {
+  attempts.value += 1
   loadLevel()
 }
 
@@ -154,36 +170,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Automation Spotter'"
-    description="Masukkan kata ke dalam tempat yang benar!"
-    :question="question"
-    :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[0]"
-    :isWin="_isWon"
-    :hasLost="hasLost"
-    :isChecked="isChecked"
-    :currentProgress="matchedCount"
-    :targetProgress="allCards.length"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-  >
-    <TaskRow
-      v-model="sourceCards"
-      :checked-map="checkedMap"
-      :is-checked="isChecked"
-      :disabled="isChecked"
-      @moved="onMoved"
-    />
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
+    description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
+    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
+    :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
+    :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
+    @cleared="handleContinue" :successResult="successResultData" :failureResult="failureResultData">
+    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
+      @moved="onMoved" />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
   </BaseGame>
 </template>

@@ -1,57 +1,31 @@
 <template>
-  <BaseGame
-    v-if="survey"
-    title="Matrix Game"
-    module-title="Lorem Ipsum"
-    :description="survey?.title"
-    :time="time"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[5]"
-    :loading="loading"
-    :error="error"
-    :retryFn="retryGame"
-  >
+  <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
+    v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame"
+    :isChecked="isChecked" :successResult="successResultData" :failureResult="failureResultData" @retry="handleRetry"
+    @cleared="handleContinue">
     <div class="flex flex-col w-full">
-      <div
-        v-for="q in survey.questions"
-        :key="q.id"
-        class="flex flex-col items-center justify-center gap-5 md:gap-8"
-      >
-        <MatrixQuestion
-          :title="q.label"
-          :options="survey.options"
-          :correct-answer="q.correctAnswer"
-          :finished="isWin || isLose"
-          v-model="answers[q.id]"
-          :disabled="!isPlaying"
-        />
+      <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
+        <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"
+          :finished="isWin || isLose" v-model="answers[q.id]" :disabled="!isPlaying" />
       </div>
     </div>
 
-    <template #footer>
-      <div class="flex flex-wrap items-center justify-center gap-4.5">
-        <UiButton
-          :size="buttonSize"
-          @click="submit"
-          text="Submit"
-          :disabled="!isPlaying"
-        ></UiButton>
-        <UiButton
-          :size="buttonSize"
-          @click="restart"
-          text="Restart"
-          variant="danger"
-          :disabled="!isLose"
-        >
+    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
+      <div v-if="!isXs" class="flex flex-wrap items-center justify-center gap-4">
+        <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying"></UiButton>
+        <UiButton :size="buttonSize" @click="() => onOpenResult && onOpenResult()" text="Continue" color="success"
+          v-if="isWin || isLose" :disabled="!isWin && !isLose">
         </UiButton>
-        <UiButton
-          :size="buttonSize"
-          @click="continueQuiz"
-          text="Continue"
-          color="success"
-          :disabled="!isWin"
-        >
-        </UiButton>
+      </div>
+      <div v-else class="flex flex-col items-center justify-center gap-4 w-full">
+        <div class="flex gap-2.5 items-center justify-center w-full">
+          <UiButton :size="buttonSize" @click="submit" text="Submit" :disabled="!isPlaying" class="w-full"></UiButton>
+        </div>
+        <div class="flex gap-2.5 items-center justify-center w-full">
+          <UiButton :size="buttonSize" @click="() => onOpenResult && onOpenResult()" text="Continue" color="success"
+            class="w-full" :disabled="!isWin && !isLose">
+          </UiButton>
+        </div>
       </div>
     </template>
   </BaseGame>
@@ -63,6 +37,7 @@ import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
+import { computeScore } from '@/application/services/ScoringService'
 import introData from '@/assets/gameData/intro.json'
 import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
@@ -75,8 +50,9 @@ type Survey = { title: string; options: Option[]; questions: Question[] }
 const survey = ref<Survey | null>(null)
 const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
-
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameService({
+const attempts = ref(0)
+const MAX_TIME = 180
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData, failureResultData } = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.matrix,
   offline: true,
@@ -85,6 +61,7 @@ const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry } = useGameS
 const loading = ref(true)
 const error = ref<unknown>(null)
 const showIntro = ref(true)
+const isChecked = ref(false)
 
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
@@ -111,6 +88,7 @@ async function initializeGame() {
         answers.value[q.id] = undefined
       })
     }
+    isChecked.value = false
     await startGame()
   } catch (err) {
     error.value = err
@@ -168,8 +146,15 @@ const submit = async () => {
   })
 
   score.value = correct
-
   const won = correct === survey.value.questions.length
+  const totalScore = computeScore(
+    { total: survey.value.questions.length, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: 180 },
+    {},
+  )
+
+  score.value = totalScore
+
+  isChecked.value = true
 
   await finish(
     won,
@@ -177,6 +162,7 @@ const submit = async () => {
       questionId: q.id,
       answer: answers.value[q.id],
     })),
+    totalScore,
   )
 }
 
@@ -186,10 +172,25 @@ const restart = async () => {
     answers.value[q.id] = undefined
   })
   score.value = null
+  attempts.value += 1
+  isChecked.value = false
   await retry()
 }
 
 const continueQuiz = () => {
-  alert('Continue to next step')
+  handleContinue()
+}
+
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
+function handleContinue() {
+  emit('cleared')
+}
+
+// Handle retry from result modal
+function handleRetry() {
+  restart()
 }
 </script>

@@ -2,26 +2,13 @@
 <template>
   <div
     class="inline-flex min-w-25 min-h-6 py-1.5 mb-1 px-2 md:px-2.5 border justify-center items-center align-middle rounded-xl"
-    :data-dd-slot="slotId"
-    :class="{
+    :data-dd-slot="slotId" :class="{
       'bg-green-100 border-green-300': isCorrect === true,
       'bg-red-100 border-red-300': isCorrect === false,
       'bg-gray-25 border-gray-500': isCorrect === null,
-    }"
-    @pointerup="handleDropPointer"
-    @touchend="handleDropTouch($event)"
-  >
-    <WordItem
-      v-if="item"
-      :key="item?.id"
-      :item="item"
-      :slotId="slotId"
-      :inSlot="true"
-      :disabled="disabled"
-      :noBackground="true"
-      class="bg-transparent"
-      @dragstart="(payload) => onDragStart?.(payload)"
-    />
+    }" @pointerup="handleDropPointer" @touchend="handleDropTouch($event)">
+    <WordItem v-if="item" :key="item?.id" :item="item" :slotId="slotId" :inSlot="true" :disabled="disabled"
+      :noBackground="true" class="bg-transparent" @dragstart="(payload) => onDragStart?.(payload)" />
   </div>
 </template>
 

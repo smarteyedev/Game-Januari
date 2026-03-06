@@ -1,82 +1,45 @@
 <template>
-  <BaseGame
-    title="Connections Game"
-    moduleTitle="Lorem Sipsum"
-    description="Connections game"
-    :time="time"
-    v-model:showIntro="showIntro"
-    :introData="introData.data[3]"
-    :loading="loading"
-    :error="error"
-    :retryFn="retryGame"
-  >
+  <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
+    v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame"
+    :isWin="isWon" :hasLost="isLost" :isChecked="isChecked" :successResult="successResult"
+    :failureResult="failureResult" @retry="handleRetry" @cleared="handleContinue">
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
-        <ConnectionsCard
-          v-for="index in 4"
-          :key="index"
-          :label="getSolvedGroup(index - 1)?.label || ''"
-          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
-          :color="getSolvedColor(index - 1)"
-          :clickable="false"
-        />
+        <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
+          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)"
+          :clickable="false" />
       </div>
     </div>
     <div>
-      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700"
-        >Create a group of four</span
-      >
+      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700">Create a group of four</span>
     </div>
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 place-items-center w-full">
-      <ConnectionsCard
-        v-for="item in items"
-        :key="item.label"
-        :label="item.label"
-        :state="item.state"
-        :color="categoryColorMap[item.category]"
-        :clickable="item.state !== 'solved'"
-        @click="toggleItem(item)"
-      />
+      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
+        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
 
     <!-- Control Buttons -->
 
-    <template #footer>
+    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
-          <UiLabel
-            v-if="wrongCount !== null && !(isWon || isLost)"
-            :label="`Wrong, you are ${wrongCount} away to form a correct group`"
-          />
-          <UiLabel
-            v-if="solvedNewGroup !== null && !(isWon || isLost)"
-            :label="`You found a new group: ${solvedNewGroup.label}`"
-          />
+          <UiLabel v-if="wrongCount !== null && !(isWon || isLost)"
+            :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
+          <UiLabel v-if="solvedNewGroup !== null && !(isWon || isLost)"
+            :label="`You found a new group: ${solvedNewGroup.label}`" />
           <UiLabel v-if="isWon" :label="`You win`" />
           <UiLabel v-if="isLost" :label="`you lose`" />
         </div>
         <div class="flex gap-4">
-          <UiButton
-            :size="buttonSize"
-            text="Submit"
-            variant="primary"
-            :disabled="selected.length !== 4 || isWon || isLost"
-            @click="submitSelection"
-          >
+          <UiButton :size="buttonSize" text="Submit" variant="primary"
+            :disabled="selected.length !== 4 || isWon || isLost" @click="submitSelection">
           </UiButton>
 
-          <!--Hidden, if lose show restart, if win show continue-->
-          <UiButton
-            :size="buttonSize"
-            text="Restart"
-            variant="danger"
-            v-if="isLost"
-            @click="restartGame"
-            :color="'error'"
-          >
+          <!--Show continue button after submit/check, regardless of win or lose-->
+          <UiButton :size="buttonSize" text="Continue" v-if="isWon || isLost" :color="'success'"
+            @click="() => onOpenResult && onOpenResult()">
           </UiButton>
-          <UiButton :size="buttonSize" text="Continue" v-if="isWon" :color="'success'"> </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
@@ -94,6 +57,7 @@ import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { useGameService } from '@/application'
+import { computeScore } from '@/application/services/ScoringService'
 import introData from '@/assets/gameData/intro.json'
 import { UiButton } from '@/components/atoms/button'
 import { shuffle } from '@/utils/shuffle'
@@ -147,11 +111,14 @@ const buttonSize = computed(() => {
   return 'xl'
 })
 
-const { time, _isWon, _isLost, startGame, finish, retry } = useGameService({
+const MAX_TIME = 180
+const gameService = useGameService({
   maxTime: 180,
   minigameId: MINIGAME_IDS.connections,
   offline: true,
 })
+
+const { time, _isWon, _isLost, startGame, finish, retry } = gameService
 
 const loading = ref(true)
 const error = ref<unknown>(null)
@@ -160,10 +127,16 @@ const showIntro = ref(true)
 const isWon = computed(() => _isWon.value)
 const isLost = computed(() => _isLost.value)
 
+// Computed properties to unwrap refs for BaseGame props
+const successResult = computed(() => gameService.successResultData.value)
+const failureResult = computed(() => gameService.failureResultData.value)
+
 const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])
 const items = ref<Item[]>([])
 const selected = ref<Item[]>([])
+
+const isChecked = ref(false)
 const categoryLabelMap = ref<Record<string, string>>({})
 const solvedGroups = ref<SolvedGroup[]>([])
 const maxAttempts = 4
@@ -183,12 +156,26 @@ function countAway(items: Item[]) {
   return 4 - maxSame
 }
 
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
 function colorFromCategory(id: string) {
   let hash = 0
   for (let i = 0; i < id.length; i++) {
     hash = id.charCodeAt(i) + ((hash << 5) - hash)
   }
+
   return COLOR_POOL[Math.abs(hash) % COLOR_POOL.length]!
+}
+
+function handleContinue() {
+  emit('cleared')
+}
+
+// Handle retry from result modal
+function handleRetry() {
+  restartGame()
 }
 
 function assignCategoryColors(categories: { id: string }[]) {
@@ -203,6 +190,7 @@ async function initializeGame() {
   error.value = null
 
   try {
+    isChecked.value = false
     await startGame()
 
     const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
@@ -276,7 +264,12 @@ async function submitSelection() {
 
     if (attemptsLeft.value <= 0) {
       revealAllGroups()
-      await finish(false)
+      const total = categories.value.length
+      const correct = solvedGroups.value.length
+      const attemptsUsed = maxAttempts - attemptsLeft.value + 1
+      const totalScore = computeScore({ total, correct, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      isChecked.value = true
+      await finish(false, undefined, totalScore)
     }
 
     return
@@ -302,7 +295,9 @@ async function submitSelection() {
 
   // win condition
   if (solvedGroups.value.length === categories.value.length) {
-    await finish(true)
+    const total = categories.value.length
+    const totalScore = computeScore({ total, correct: solvedGroups.value.length, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    await finish(true, undefined, totalScore)
   }
 }
 
@@ -336,6 +331,7 @@ function revealAllGroups() {
 }
 
 async function restartGame() {
+  isChecked.value = false
   await retry()
   resetLocalState()
 }

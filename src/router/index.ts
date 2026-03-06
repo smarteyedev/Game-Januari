@@ -15,6 +15,7 @@ const router = createRouter({
   ],
 })
 
+
 router.beforeEach(async () => {
   const session = useSessionStore(pinia)
 
@@ -26,5 +27,6 @@ router.beforeEach(async () => {
     await session.createGuestSession()
   }
 })
+
 
 export default router
