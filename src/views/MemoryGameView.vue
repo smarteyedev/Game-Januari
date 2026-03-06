@@ -10,6 +10,8 @@ import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import { shuffle } from '@/utils/shuffle'
 import { useGameService } from '@/application/services/GameService'
 import { computeScore } from '@/application/services/ScoringService'
+import { UiButton } from '@/components/atoms/button'
+import { useBreakpoint } from '@/composables/useBreakpoint'
 
 // Level fetching
 const loading = ref(false)
@@ -153,6 +155,7 @@ const gameOver = computed(() => _isLost.value || (_isWon.value && allMatched.val
 // Emit for session tracking
 const emit = defineEmits<{
   (e: 'cleared'): void
+  (e: 'open-result'): void
 }>()
 
 function handleContinue() {
@@ -179,6 +182,15 @@ function retryGame() {
 onMounted(() => {
   fetchLevel()
 })
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
 </script>
 
 <template>
@@ -188,10 +200,15 @@ onMounted(() => {
     :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" :successResult="successResultData"
     :failureResult="failureResultData" @start="start" @retry="retryGame" @cleared="handleContinue">
     <MemoryBoard :cards="cards" @flip="flipCard" />
-    <template #footer-left>
-      <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
-        Card Turns: {{ turns }}
-      </span>
+    <template #footer>
+      <div class="flex flex-col xs:flex-row justify-between w-full items-center">
+        <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
+          Card Turns: {{ turns }}
+        </span>
+        <UiButton v-if="allMatched || time <= 0" :size="buttonSize" text="Continue" variant="primary"
+          @click="emit('open-result')">
+        </UiButton>
+      </div>
     </template>
   </BaseGame>
 </template>

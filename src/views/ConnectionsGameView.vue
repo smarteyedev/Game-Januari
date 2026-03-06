@@ -331,6 +331,7 @@ function revealAllGroups() {
 }
 
 async function restartGame() {
+  isChecked.value = false
   await retry()
   resetLocalState()
 }
