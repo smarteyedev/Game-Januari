@@ -91,7 +91,7 @@ const showResultLocal = ref<boolean>(props.showResult ?? false)
 // can finish before showing the result popup.  Otherwise the dialog opens
 // immediately which looks jarring.  Use a small constant that a bit longer than the
 // CSS transition duration used by the progress component (≈300ms).
-const RESULT_MODAL_DELAY = 1000
+const RESULT_MODAL_DELAY = 3000
 
 // hold reference to an active timeout so repeated calls don't stack delays
 let resultTimer: number | undefined

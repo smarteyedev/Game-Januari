@@ -2,7 +2,7 @@
     <div class="flex flex-col text-primary-700 gap-4 w-full">
         <div class="flex flex-col gap-1.5">
             <div class="flex justify-between m-0 gap-0 border-b border-gray-100 pb-2">
-                <span class="text-body-md md:text-h4 font-extrabold text-primary-700">
+                <span class="text-body-md md:text-body-lg font-extrabold text-primary-700">
                     Review
                 </span>
 
@@ -12,10 +12,10 @@
 
             <div v-if="reviewPoints.length > 0" class="flex flex-col gap-2">
                 <div v-for="(item, index) in reviewPoints" :key="index" class="flex flex-col gap-1">
-                    <p class="text-body-xs md:text-h4 font-extrabold">
+                    <p class="text-body-xs md:text-body-lg font-extrabold">
                         {{ item.point }}
                     </p>
-                    <p class="text-body-xs md:text-h4 font-semibold">
+                    <p class="text-body-xs md:text-body-lg">
                         {{ item.review }}
                     </p>
                 </div>
