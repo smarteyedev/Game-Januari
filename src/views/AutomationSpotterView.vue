@@ -1,140 +1,70 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
-import TaskRow from '@/components/games/AutomationSpotter/TaskRow.vue'
-import SpotZones from '@/components/games/AutomationSpotter/SpotZones.vue'
-import type { DragCard, Zone } from '@/domain/types'
-import { levelRepository } from '@/infrastructure'
+import TaskRow from '@/components/organisms/AutomationSpotter/TaskRow.vue'
+import SpotZones from '@/components/organisms/AutomationSpotter/SpotZones.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import introData from '@/assets/gameData/intro.json'
-import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
-import { shuffle } from '@/utils/shuffle'
-import { useGameService } from '@/application/services/GameService'
-import { computeScore } from '@/application/services/ScoringService'
-// local asset will be loaded by levelRepository when offline
+import { MINIGAME_IDS } from '@/utils/constants'
+import { useAutomationSpotter } from '@/composables/games/useAutomationSpotter'
+import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
 
-// Level fetching
-const loading = ref(false)
-const error = ref<unknown>(null)
+// Game Logic Composable
+const {
+  allCards,
+  sourceCards,
+  zones,
+  checkedMap,
+  isChecked,
+  question,
+  matchedCount,
+  fetchLevel,
+  onMoved,
+  checkAnswers: gameCheckAnswers,
+  resetBoard
+} = useAutomationSpotter()
 
-// Game data
-const gameData = ref<{
-  question: string
-  card: DragCard[]
-} | null>(null)
-
-// Card state
-const allCards = ref<DragCard[]>([])
-const sourceCards = ref<DragCard[]>([])
-
-const zones = ref<Zone[]>([
-  { id: true, label: 'Bisa', cards: [] },
-  { id: false, label: 'Tidak Bisa', cards: [] },
-])
-
-const checkedMap = ref<Record<number, boolean>>({})
-const isChecked = ref(false)
-const question = ref('')
-const showIntro = ref(true)
-const attempts = ref(0)
+// Game Meta State
 const SCORING_TIME_TOLERANCE = 30
 const answerWeight = 0.7
 const timeWeight = 0.3
+const MAX_TIME = 180
 
-const gameServiceOptions = {
-  maxTime: 180,
+const {
+  time,
+  _isWon,
+  _isLost,
+  showIntro,
+  introData,
+  introLoading,
+  gameLoading,
+  gameError,
+  successResultData,
+  start,
+  retryGame,
+  finishGame
+} = useBaseGameLogic({
+  maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.automationSpotter,
   offline: true,
-}
-
-const MAX_TIME = 180
-const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
-
-// Computed
-const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
-const isLevelWin = computed(() => {
-  if (!isChecked.value) return false
-  return (
-    Object.keys(checkedMap.value).length === allCards.value.length &&
-    Object.values(checkedMap.value).every(Boolean)
-  )
+  scoringParams: {
+    timeTolerance: SCORING_TIME_TOLERANCE,
+    answerWeight,
+    timeWeight
+  },
+  fetchLevel
 })
-const hasLost = computed(() => isChecked.value && !isLevelWin.value)
-
-// Fetch level
-async function fetchLevel() {
-  loading.value = true
-  error.value = null
-
-  try {
-    // pass offline flag so repository can load local asset when needed
-    const offlineData = await levelRepository.getLevel<any>(
-      MinigameId.AutomationSpotter,
-      1,
-      gameServiceOptions.offline,
-    )
-    const raw: any = offlineData as any
-    const content = raw?.content ?? raw
-    gameData.value = {
-      question: content?.question ?? '',
-      card: content?.card ?? [],
-    }
-    loadLevel()
-  } catch (err) {
-    error.value = err
-    console.error('Failed to load level', err)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Load level
-function loadLevel() {
-  if (!gameData.value) return
-
-  retry()
-  question.value = gameData.value.question
-  allCards.value = shuffle(gameData.value.card.map((c) => ({ ...c, matched: false })))
-  sourceCards.value = [...allCards.value]
-  zones.value.forEach((zone) => (zone.cards = []))
-  checkedMap.value = {}
-  isChecked.value = false
-}
-
-// Handle drag moves
-function onMoved(ids: number[]) {
-  if (!isChecked.value) return
-  ids.forEach((id) => {
-    if (checkedMap.value[id] !== undefined) delete checkedMap.value[id]
-  })
-}
 
 // Check answers
 async function checkAnswers() {
-  const result: Record<number, boolean> = {}
+  const result = gameCheckAnswers()
 
-  zones.value.forEach((zone) => {
-    zone.cards.forEach((card) => {
-      result[card.id] = card.answer === zone.id
+  if (result.isPerfect) {
+    await finishGame(true, {
+      scoreContext: {
+        total: result.totalCount,
+        correct: result.correctCount,
+      }
     })
-  })
-
-  checkedMap.value = result
-  isChecked.value = true
-
-  const isPerfect =
-    Object.values(result).every(Boolean) &&
-    Object.keys(result).length === allCards.value.length
-
-  if (isPerfect) {
-    const total = allCards.value.length
-    const correct = Object.values(checkedMap.value).filter(Boolean).length
-    const totalScore = computeScore(
-      { total, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: gameServiceOptions.maxTime },
-      { timeTolerance: SCORING_TIME_TOLERANCE, answerWeight, timeWeight },
-    )
-    await finish(true, undefined, totalScore)
   } else {
-    await finish(false) // ← this stops timer
+    await finishGame(false)
   }
 }
 
@@ -142,42 +72,49 @@ function handleContinue() {
   emit('cleared')
 }
 
-// Retry game
-function retryGame() {
-  attempts.value += 1
-  loadLevel()
-}
-
-// Start game
-async function start() {
-  showIntro.value = false
-  await startGame()
-}
-
 // Emit
 const emit = defineEmits<{
   (e: 'cleared'): void
 }>()
-
-// Lifecycle
-onMounted(() => {
-  fetchLevel()
-})
-
-onUnmounted(() => {
-  // Cleanup handled by useGameService
-})
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
-    description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
-    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
-    :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
-    :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
-    @cleared="handleContinue" :successResult="successResultData" :failureResult="failureResultData">
-    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
-      @moved="onMoved" />
-    <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
+  <BaseGame
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    title="Automation Spotter"
+    description="Masukkan kata ke dalam tempat yang benar!"
+    :question="question"
+    :time="time"
+    :maxTime="MAX_TIME"
+    :loading="gameLoading || introLoading"
+    :error="gameError"
+    :retryFn="() => fetchLevel(1, true)"
+    v-model:showIntro="showIntro"
+    :introData="introData"
+    :isWin="_isWon"
+    :hasLost="_isLost"
+    :isChecked="isChecked"
+    :currentProgress="matchedCount"
+    :targetProgress="allCards.length"
+    :showProgress="true"
+    @start="start"
+    @retry="retryGame(resetBoard)"
+    @check="checkAnswers"
+    @cleared="handleContinue"
+    :successResult="successResultData"
+  >
+    <TaskRow
+      v-model="sourceCards"
+      :checked-map="checkedMap"
+      :is-checked="isChecked"
+      :disabled="isChecked"
+      @moved="onMoved"
+    />
+    <SpotZones
+      :zones="zones"
+      :checked-map="checkedMap"
+      :is-checked="isChecked"
+      @moved="onMoved"
+    />
   </BaseGame>
 </template>

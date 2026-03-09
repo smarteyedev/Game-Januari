@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Keypoint } from '@/domain/types'
-import IconLabel from './IconLabel.vue'
+import IconLabel from '@/components/molecules/IconLabel.vue'
 
 const _ = defineProps<{
   title?: string
@@ -17,8 +17,15 @@ const _ = defineProps<{
     </div>
 
     <div class="flex flex-col gap-4 w-full text-left text-body-md md:text-h4">
-      <IconLabel v-for="(point, index) in key_points ?? []" :key="index" :label="point.description"
-        :iconName="point.icon_name" :bullet="!point.icon_name" iconPosition="start" icon-color="#00A3B5" />
+      <IconLabel
+        v-for="(point, index) in key_points ?? []"
+        :key="index"
+        :label="point.description"
+        :iconName="point.icon_name"
+        :bullet="!point.icon_name"
+        iconPosition="start"
+        icon-color="#00A3B5"
+      />
     </div>
   </div>
 </template>

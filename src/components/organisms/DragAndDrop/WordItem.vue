@@ -1,6 +1,12 @@
 <template>
-  <div @pointerdown="pointerStart" @touchstart.prevent="touchStart" @mousedown="pointerStart">
-    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" />
+  <div
+@pointerdown="pointerStart"
+@touchstart.prevent="touchStart"
+@mousedown="pointerStart">
+    <Card
+:label="item.word"
+:custom-class="customClass"
+:disabled="disabled" />
   </div>
 </template>
 

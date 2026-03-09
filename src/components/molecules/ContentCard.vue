@@ -1,5 +1,7 @@
 <template>
-  <Card :centered="true" :customClass="customClass">
+  <Card
+:centered="true"
+:customClass="customClass">
     <slot></slot>
   </Card>
 </template>

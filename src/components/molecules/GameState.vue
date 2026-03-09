@@ -17,10 +17,19 @@ defineProps<Props>()
       <UiLoading class="grid place-items-center" />
     </div>
 
-    <div v-else-if="error" class="flex flex-col items-center justify-center gap-4 p-8">
+    <div
+v-else-if="error"
+class="flex flex-col items-center justify-center gap-4 p-8">
       <p class="text-h4 text-red-600">Failed to load game</p>
-      <UiButton v-if="retryFn" text="Retry" variant="primary" size="md" @click="retryFn" />
-      <p v-else class="text-body-sm text-gray-500">Please refresh the page</p>
+      <UiButton
+v-if="retryFn"
+text="Retry"
+variant="primary"
+size="md"
+@click="retryFn" />
+      <p
+v-else
+class="text-body-sm text-gray-500">Please refresh the page</p>
     </div>
 
     <slot v-else />

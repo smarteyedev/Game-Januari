@@ -1,6 +1,15 @@
 <template>
-  <svg width="84" height="80" viewBox="0 0 84 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <path fill-rule="evenodd" clip-rule="evenodd" d="M84 63H81V80H84V63Z" fill="black" />
+  <svg
+width="84"
+height="80"
+viewBox="0 0 84 80"
+fill="none"
+xmlns="http://www.w3.org/2000/svg">
+    <path
+fill-rule="evenodd"
+clip-rule="evenodd"
+d="M84 63H81V80H84V63Z"
+fill="black" />
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"
@@ -27,9 +36,15 @@
         gradientUnits="userSpaceOnUse"
       >
         <stop stop-color="#00C8CA" />
-        <stop offset="0.37" stop-color="#0652FF" />
-        <stop offset="0.64" stop-color="#2750FE" />
-        <stop offset="1" stop-color="#F246FB" />
+        <stop
+offset="0.37"
+stop-color="#0652FF" />
+        <stop
+offset="0.64"
+stop-color="#2750FE" />
+        <stop
+offset="1"
+stop-color="#F246FB" />
       </linearGradient>
     </defs>
   </svg>

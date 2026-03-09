@@ -9,4 +9,3 @@ export type { GameServiceOptions, GameServiceReturn } from './services/GameServi
 
 export { computeScore, getFeedback } from './services/ScoringService'
 export type { ScoreContext, ScoringParams } from './services/ScoringService'
-

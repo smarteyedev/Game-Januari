@@ -152,12 +152,8 @@ export class Logger {
    */
   private outputToConsole(entry: LogEntry): void {
     const levelPrefix = this.getLevelPrefix(entry.level)
-    const timestamp = this.options.includeTimestamp
-      ? `[${entry.timestamp.toISOString()}] `
-      : ''
-    const contextStr = entry.context
-      ? ` ${JSON.stringify(entry.context)}`
-      : ''
+    const timestamp = this.options.includeTimestamp ? `[${entry.timestamp.toISOString()}] ` : ''
+    const contextStr = entry.context ? ` ${JSON.stringify(entry.context)}` : ''
     const errorStr = entry.error ? `\n${entry.error.stack || entry.error.message}` : ''
 
     switch (entry.level) {
@@ -207,4 +203,3 @@ export const error = (message: string, error?: Error, context?: Record<string, u
   logger.error(message, error, context)
 
 export default logger
-

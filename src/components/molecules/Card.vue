@@ -53,7 +53,7 @@ function handleDragStart(ev: DragEvent) {
       ev.dataTransfer.setData('text/plain', '')
       ev.dataTransfer.effectAllowed = 'move'
     }
-  } catch (e) {
+  } catch (_) {
     // ignore
   }
   emit('dragstart', ev)
