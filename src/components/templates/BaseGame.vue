@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { nextTick, onMounted, onUnmounted, ref, watch, type Slot } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
-import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
+import GameOverlayManager from '@/components/molecules/GameOverlayManager.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
-import GameResultModal from '../molecules/GameResultModal.vue'
-import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
 import TopActionBar from '../molecules/TopActionBar.vue'
 
 /**
@@ -59,12 +57,6 @@ interface BaseGameProps {
   hideSubmit?: boolean
   /** Custom time formatter function */
   formatTime?: (seconds: number) => string
-  /** Custom slots configuration */
-  slots?: {
-    header?: Slot
-    default?: Slot
-    footer?: Slot
-  }
 }
 
 const props = withDefaults(defineProps<BaseGameProps>(), {
@@ -79,21 +71,27 @@ const props = withDefaults(defineProps<BaseGameProps>(), {
   hasLost: false,
   hideSubmit: false,
   successResult: null,
-  failureResult: null,
 })
+
+const emit = defineEmits<{
+  (e: 'check'): void
+  (e: 'retry'): void
+  (e: 'cleared'): void
+  (e: 'start'): void
+  (e: 'update:showIntro', value: boolean): void
+  (e: 'update:showResult', value: boolean): void
+  (e: 'update:showSummary', value: boolean): void
+  (e: 'toggle-summary'): void
+}>()
 
 // Local control for showing result modal when game is checked
 const showResultLocal = ref<boolean>(props.showResult ?? false)
+const showSummaryLocal = ref<boolean>(props.showSummary ?? false)
 
 // when progress bar is displayed, we want to wait a moment so the animation
-// can finish before showing the result popup.  Otherwise the dialog opens
-// immediately which looks jarring.  Use a small constant that a bit longer than the
-// CSS transition duration used by the progress component (≈300ms).
+// can finish before showing the result popup.
 const RESULT_MODAL_DELAY = 3000
-
-// hold reference to an active timeout so repeated calls don't stack delays
 let resultTimer: number | undefined
-
 const isDelayActive = ref(false)
 
 function openResultModal(useDelay = true) {
@@ -115,14 +113,9 @@ function openResultModal(useDelay = true) {
   }
 }
 
-// Removed: isChecked watcher should NOT open result modal
-// Result modal should only open based on isWin or hasLost (win/lose state)
-
-// Also show result modal when game is won or lost
 watch(
   () => props.isWin,
   (val) => {
-    // Only open when we also have result data available
     if (val && props.successResult) openResultModal()
   },
 )
@@ -134,23 +127,13 @@ watch(
   },
 )
 
-const emit = defineEmits<{
-  /** Emit when check/submit button is clicked */
-  (e: 'check'): void
-  /** Emit when retry button is clicked */
-  (e: 'retry'): void
-  /** Emit when game is cleared/completed */
-  (e: 'cleared'): void
-  /** Emit when game starts (after intro) */
-  (e: 'start'): void
-  /** Emit when intro visibility should change */
-  (e: 'update:showIntro', value: boolean): void
-}>()
+watch(
+  () => props.successResult,
+  (val) => {
+    if (val) openResultModal()
+  },
+)
 
-/**
- * Handle start button click
- * Closes intro modal and emits start event
- */
 function handleStart() {
   emit('update:showIntro', false)
   emit('start')
@@ -169,25 +152,16 @@ function handleCleared() {
 const gameWrapper = ref<HTMLElement | null>(null)
 const isFullscreen = ref(false)
 
-/**
- * Toggle fullscreen mode for the game wrapper
- */
 function toggleFullscreen() {
   const el = gameWrapper.value
   if (!el) return
-
   if (!document.fullscreenElement) {
-    el.requestFullscreen().catch((err) => {
-      console.warn('Failed to enter fullscreen:', err)
-    })
+    el.requestFullscreen().catch(err => console.warn('Fullscreen failed', err))
   } else {
     document.exitFullscreen()
   }
 }
 
-/**
- * Handle fullscreen change event
- */
 function handleFullscreenChange() {
   isFullscreen.value = !!document.fullscreenElement
 }
@@ -200,52 +174,31 @@ onUnmounted(() => {
   document.removeEventListener('fullscreenchange', handleFullscreenChange)
 })
 
-const successResult = ref<SuccessResultData | undefined>()
-
-// Local control for summary modal
-const showSummaryLocal = ref(false)
-const summaryData = ref<SuccessResultData | undefined>()
-
 function handleOpenResult() {
-  // ensure latest result data is synced
-  successResult.value = props.successResult ?? undefined
-
   openResultModal(false)
 }
 
 function handleViewSummary() {
-  // Only show summary when player wins (use successResult only)
-  summaryData.value = successResult.value
-
-  // If summary is currently shown, close summary and go back to game content
   if (showSummaryLocal.value) {
     showSummaryLocal.value = false
     showResultLocal.value = false
   } else {
-    // Otherwise, close result modal and open summary modal
     showResultLocal.value = false
     showSummaryLocal.value = true
   }
+  emit('toggle-summary')
 }
 
 function handleCheck() {
-  // Delegate check handling to parent/game view; game service will populate result data
   emit('check')
 }
-
-// Initialize local result refs from incoming props and update on changes
-watch(
-  () => props.successResult,
-  (val) => {
-    successResult.value = val ?? undefined
-    if (successResult.value) openResultModal()
-    console.debug('BaseGame: successResult prop changed', { value: successResult.value })
-  },
-)
 </script>
 
 <template>
-  <GameState :loading="loading" :error="error" :retryFn="retryFn">
+  <GameState
+:loading="loading"
+:error="error"
+:retryFn="retryFn">
     <div
       ref="gameWrapper"
       class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
@@ -256,7 +209,6 @@ watch(
         backgroundRepeat: 'no-repeat',
       }"
     >
-      <!-- Topbar (always visible) -->
       <TopActionBar
         :text="moduleTitle"
         class="z-60"
@@ -269,41 +221,26 @@ watch(
         :isShown="showSummaryLocal"
       />
 
-      <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
-        <!-- Intro Modal -->
-
-        <GameIntroModal
-          v-if="showIntro && introData"
-          :modelValue="showIntro"
-          @update:modelValue="emit('update:showIntro', $event)"
+        <GameOverlayManager
+          :show-intro="showIntro"
+          :show-result="showResultLocal"
+          :show-summary="showSummaryLocal"
           :title="title"
-          :introData="introData"
+          :intro-data="introData"
+          :is-win="isWin"
+          :success-result="successResult"
+          @update:show-intro="emit('update:showIntro', $event)"
+          @update:show-result="showResultLocal = $event"
+          @update:show-summary="showSummaryLocal = $event"
           @start="handleStart"
-          containerPosition="relative"
-        />
-
-        <GameResultModal
-          v-else-if="showResultLocal"
-          :success="isWin"
-          :successResult="successResult"
-          v-model:modelValue="showResultLocal"
-          @continue="handleCleared"
           @retry="handleRetry"
-          containerPosition="relative"
-        />
-
-        <GameResultSummaryModal
-          v-else-if="showSummaryLocal"
-          :resultSummary="summaryData"
-          v-model:modelValue="showSummaryLocal"
-          containerPosition="relative"
+          @cleared="handleCleared"
           @toggle-summary="handleViewSummary"
         />
 
-        <!-- Game Content -->
         <div
-          v-else
+          v-if="!showIntro && !showResultLocal && !showSummaryLocal"
           class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
         >
           <slot name="header">
@@ -341,7 +278,6 @@ watch(
               <template #footer-left>
                 <slot name="footer-left" />
               </template>
-
               <template #footer-right>
                 <slot name="footer-right" />
               </template>

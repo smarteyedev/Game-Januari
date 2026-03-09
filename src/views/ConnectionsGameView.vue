@@ -1,19 +1,120 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { UiLabel } from '@/components/atoms/label'
+import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
+import { MINIGAME_IDS } from '@/utils/constants'
+import BaseGame from '@/components/templates/BaseGame.vue'
+import { UiButton } from '@/components/atoms/button'
+import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useConnectionsGame } from '@/composables/games/useConnectionsGame'
+import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
+
+// Game Logic Composable
+const {
+  categories,
+  items,
+  selected,
+  solvedGroups,
+  attemptsLeft,
+  maxAttempts,
+  wrongCount,
+  solvedNewGroup,
+  categoryColorMap,
+  loading: gameLoading,
+  error,
+  fetchLevel,
+  toggleItem,
+  submitSelection: gameSubmitSelection,
+  reset: resetGame
+} = useConnectionsGame()
+
+const { isXs, isSm, isMd } = useBreakpoint()
+
+const buttonSize = computed(() => {
+  if (isXs.value) return 'xs'
+  if (isSm.value) return 'sm'
+  if (isMd.value) return 'md'
+  return 'xl'
+})
+
+const MAX_TIME = 180
+
+const {
+  time,
+  _isWon,
+  _isLost,
+  showIntro,
+  introData,
+  introLoading,
+  gameLoading: baseLoading,
+  gameError,
+  successResultData,
+  start,
+  retryGame,
+  finishGame
+} = useBaseGameLogic({
+  maxTime: MAX_TIME,
+  minigameId: MINIGAME_IDS.connections,
+  offline: true,
+  introId: 3,
+  fetchLevel
+})
+
+// Emit
+const emit = defineEmits<{
+  (e: 'cleared'): void
+}>()
+
+function handleContinue() {
+  emit('cleared')
+}
+
+// Check Selection
+async function submitSelection() {
+  const result = gameSubmitSelection()
+  if (!result) return
+
+  if (result.gameOver) {
+    const attemptsUsed = maxAttempts.value - attemptsLeft.value + (result.win ? 0 : 1)
+    await finishGame(result.win || false, {
+      scoreContext: {
+        total: categories.value.length,
+        correct: solvedGroups.value.length,
+        attempts: attemptsUsed,
+      }
+    })
+  }
+}
+
+function getSolvedGroup(index: number) {
+  return solvedGroups.value[index]
+}
+
+function getSolvedColor(index: number) {
+  const group = solvedGroups.value[index]
+  return group ? (categoryColorMap.value[group.id] ?? 'bg-gray-50') : 'bg-gray-50'
+}
+</script>
+
 <template>
   <BaseGame
     title="Connections Game"
-    moduleTitle="Lorem Sipsum"
+    moduleTitle="Explore Artificial Intelligence (AI) Tools"
     description="Connections game"
     :time="time"
+    :maxTime="MAX_TIME"
     v-model:showIntro="showIntro"
-    :introData="introData.data[3]"
-    :loading="loading"
-    :error="error"
-    :retryFn="retryGame"
-    :isWin="isWon"
-    :hasLost="isLost"
-    :isChecked="isChecked"
-    :successResult="successResult"
-    @retry="handleRetry"
+    :introData="introData"
+    :loading="baseLoading || introLoading || gameLoading"
+    :error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)"
+    :isWin="_isWon"
+    :hasLost="_isLost"
+    :isChecked="false"
+    :successResult="successResultData"
+    @start="start"
+    @retry="retryGame(resetGame)"
+    @check="submitSelection"
     @cleared="handleContinue"
   >
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
@@ -45,38 +146,40 @@
       />
     </div>
 
-    <!-- Control Buttons -->
-
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
-        <!--Event message for user feedback-->
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
           <UiLabel
-            v-if="wrongCount !== null && !(isWon || isLost)"
+            v-if="wrongCount !== null && !(_isWon || _isLost)"
             :label="`Wrong, you are ${wrongCount} away to form a correct group`"
           />
           <UiLabel
-            v-if="solvedNewGroup !== null && !(isWon || isLost)"
+            v-if="solvedNewGroup !== null && !(_isWon || _isLost)"
             :label="`You found a new group: ${solvedNewGroup.label}`"
           />
-          <UiLabel v-if="isWon" :label="`You win`" />
-          <UiLabel v-if="isLost" :label="`you lose`" />
+          <UiLabel
+            v-if="_isWon"
+            :label="`You win`"
+          />
+          <UiLabel
+            v-if="_isLost"
+            :label="`you lose`"
+          />
         </div>
         <div class="flex gap-4">
           <UiButton
             :size="buttonSize"
             text="Submit"
             variant="primary"
-            :disabled="selected.length !== 4 || isWon || isLost"
+            :disabled="selected.length !== 4 || _isWon || _isLost"
             @click="submitSelection"
           >
           </UiButton>
 
-          <!--Show continue button after submit/check, regardless of win or lose-->
           <UiButton
             :size="buttonSize"
             text="Continue"
-            v-if="isWon || isLost"
+            v-if="_isWon || _isLost"
             :color="'success'"
             @click="() => onOpenResult && onOpenResult()"
           >
@@ -89,323 +192,3 @@
     </template>
   </BaseGame>
 </template>
-
-<script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
-import { UiLabel } from '@/components/atoms/label'
-import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
-import { levelRepository } from '@/infrastructure'
-import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
-import BaseGame from '@/components/templates/BaseGame.vue'
-import { useGameService } from '@/application'
-import { computeScore } from '@/application/services/ScoringService'
-import introData from '@/assets/gameData/intro.json'
-import { UiButton } from '@/components/atoms/button'
-import { shuffle } from '@/utils/shuffle'
-import { useBreakpoint } from '@/composables/useBreakpoint'
-
-type Category = {
-  id: string
-  label: string
-}
-
-type ItemState = 'idle' | 'selected' | 'solved'
-
-type Item = {
-  label: string
-  category: string
-  state: ItemState
-}
-
-type SolvedGroup = {
-  id: string
-  label: string
-  color: string
-}
-
-const COLOR_POOL = [
-  'bg-red-200',
-  'bg-orange-200',
-  'bg-amber-200',
-  'bg-yellow-200',
-  'bg-lime-200',
-  'bg-green-200',
-  'bg-emerald-200',
-  'bg-teal-200',
-  'bg-cyan-200',
-  'bg-sky-200',
-  'bg-blue-200',
-  'bg-indigo-200',
-  'bg-violet-200',
-  'bg-purple-200',
-  'bg-fuchsia-200',
-  'bg-pink-200',
-  'bg-rose-200',
-]
-
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
-
-const MAX_TIME = 180
-const gameService = useGameService({
-  maxTime: 180,
-  minigameId: MINIGAME_IDS.connections,
-  offline: true,
-})
-
-const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry } = gameService
-
-// Watch for timeout to trigger loss state
-watch(
-  () => isTimeOver.value,
-  (over) => {
-    if (over && !_isWon.value && !_isLost.value) {
-      // Time is up and game is not yet finished - mark as lost
-      finish(false)
-    }
-  },
-)
-
-const loading = ref(true)
-const error = ref<unknown>(null)
-const showIntro = ref(true)
-
-const isWon = computed(() => _isWon.value)
-const isLost = computed(() => _isLost.value)
-
-// Computed properties to unwrap refs for BaseGame props
-const successResult = computed(() => gameService.successResultData.value)
-
-const categoryColorMap = ref<Record<string, string>>({})
-const categories = ref<Category[]>([])
-const items = ref<Item[]>([])
-const selected = ref<Item[]>([])
-
-const isChecked = ref(false)
-const categoryLabelMap = ref<Record<string, string>>({})
-const solvedGroups = ref<SolvedGroup[]>([])
-const maxAttempts = 4
-const attemptsLeft = ref(maxAttempts)
-
-const wrongCount = ref<number | null>(null)
-const solvedNewGroup = ref<{ id: string; label: string } | null>(null)
-
-function countAway(items: Item[]) {
-  const freq: Record<string, number> = {}
-
-  items.forEach((item) => {
-    freq[item.category] = (freq[item.category] || 0) + 1
-  })
-
-  const maxSame = Math.max(...Object.values(freq))
-  return 4 - maxSame
-}
-
-const emit = defineEmits<{
-  (e: 'cleared'): void
-}>()
-
-function colorFromCategory(id: string) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) {
-    hash = id.charCodeAt(i) + ((hash << 5) - hash)
-  }
-
-  return COLOR_POOL[Math.abs(hash) % COLOR_POOL.length]!
-}
-
-function handleContinue() {
-  emit('cleared')
-}
-
-// Handle retry from result modal
-function handleRetry() {
-  restartGame()
-}
-
-function assignCategoryColors(categories: { id: string }[]) {
-  categories.forEach((cat) => {
-    categoryColorMap.value[cat.id] = colorFromCategory(cat.id)
-  })
-}
-
-// Fetch game data and start game
-async function initializeGame() {
-  loading.value = true
-  error.value = null
-
-  try {
-    isChecked.value = false
-    await startGame()
-
-    const raw = await levelRepository.getLevel<any>(MinigameId.Connections, 1, true)
-    const data: any = raw && raw.content ? raw.content : raw
-
-    // Normalize categories to use the `category` string as id (matches items' category field)
-    const rawCategories = data.target_category || []
-    categories.value = rawCategories.map((c: any) => ({ id: String(c.category), label: c.label }))
-    assignCategoryColors(categories.value)
-
-    categoryLabelMap.value = Object.fromEntries(categories.value.map((c) => [c.id, c.label]))
-
-    const itemsSrc = data.items || []
-    items.value = shuffle(
-      itemsSrc.map((item: any) => ({
-        label: item.label,
-        category: item.category,
-        state: 'idle',
-      })),
-    )
-  } catch (err) {
-    error.value = err
-    console.error('Failed to initialize game', err)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Retry function for error state
-function retryGame() {
-  initializeGame()
-}
-
-onMounted(async () => {
-  await initializeGame()
-})
-
-function toggleItem(item: Item) {
-  if (item.state === 'solved') return
-  if (isWon.value || isLost.value) return
-
-  if (item.state === 'selected') {
-    item.state = 'idle'
-    selected.value = selected.value.filter((i) => i !== item)
-    return
-  }
-
-  if (selected.value.length < 4) {
-    item.state = 'selected'
-    selected.value.push(item)
-  }
-}
-
-async function submitSelection() {
-  if (selected.value.length !== 4) return
-  if (isWon.value || isLost.value) return
-
-  solvedNewGroup.value = null
-  wrongCount.value = null
-
-  const categoryId = selected.value[0]!.category
-  const isMatch = selected.value.every((item) => item.category === categoryId)
-
-  if (!isMatch) {
-    attemptsLeft.value--
-
-    wrongCount.value = countAway(selected.value)
-
-    selected.value.forEach((i) => (i.state = 'idle'))
-    selected.value = []
-
-    if (attemptsLeft.value <= 0) {
-      revealAllGroups()
-      const total = categories.value.length
-      const correct = solvedGroups.value.length
-      const attemptsUsed = maxAttempts - attemptsLeft.value + 1
-      const totalScore = computeScore({
-        total,
-        correct,
-        attempts: attemptsUsed,
-        timeUsed: MAX_TIME - time.value,
-        maxTime: 180,
-      })
-      isChecked.value = true
-      await finish(false, undefined, totalScore)
-    }
-
-    return
-  }
-
-  // correct group
-  selected.value.forEach((item) => {
-    item.state = 'solved'
-  })
-
-  solvedGroups.value.push({
-    id: categoryId,
-    label: categoryLabelMap.value[categoryId]!,
-    color: categoryColorMap.value[categoryId]!,
-  })
-
-  solvedNewGroup.value = {
-    id: categoryId,
-    label: categoryLabelMap.value[categoryId]!,
-  }
-
-  selected.value = []
-
-  // win condition
-  if (solvedGroups.value.length === categories.value.length) {
-    const total = categories.value.length
-    const totalScore = computeScore({
-      total,
-      correct: solvedGroups.value.length,
-      timeUsed: MAX_TIME - time.value,
-      maxTime: 180,
-    })
-    await finish(true, undefined, totalScore)
-  }
-}
-
-function getSolvedGroup(index: number) {
-  return solvedGroups.value[index]
-}
-
-function getSolvedColor(index: number) {
-  const group = solvedGroups.value[index]
-  return group ? (categoryColorMap.value[group.id] ?? 'bg-gray-50') : 'bg-gray-50'
-}
-
-function revealAllGroups() {
-  const solvedCategoryIds = new Set(solvedGroups.value.map((g) => g.id))
-
-  // mark all items as solved
-  items.value.forEach((item) => {
-    item.state = 'solved'
-  })
-
-  // add missing groups to solvedGroups
-  categories.value.forEach((cat) => {
-    if (!solvedCategoryIds.has(cat.id)) {
-      solvedGroups.value.push({
-        id: cat.id,
-        label: categoryLabelMap.value[cat.id]!,
-        color: categoryColorMap.value[cat.id]!,
-      })
-    }
-  })
-}
-
-async function restartGame() {
-  isChecked.value = false
-  await retry()
-  resetLocalState()
-}
-
-function resetLocalState() {
-  attemptsLeft.value = maxAttempts
-  wrongCount.value = null
-  solvedNewGroup.value = null
-  solvedGroups.value = []
-  selected.value = []
-
-  items.value.forEach((item) => (item.state = 'idle'))
-  items.value = shuffle(items.value)
-}
-</script>

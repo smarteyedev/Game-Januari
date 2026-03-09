@@ -84,16 +84,22 @@ const backStyle = computed<CSSProperties>(() => {
       :class="{ 'rotate-y-180': flipped || matched }"
     >
       <!-- BACK SIDE -->
-      <div class="absolute inset-0 backface-hidden" :style="backStyle">
+      <div
+class="absolute inset-0 backface-hidden"
+:style="backStyle">
         <div class="w-full h-full flex items-center justify-center">
           <span class="text-primary-500 text-5xl font-bold">?</span>
         </div>
       </div>
 
       <!-- FRONT SIDE -->
-      <div class="absolute inset-0 backface-hidden rotate-y-180" :style="frontStyle">
+      <div
+class="absolute inset-0 backface-hidden rotate-y-180"
+:style="frontStyle">
         <!-- TEXT CARD -->
-        <div v-if="contentType === 'text'" class="w-full h-full flex items-center justify-center">
+        <div
+v-if="contentType === 'text'"
+class="w-full h-full flex items-center justify-center">
           <p class="font-semibold text-[10px] md:text-body-sm text-center text-black">
             {{ text }}
           </p>
@@ -104,7 +110,9 @@ const backStyle = computed<CSSProperties>(() => {
           v-else-if="contentType === 'svg'"
           class="w-full h-full flex items-center justify-center"
         >
-          <component :is="LogoComponent" class="w-14 md:w-[128px] h-auto" />
+          <component
+:is="LogoComponent"
+class="w-14 md:w-[128px] h-auto" />
         </div>
 
         <!-- IMAGE CARD -->

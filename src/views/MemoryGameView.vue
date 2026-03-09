@@ -1,34 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted, computed, watch } from 'vue'
-import type { MemoryCard, ContentType } from '@/domain/types'
-import { levelRepository } from '@/infrastructure'
+import { computed, watch } from 'vue'
 import MemoryBoard from '@/components/games/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import introData from '@/assets/gameData/intro.json'
-import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
-import { shuffle } from '@/utils/shuffle'
-import { useGameService } from '@/application/services/GameService'
-import { computeScore } from '@/application/services/ScoringService'
+import { MINIGAME_IDS } from '@/utils/constants'
 import { UiButton } from '@/components/atoms/button'
 import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useMemoryGame } from '@/composables/games/useMemoryGame'
+import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
+import type { MemoryCard } from '@/domain/types'
 
-// Level fetching
-const loading = ref(false)
-const error = ref<unknown>(null)
-
-// Game data
-const gameData = ref<{
-  id: number
-  card: MemoryCard[]
-} | null>(null)
-
-const cards = ref<MemoryCard[]>([])
-
-// Card matching state
-let firstCard: MemoryCard | null = null
-let lock = false
-const turns = ref(0)
+// Game Logic Composable
+const {
+  cards,
+  turns,
+  loading: gameLoading,
+  error,
+  isAllMatched,
+  fetchLevel,
+  flipCard: gameFlipCard,
+  reset: resetGame
+} = useMemoryGame()
 
 // Audio
 const audio = new Audio(clickSound)
@@ -41,134 +33,51 @@ function playClick() {
   }
 }
 
-const gameServiceOptions = {
-  maxTime: 180,
+const MAX_TIME = 180
+
+const {
+  time,
+  isWon,
+  isLost,
+  showIntro,
+  introData,
+  introLoading,
+  gameLoading: baseLoading,
+  gameError,
+  successResultData,
+  start,
+  retryGame,
+  finishGame
+} = useBaseGameLogic({
+  maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.memory,
   offline: true,
-}
-const MAX_TIME = 180
-const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry, successResultData } =
-  useGameService(gameServiceOptions)
+  introId: 2,
+  fetchLevel
+})
 
-// Watch for timeout to trigger loss state
-watch(
-  () => isTimeOver.value,
-  (over) => {
-    if (over && !_isWon.value && !_isLost.value) {
-      // Time is up and game is not yet finished - mark as lost
-      finish(false)
-    }
-  },
-)
+// Watch for win condition
+watch(isAllMatched, async (matched) => {
+  if (matched && !isWon.value && !isLost.value) {
+    const totalPairs = cards.value.length / 2
+    const scoringAttempts = Math.max(0, (turns.value / 2) - 5) // 5 free attempts
 
-// Fetch level from API
-async function fetchLevel() {
-  loading.value = true
-  error.value = null
-
-  try {
-    const data = await levelRepository.getLevel<any>(
-      MinigameId.Memory,
-      1,
-      gameServiceOptions.offline,
-    )
-    const raw: any = data as any
-
-    if (raw && raw.content && (raw.content.card || raw.content.id)) {
-      gameData.value = {
-        id: raw.content.id ?? raw.id ?? 1,
-        card: raw.content.card,
-      }
-    } else if (raw && (raw.card || raw.id)) {
-      gameData.value = raw as any
-    } else if (Array.isArray(raw) && raw.length > 0) {
-      const first = raw[0]
-      gameData.value = {
-        id: first.id ?? 1,
-        card: first.card ?? first.cards ?? [],
-      }
-    } else {
-      gameData.value = raw as any
-    }
-
-    cards.value = loadLevel()
-  } catch (err) {
-    error.value = err
-    console.error('Failed to load level', err)
-  } finally {
-    loading.value = false
-  }
-}
-
-// Load and shuffle cards
-function loadLevel(): MemoryCard[] {
-  if (!gameData.value) return []
-
-  return shuffle(
-    gameData.value.card.map((card) => ({
-      ...card,
-      contentType: card.contentType as ContentType,
-      flipped: false,
-      matched: false,
-    })),
-  )
-}
-
-// Card flip logic
-async function flipCard(card: MemoryCard) {
-  if (gameOver.value || lock || card.flipped || card.matched) return
-
-  playClick()
-  card.flipped = true
-  turns.value++
-
-  if (!firstCard) {
-    firstCard = card
-    return
-  }
-
-  // Check match
-  if (firstCard.pairId === card.pairId) {
-    firstCard.matched = true
-    card.matched = true
-    firstCard = null
-
-    if (allMatched.value) {
-      const totalPairs = cards.value.length / 2
-      let scoringAttempts = turns.value / 2
-
-      const FREE_ATTEMPTS = 5
-
-      scoringAttempts = Math.max(0, scoringAttempts - FREE_ATTEMPTS)
-      const totalScore = computeScore({
+    await finishGame(true, {
+      scoreContext: {
         total: totalPairs,
         correct: totalPairs,
         attempts: scoringAttempts,
-        timeUsed: MAX_TIME - time.value,
-        maxTime: 180,
-      })
-      await finish(true, undefined, totalScore)
-    }
-  } else {
-    lock = true
-    setTimeout(() => {
-      card.flipped = false
-      if (firstCard) firstCard.flipped = false
-      firstCard = null
-      lock = false
-    }, 800)
+      }
+    })
   }
+})
+
+// Card flip handler
+function handleFlip(card: MemoryCard) {
+  if (isWon.value || isLost.value) return
+  playClick()
+  gameFlipCard(card)
 }
-
-// Game state
-const showIntro = ref(true)
-const attempts = ref(0)
-
-// Computed states
-const allMatched = computed(
-  () => cards.value.length > 0 && cards.value.every((card) => card.matched),
-)
-const gameOver = computed(() => _isLost.value || (_isWon.value && allMatched.value))
 
 // Emit for session tracking
 const emit = defineEmits<{
@@ -179,27 +88,6 @@ const emit = defineEmits<{
 function handleContinue() {
   emit('cleared')
 }
-
-// Start game
-async function start() {
-  showIntro.value = false
-  await startGame()
-}
-
-// retry game
-function retryGame() {
-  attempts.value += 1
-  cards.value = loadLevel()
-  firstCard = null
-  lock = false
-  turns.value = 0
-  retry()
-}
-
-// Lifecycle
-onMounted(() => {
-  fetchLevel()
-})
 
 const { isXs, isSm, isMd } = useBreakpoint()
 
@@ -217,29 +105,32 @@ const buttonSize = computed(() => {
     :title="'Memory Game'"
     :description="'Pasangkan kartu dengan deskripsi yang benar!'"
     :time="time"
-    :maxTime="180"
-    :loading="loading"
-    :error="error"
-    :retryFn="fetchLevel"
+    :maxTime="MAX_TIME"
+    :loading="baseLoading || introLoading || gameLoading"
+    :error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)"
     v-model:showIntro="showIntro"
-    :introData="introData.data[2]"
-    :isWin="_isWon"
-    :hasLost="_isLost"
+    :introData="introData"
+    :isWin="isWon"
+    :hasLost="isLost"
     :hideSubmit="true"
-    :isChecked="allMatched"
+    :isChecked="isAllMatched"
     :successResult="successResultData"
     @start="start"
-    @retry="retryGame"
+    @retry="retryGame(resetGame)"
     @cleared="handleContinue"
   >
-    <MemoryBoard :cards="cards" @flip="flipCard" />
+    <MemoryBoard
+      :cards="cards"
+      @flip="handleFlip"
+    />
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
         <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
           Card Turns: {{ turns }}
         </span>
         <UiButton
-          v-if="allMatched || time <= 0"
+          v-if="isAllMatched || time <= 0"
           :size="buttonSize"
           text="Continue"
           variant="primary"

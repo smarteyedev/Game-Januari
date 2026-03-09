@@ -3,6 +3,11 @@
  * These are the foundational types used across all layers
  */
 
+import { MinigameId } from './minigame'
+import type { IntroData } from './gameData'
+
+export { MinigameId }
+
 // ============================================================================
 // ENUMS
 // ============================================================================
@@ -20,15 +25,6 @@ export enum LevelButtonState {
   Unlocked = 'unlocked',
   Cleared = 'cleared',
   Locked = 'locked',
-}
-
-export enum MinigameId {
-  AutomationSpotter = 'automation-spotter',
-  DragAndDrop = 'drag-and-drop',
-  Memory = 'memory-game',
-  Connections = 'connections-game',
-  Scrambles = 'scrambles-game',
-  Matrix = 'matrix-game',
 }
 
 export enum ContentType {
@@ -129,17 +125,6 @@ export interface GameResultResponse {
   failure?: SuccessResultData
 }
 
-export interface Keypoint {
-  icon_name?: string
-  description: string
-}
-
-export interface IntroData {
-  title: string
-  description: string
-  key_points: Keypoint[]
-}
-
 export interface GameIntroMapping {
   automationSpotter: IntroData
   dragAndDropPrompt: IntroData
@@ -180,3 +165,4 @@ export interface MemoryCard {
 
 // Re-export game data types for convenience
 export * from './gameData'
+export * from './minigame'

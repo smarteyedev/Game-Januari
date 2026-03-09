@@ -16,7 +16,7 @@ import {
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
-import { getFeedback } from './ScoringService'
+import { computeScore, getFeedback, type ScoreContext, type ScoringParams } from './ScoringService'
 import { logger } from '@/infrastructure/logging'
 import dummyResultData from '@/assets/gameData/dummyResult.json'
 
@@ -39,6 +39,15 @@ export type GameServiceOptions = {
   onSubmit?: (result: GameResult) => void
   /** Auto-submit score when game ends */
   autoSubmit?: boolean
+  /** Default scoring parameters */
+  scoringParams?: ScoringParams
+}
+
+export interface FinishOptions {
+  answers?: unknown[]
+  score?: number
+  scoreContext?: ScoreContext
+  scoringParams?: ScoringParams
 }
 
 export type GameServiceReturn = {
@@ -60,7 +69,7 @@ export type GameServiceReturn = {
   // Game actions
   startGame: () => Promise<void>
   submitScore: (score: number, answers?: unknown[]) => Promise<void>
-  finish: (won: boolean, finalAnswers?: unknown[], finalScore?: number) => Promise<void>
+  finish: (won: boolean, options?: FinishOptions) => Promise<void>
   reset: () => void
   retry: () => Promise<void>
 
@@ -94,6 +103,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     onLose,
     onSubmit,
     autoSubmit = true,
+    scoringParams: defaultScoringParams = {}
   } = options
 
   // Game entity
@@ -172,12 +182,38 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Handle game over - win or lose
    */
-  async function handleGameOver(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
+  async function handleGameOver(
+    won: boolean, 
+    finalAnswers?: unknown[], 
+    finalScore?: number,
+    scoreContext?: ScoreContext,
+    scoringParams?: ScoringParams
+  ) {
     stopTimer()
     game.value.setSubmitting()
 
     _didWin.value = won
-    const resolvedScore = typeof finalScore === 'number' ? finalScore : won ? 100 : 0
+    
+    let resolvedScore = 0
+    if (typeof finalScore === 'number') {
+      resolvedScore = finalScore
+    } else if (won) {
+      if (scoreContext) {
+        resolvedScore = computeScore(
+          { 
+            timeUsed: maxTime - time.value, 
+            maxTime, 
+            ...scoreContext 
+          }, 
+          { 
+            ...defaultScoringParams, 
+            ...scoringParams 
+          }
+        )
+      } else {
+        resolvedScore = 100
+      }
+    }
 
     if (finalAnswers) {
       game.value.answers.push(...finalAnswers)
@@ -313,8 +349,14 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Finish the game manually
    */
-  function finish(won: boolean, finalAnswers?: unknown[], finalScore?: number) {
-    return handleGameOver(won, finalAnswers, finalScore)
+  function finish(won: boolean, finishOptions?: FinishOptions) {
+    return handleGameOver(
+      won, 
+      finishOptions?.answers, 
+      finishOptions?.score, 
+      finishOptions?.scoreContext, 
+      finishOptions?.scoringParams
+    )
   }
 
   /**

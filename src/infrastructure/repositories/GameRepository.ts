@@ -12,6 +12,7 @@ import {
   type LevelDataArrayResponse,
   type LevelDataKeyedResponse,
   type GameResultResponse,
+  type IntroData,
 } from '@/domain/types'
 import { httpClient } from '../api/ApiClient'
 import { API_ENDPOINTS } from '@/utils/constants'
@@ -90,6 +91,20 @@ export class LevelRepository {
     const endpoint = this.getEndpoint(minigameId)
     const response = await httpClient.get<T>(API_ENDPOINTS.MINIGAME_LEVELS(endpoint, level))
     return response.data
+  }
+
+  /**
+   * Get intro data from local JSON assets
+   */
+  async getIntroData(): Promise<IntroData[]> {
+    try {
+      const mod = await import('@/assets/gameData/intro.json')
+      return (mod.default?.data || mod.data || []) as IntroData[]
+    } catch (err) {
+      const error = err instanceof Error ? err : new Error(String(err))
+      logger.error('Failed to load intro data', error)
+      return []
+    }
   }
 
   /**

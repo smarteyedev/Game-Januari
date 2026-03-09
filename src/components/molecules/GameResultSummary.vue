@@ -13,8 +13,13 @@
         />
       </div>
 
-      <div v-if="reviewPoints.length > 0" class="flex flex-col gap-2">
-        <div v-for="(item, index) in reviewPoints" :key="index" class="flex flex-col gap-1">
+      <div
+v-if="reviewPoints.length > 0"
+class="flex flex-col gap-2">
+        <div
+v-for="(item, index) in reviewPoints"
+:key="index"
+class="flex flex-col gap-1">
           <p class="text-body-xs md:text-body-lg font-extrabold">
             {{ item.point }}
           </p>

@@ -3,11 +3,24 @@
  * These types define the structure of game data loaded from local assets or API
  */
 
-import type { MinigameId } from './index'
+import type { MinigameId } from './minigame'
 
 // ============================================================================
-// Base Types
+// Shared Types
 // ============================================================================
+
+export interface Keypoint {
+  id?: number
+  icon_name?: string
+  description: string
+}
+
+export interface IntroData {
+  id?: number
+  title: string
+  description: string
+  key_points: Keypoint[]
+}
 
 /**
  * Base interface for all level data
@@ -15,12 +28,28 @@ import type { MinigameId } from './index'
 export interface BaseLevelData {
   id?: number
   version?: string
+  intro?: IntroData
+  [key: string]: unknown
+}
+
+// Missing types for GameContent
+export interface ConnectionGroupData {
+  id: number
+  category: string
+  label: string
+}
+
+export interface MatrixRowData {
+  id: number
+  label: string
+  answer: number
 }
 
 /**
  * Content structure for game data
  */
 export interface GameContent {
+  id?: number
   question?: string
   cards?: DragCardData[]
   items?: WordItemData[]
@@ -28,6 +57,8 @@ export interface GameContent {
   connections?: ConnectionGroupData[]
   words?: string[]
   matrix?: MatrixRowData[]
+  // Specific for some games
+  card?: DragCardData[] | MemoryCardData[]
   [key: string]: unknown
 }
 
@@ -43,8 +74,11 @@ export interface DragCardData {
 }
 
 export interface AutomationSpotterLevelData extends BaseLevelData {
-  intro?: string
-  content?: GameContent
+  content?: {
+    id?: number
+    question?: string
+    card?: DragCardData[]
+  }
   config?: GameConfigData
 }
 
@@ -64,8 +98,8 @@ export interface BlankSlotData {
 }
 
 export interface DragAndDropLevelData extends BaseLevelData {
-  intro?: string
   content?: {
+    id?: number
     sentence?: string
     blanks?: BlankSlotData[]
     items?: WordItemData[]
@@ -90,8 +124,9 @@ export interface MemoryCardData {
 }
 
 export interface MemoryLevelData extends BaseLevelData {
-  intro?: string
   content?: {
+    id?: number
+    card?: MemoryCardData[]
     pairs?: MemoryPairData[]
     gridSize?: number
   }
@@ -105,19 +140,20 @@ export interface MemoryLevelData extends BaseLevelData {
 export interface ConnectionItemData {
   id: number
   label: string
-  group: number
+  category: string
 }
 
-export interface ConnectionGroupData {
+export interface TargetCategoryData {
   id: number
-  name: string
-  items: string[]
+  category: string
+  label: string
 }
 
 export interface ConnectionsLevelData extends BaseLevelData {
-  intro?: string
   content?: {
-    groups?: ConnectionGroupData[]
+    id?: number
+    target_category?: TargetCategoryData[]
+    items?: ConnectionItemData[]
     gridSize?: number
   }
   config?: GameConfigData
@@ -127,17 +163,11 @@ export interface ConnectionsLevelData extends BaseLevelData {
 // Scrambles Game Types
 // ============================================================================
 
-export interface ScrambleWordData {
-  id: number
-  word: string
-  scrambled?: string
-}
-
 export interface ScramblesLevelData extends BaseLevelData {
-  intro?: string
   content?: {
-    words?: ScrambleWordData[]
-    sentence?: string
+    id?: number
+    question?: string
+    answer?: string
   }
   config?: GameConfigData
 }
@@ -146,24 +176,24 @@ export interface ScramblesLevelData extends BaseLevelData {
 // Matrix Game Types
 // ============================================================================
 
-export interface MatrixRowData {
-  row: number
-  cells: (string | number | boolean | null)[]
+export interface MatrixOptionData {
+  id: number
+  label: string
 }
 
-export interface MatrixQuestionData {
+export interface MatrixSubQuestionData {
   id: number
-  question: string
-  correctAnswer: string | number | boolean
+  label: string
+  answer: number
 }
 
 export interface MatrixLevelData extends BaseLevelData {
-  intro?: string
   content?: {
-    matrix?: MatrixRowData[]
-    questions?: MatrixQuestionData[]
-    rowHeaders?: string[]
-    colHeaders?: string[]
+    id?: number
+    question?: string
+    options?: MatrixOptionData[]
+    subquestions?: MatrixSubQuestionData[]
+    gridSize?: number
   }
   config?: GameConfigData
 }
@@ -173,6 +203,11 @@ export interface MatrixLevelData extends BaseLevelData {
 // ============================================================================
 
 export interface GameConfigData {
+  id?: number
+  module_title?: string
+  max_attempt?: number
+  junk_letter?: number
+  max_time?: number // Note: JSON uses snake_case sometimes
   maxTime?: number
   timeTolerance?: number
   answerWeight?: number
