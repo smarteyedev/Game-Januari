@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import UiModal from '@/components/molecules/modal/index.vue'
-import GameIntro from '../molecules/GameIntro.vue'
+import UiModal from '@/components/organisms/modal/index.vue'
+import GameIntro from './GameIntro.vue'
 import type { IntroData } from '@/domain/types'
-import UnknownIcon from '../atoms/svg/UnknownIcon.vue'
+import UnknownIcon from '@/components/atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
-import type { TContainerPosition } from './modal'
+import type { TContainerPosition } from './modal/types'
 import { useBreakpoint } from '@/composables/useBreakpoint'
 import { computed } from 'vue'
 

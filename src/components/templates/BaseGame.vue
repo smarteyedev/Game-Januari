@@ -2,11 +2,11 @@
 import { onMounted, onUnmounted, ref, watch } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
-import GameOverlayManager from '@/components/molecules/GameOverlayManager.vue'
+import GameOverlayManager from '@/components/organisms/GameOverlayManager.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
-import TopActionBar from '../molecules/TopActionBar.vue'
+import TopActionBar from '@/components/molecules/TopActionBar.vue'
 
 /**
  * BaseGame Component Props

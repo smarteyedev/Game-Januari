@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import UiModal from '@/components/molecules/modal/index.vue'
-import type { TContainerPosition } from './modal'
+import UiModal from '@/components/organisms/modal/index.vue'
+import type { TContainerPosition } from './modal/types'
 import GameResultSummary from './GameResultSummary.vue'
 
 interface Props {

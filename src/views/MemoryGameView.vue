@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import MemoryBoard from '@/components/games/MemoryGame/MemoryBoard.vue'
+import MemoryBoard from '@/components/organisms/MemoryGame/MemoryBoard.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'

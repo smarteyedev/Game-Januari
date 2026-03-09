@@ -125,7 +125,7 @@ v-bind="{ onPositiveClick: onOK }">
 
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, watch } from 'vue'
-import UiAtomsIcon from '../../atoms/icon/index.vue'
+import UiAtomsIcon from '@/components/atoms/icon/index.vue'
 import type { IModalProps, TModalFooterPosition } from './types.ts'
 import { UiButton } from '@/components/atoms/button/index.ts'
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Keypoint } from '@/domain/types'
-import IconLabel from './IconLabel.vue'
+import IconLabel from '@/components/molecules/IconLabel.vue'
 
 const _ = defineProps<{
   title?: string

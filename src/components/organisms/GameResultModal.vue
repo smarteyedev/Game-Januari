@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import UiModal from '@/components/molecules/modal/index.vue'
+import UiModal from '@/components/organisms/modal/index.vue'
 import type { SuccessResultData } from '@/domain/types'
 import UiButton from '@/components/atoms/button/index.vue'
-import type { TContainerPosition } from './modal'
+import type { TContainerPosition } from './modal/types'
 import { useBreakpoint } from '@/composables/useBreakpoint'
 import { computed } from 'vue'
-import FailedIcon from '../atoms/svg/FailedIcon.vue'
-import SuccessIcon from '../atoms/svg/SuccessIcon.vue'
+import FailedIcon from '@/components/atoms/svg/FailedIcon.vue'
+import SuccessIcon from '@/components/atoms/svg/SuccessIcon.vue'
 import GameResult from './GameResult.vue'
 
 interface Props {

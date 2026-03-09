@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import MatrixQuestion from '@/components/molecules/MatrixQuestion.vue'
+import MatrixQuestion from '@/components/organisms/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
 import { useBreakpoint } from '@/composables/useBreakpoint'
 import { useMatrixGame } from '@/composables/games/useMatrixGame'

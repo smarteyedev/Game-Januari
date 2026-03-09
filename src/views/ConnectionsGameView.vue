@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
-import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
+import ConnectionsCard from '@/components/atoms/ConnectionsCard.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { UiButton } from '@/components/atoms/button'

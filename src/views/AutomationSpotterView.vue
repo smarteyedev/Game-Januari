@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import TaskRow from '@/components/games/AutomationSpotter/TaskRow.vue'
-import SpotZones from '@/components/games/AutomationSpotter/SpotZones.vue'
+import TaskRow from '@/components/organisms/AutomationSpotter/TaskRow.vue'
+import SpotZones from '@/components/organisms/AutomationSpotter/SpotZones.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { useAutomationSpotter } from '@/composables/games/useAutomationSpotter'

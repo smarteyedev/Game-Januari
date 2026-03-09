@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { Blank } from '@/domain/types'
-import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
-import WordItem from '@/components/games/DragAndDrop/WordItem.vue'
+import BlankSlot from '@/components/organisms/DragAndDrop/BlankSlot.vue'
+import WordItem from '@/components/organisms/DragAndDrop/WordItem.vue'
 import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import Card from '@/components/molecules/Card.vue'
