@@ -112,9 +112,8 @@ function openResultModal(useDelay = true) {
   }
 }
 
-watch(() => props.isChecked, (val) => {
-  if (val) openResultModal(true) // delay
-})
+// Removed: isChecked watcher should NOT open result modal
+// Result modal should only open based on isWin or hasLost (win/lose state)
 
 // Also show result modal when game is won or lost
 watch(() => props.isWin, (val) => {

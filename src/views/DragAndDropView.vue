@@ -43,7 +43,6 @@ const ghostVisible = ref(false)
 // Game state
 const showIntro = ref(true)
 const isChecked = ref(false)
-const isWin = ref(false)
 const correctCount = ref<number | null>(null)
 const attempts = ref(0)
 
@@ -66,10 +65,10 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
-// Computed
-const hasLost = computed(() => isChecked.value && !isWin.value)
+// Computed - use game service's _isWon and _isLost for consistency
+const hasLost = computed(() => _isLost.value)
 const totalSlots = computed(() => board.value.filter((part: any) => part.type === 'slot').length)
 
 // Emit
@@ -157,7 +156,6 @@ function loadLevel() {
 
   correctCount.value = null
   isChecked.value = false
-  isWin.value = false
   isLocked.value = false
 }
 
@@ -366,7 +364,6 @@ async function checkAnswers() {
 
   correctCount.value = count
   const won = count === totalSlots.value
-  isWin.value = won
   isLocked.value = true
 
 

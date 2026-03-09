@@ -1,8 +1,8 @@
 <template>
   <BaseGame v-if="survey" title="Matrix Game" module-title="Lorem Ipsum" :description="survey?.title" :time="time"
     v-model:showIntro="showIntro" :introData="introData.data[5]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isChecked="isChecked" :successResult="successResultData" :failureResult="failureResultData" @retry="handleRetry"
-    @cleared="handleContinue">
+    :isWin="isWin" :hasLost="isLose" :isChecked="isChecked" :successResult="successResultData"
+    :failureResult="failureResultData" @retry="handleRetry" @cleared="handleContinue">
     <div class="flex flex-col w-full">
       <div v-for="q in survey.questions" :key="q.id" class="flex flex-col items-center justify-center gap-5 md:gap-8">
         <MatrixQuestion :title="q.label" :options="survey.options" :correct-answer="q.correctAnswer"

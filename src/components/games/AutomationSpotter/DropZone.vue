@@ -45,7 +45,7 @@ function updateModel(newVal: DragCard[]) {
 
 <template>
   <div :class="[
-    'relative w-full px-2.5 py-4 rounded-lg md:rounded-2xl min-w-32 min-h-14 md:min-h-64',
+    'relative w-full px-2.5 py-4 rounded-lg md:rounded-2xl min-w-32 min-h-14 md:min-h-37.5',
     className,
   ]">
     <p :class="[

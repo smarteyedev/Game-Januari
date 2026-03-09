@@ -53,8 +53,11 @@ const buttonSize = computed(() => {
     <!-- RIGHT -->
     <div class="flex items-end gap-3 sm:gap-4 mt-2 md:mt-0">
       <slot name="footer-right">
-        <!-- CONTINUE / VIEW RESULT -->
-        <UiButton v-if="isChecked" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
+        <!-- CONTINUE / VIEW RESULT - show when game is won or lost (finished) -->
+        <UiButton v-if="isWin" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
+        </UiButton>
+        <UiButton v-else-if="hasLost" :size="buttonSize" text="View Result" variant="primary"
+          @click="emit('open-result')">
         </UiButton>
         <UiButton v-else-if="isXs || isSm" :size="buttonSize" text="Continue" variant="primary" @click="emit('check')">
         </UiButton>

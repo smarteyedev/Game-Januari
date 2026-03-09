@@ -39,15 +39,16 @@ const attempts = ref(0)
 const SCORING_TIME_TOLERANCE = 30
 const answerWeight = 0.7
 const timeWeight = 0.3
+const MAX_TIME = 180
 
 const gameServiceOptions = {
-  maxTime: 180,
+  maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.automationSpotter,
   offline: true,
 }
 
-const MAX_TIME = 180
-const { time, _isWon, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
+
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
@@ -58,7 +59,8 @@ const isLevelWin = computed(() => {
     Object.values(checkedMap.value).every(Boolean)
   )
 })
-const hasLost = computed(() => isChecked.value && !isLevelWin.value)
+// Use game service's _isLost for consistency
+const hasLost = computed(() => _isLost.value)
 
 // Fetch level
 async function fetchLevel() {
