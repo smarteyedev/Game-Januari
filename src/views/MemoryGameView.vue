@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import type { MemoryCard, ContentType } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
 import MemoryBoard from '@/components/games/MemoryGame/MemoryBoard.vue'
@@ -47,8 +47,19 @@ const gameServiceOptions = {
   offline: true,
 }
 const MAX_TIME = 180
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry, successResultData } =
   useGameService(gameServiceOptions)
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -222,7 +233,7 @@ const buttonSize = computed(() => {
     @cleared="handleContinue"
   >
     <MemoryBoard :cards="cards" @flip="flipCard" />
-    <template #footer>
+    <template #footer="{ onOpenResult }">
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
         <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
           Card Turns: {{ turns }}
@@ -232,7 +243,7 @@ const buttonSize = computed(() => {
           :size="buttonSize"
           text="Continue"
           variant="primary"
-          @click="emit('open-result')"
+          @click="onOpenResult"
         >
         </UiButton>
       </div>

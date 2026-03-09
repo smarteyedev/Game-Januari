@@ -126,6 +126,7 @@ export interface SuccessResultData {
 
 export interface GameResultResponse {
   success: SuccessResultData
+  failure?: SuccessResultData
 }
 
 export interface Keypoint {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, nextTick } from 'vue'
+import { computed, onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import type { Blank } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
 import BlankSlot from '@/components/games/DragAndDrop/BlankSlot.vue'
@@ -65,8 +65,19 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry, successResultData } =
   useGameService(gameServiceOptions)
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 // Computed - use game service's _isWon and _isLost for consistency
 const hasLost = computed(() => _isLost.value)

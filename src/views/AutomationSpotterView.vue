@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import TaskRow from '@/components/games/AutomationSpotter/TaskRow.vue'
 import SpotZones from '@/components/games/AutomationSpotter/SpotZones.vue'
 import type { DragCard, Zone } from '@/domain/types'
@@ -47,8 +47,19 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry, successResultData } =
   useGameService(gameServiceOptions)
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)

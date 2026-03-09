@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/molecules/ConnectionsCard.vue'
 import { levelRepository } from '@/infrastructure'
@@ -159,7 +159,18 @@ const gameService = useGameService({
   offline: true,
 })
 
-const { time, _isWon, _isLost, startGame, finish, retry } = gameService
+const { time, _isWon, _isLost, isTimeOver, startGame, finish, retry } = gameService
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 const loading = ref(true)
 const error = ref<unknown>(null)

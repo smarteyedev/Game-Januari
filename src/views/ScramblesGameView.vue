@@ -117,7 +117,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed, useTemplateRef, nextTick } from 'vue'
+import { onMounted, ref, computed, useTemplateRef, nextTick, watch } from 'vue'
 import BoxInput from '@/components/atoms/BoxInput.vue'
 import CharacterKey from '@/components/atoms/CharacterKey.vue'
 import UiButton from '@/components/atoms/button/index.vue'
@@ -136,12 +136,32 @@ type Submission = {
 }
 
 const MAX_TIME = 180
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData } =
-  useGameService({
-    maxTime: MAX_TIME,
-    minigameId: MINIGAME_IDS.scrambles,
-    offline: true,
-  })
+const {
+  time,
+  _isWon,
+  _isLost,
+  _isPlaying,
+  isTimeOver,
+  startGame,
+  finish,
+  retry,
+  successResultData,
+} = useGameService({
+  maxTime: MAX_TIME,
+  minigameId: MINIGAME_IDS.scrambles,
+  offline: true,
+})
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)

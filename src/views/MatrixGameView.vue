@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { levelRepository } from '@/infrastructure'
 import { MINIGAME_IDS, MinigameId } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
@@ -99,12 +99,32 @@ const answers = ref<Record<string, number | undefined>>({})
 const score = ref<number | null>(null)
 const attempts = ref(0)
 const MAX_TIME = 180
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData } =
-  useGameService({
-    maxTime: 180,
-    minigameId: MINIGAME_IDS.matrix,
-    offline: true,
-  })
+const {
+  time,
+  _isWon,
+  _isLost,
+  _isPlaying,
+  isTimeOver,
+  startGame,
+  finish,
+  retry,
+  successResultData,
+} = useGameService({
+  maxTime: 180,
+  minigameId: MINIGAME_IDS.matrix,
+  offline: true,
+})
+
+// Watch for timeout to trigger loss state
+watch(
+  () => isTimeOver.value,
+  (over) => {
+    if (over && !_isWon.value && !_isLost.value) {
+      // Time is up and game is not yet finished - mark as lost
+      finish(false)
+    }
+  },
+)
 
 const loading = ref(true)
 const error = ref<unknown>(null)

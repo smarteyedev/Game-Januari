@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, watch, type Slot } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch, type Slot } from 'vue'
 import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
@@ -94,6 +94,8 @@ const RESULT_MODAL_DELAY = 3000
 // hold reference to an active timeout so repeated calls don't stack delays
 let resultTimer: number | undefined
 
+const isDelayActive = ref(false)
+
 function openResultModal(useDelay = true) {
   if (resultTimer) {
     clearTimeout(resultTimer)
@@ -101,12 +103,15 @@ function openResultModal(useDelay = true) {
   }
 
   if (useDelay) {
+    isDelayActive.value = true
     resultTimer = window.setTimeout(() => {
       showResultLocal.value = true
       resultTimer = undefined
+      isDelayActive.value = false
     }, RESULT_MODAL_DELAY)
   } else {
     showResultLocal.value = true
+    isDelayActive.value = false
   }
 }
 
@@ -212,7 +217,7 @@ function handleViewSummary() {
   // Only show summary when player wins (use successResult only)
   summaryData.value = successResult.value
 
-  // If summary is currently shown, close both modals to go back to game content
+  // If summary is currently shown, close summary and go back to game content
   if (showSummaryLocal.value) {
     showSummaryLocal.value = false
     showResultLocal.value = false
@@ -222,13 +227,6 @@ function handleViewSummary() {
     showSummaryLocal.value = true
   }
 }
-
-// when the summary modal closes, go back to game content (don't reopen result modal)
-watch(showSummaryLocal, (val) => {
-  if (!val) {
-    showResultLocal.value = false
-  }
-})
 
 function handleCheck() {
   // Delegate check handling to parent/game view; game service will populate result data
@@ -337,7 +335,8 @@ watch(
               @check="handleCheck"
               @retry="handleRetry"
               @cleared="handleCleared"
-              @open-result="handleOpenResult()"
+              @open-result="handleOpenResult"
+              :delay="isDelayActive"
             >
               <template #footer-left>
                 <slot name="footer-left" />

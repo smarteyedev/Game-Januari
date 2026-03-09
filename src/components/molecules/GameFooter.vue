@@ -12,7 +12,7 @@ const props = defineProps<{
   isWin?: boolean
   hasLost?: boolean
   hideSubmit?: boolean
-  showResult?: boolean
+  delay?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -32,7 +32,7 @@ const buttonSize = computed(() => {
 })
 
 function handleContinue() {
-  if (props.hasLost) {
+  if (props.hasLost || props.isWin) {
     emit('open-result')
   } else {
     emit('check')
@@ -60,14 +60,12 @@ function handleContinue() {
       <slot name="footer-right">
         <!-- CONTINUE / VIEW RESULT - show when game is won or lost (finished) -->
         <UiButton
-          v-if="isWin"
+          :disabled="delay"
           :size="buttonSize"
           text="Continue"
           variant="primary"
-          @click="emit('open-result')"
+          @click="handleContinue"
         >
-        </UiButton>
-        <UiButton :size="buttonSize" text="Continue" variant="primary" @click="handleContinue">
         </UiButton>
       </slot>
     </div>

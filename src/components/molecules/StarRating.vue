@@ -24,10 +24,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
+
+// defineModel handles both props declaration and v-model binding
+const modelValue = defineModel<number>({ default: 0 })
 
 const props = defineProps({
-  modelValue: { type: Number, default: 0 },
   max: { type: Number, default: 5 },
   readonly: { type: Boolean, default: false },
   ariaLabel: { type: String, default: 'Star rating' },
@@ -35,18 +37,23 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue'])
 
-const localValue = ref(props.modelValue)
 const localHover = ref(0)
 
-watch(
-  () => props.modelValue,
-  (v) => (localValue.value = v),
-)
+// Use computed with getter/setter instead of watch
+// This allows two-way binding while respecting readonly state
+const localValue = computed({
+  get: () => modelValue.value,
+  set: (v: number) => {
+    if (!props.readonly) {
+      modelValue.value = v
+      emit('update:modelValue', v)
+    }
+  },
+})
 
 const updateValue = (v: number) => {
   if (props.readonly) return
   localValue.value = v
-  emit('update:modelValue', v)
 }
 
 const focusPrev = (e: KeyboardEvent) => {

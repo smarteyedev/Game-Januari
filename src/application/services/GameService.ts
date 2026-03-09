@@ -146,7 +146,10 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
       // Use offline dummy data
       logger.info('Using offline dummy result data', { won })
       const dummyData = dummyResultData as GameResultResponse
-      return won ? { success: dummyData.success } : { failure: undefined }
+      // Always provide result data for both win and lose cases so the modal can show
+      return won
+        ? { success: dummyData.success }
+        : { success: dummyData.failure ?? dummyData.success }
     }
 
     try {
