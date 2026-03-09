@@ -156,12 +156,14 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
         ? { success: resultData.success }
         : { failure: resultData.failure }
     } catch (err) {
-      logger.error('Failed to fetch game result from API, using offline data', err)
-      const dummyData = dummyResultData as GameResultResponse
-      return won 
-        ? { success: dummyData.success }
-        : { failure: dummyData.failure }
-    }
+  const error = err instanceof Error ? err : new Error(String(err))
+  logger.error('Failed to fetch game result from API, using offline data', error)
+
+  const dummyData = dummyResultData as GameResultResponse
+  return won
+    ? { success: dummyData.success }
+    : { failure: dummyData.failure }
+}
   }
 
   /**
