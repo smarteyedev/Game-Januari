@@ -1,4 +1,3 @@
-
 export type TModalFooterPosition = 'left' | 'center' | 'right'
 export type TModalPosition =
   | 'top-left'

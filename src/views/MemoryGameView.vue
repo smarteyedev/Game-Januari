@@ -37,7 +37,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 }
 
@@ -47,7 +47,8 @@ const gameServiceOptions = {
   offline: true,
 }
 const MAX_TIME = 180
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+  useGameService(gameServiceOptions)
 
 // Fetch level from API
 async function fetchLevel() {
@@ -128,7 +129,13 @@ async function flipCard(card: MemoryCard) {
       const FREE_ATTEMPTS = 5
 
       scoringAttempts = Math.max(0, scoringAttempts - FREE_ATTEMPTS)
-      const totalScore = computeScore({ total: totalPairs, correct: totalPairs, attempts: scoringAttempts, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      const totalScore = computeScore({
+        total: totalPairs,
+        correct: totalPairs,
+        attempts: scoringAttempts,
+        timeUsed: MAX_TIME - time.value,
+        maxTime: 180,
+      })
       await finish(true, undefined, totalScore)
     }
   } else {
@@ -194,19 +201,39 @@ const buttonSize = computed(() => {
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="180" :loading="loading"
-    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[2]" :isWin="_isWon"
-    :hasLost="_isLost" :hideSubmit="true" :isChecked="allMatched" :successResult="successResultData"
-    :failureResult="failureResultData" @start="start" @retry="retryGame" @cleared="handleContinue">
+  <BaseGame
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[2]"
+    :isWin="_isWon"
+    :hasLost="_isLost"
+    :hideSubmit="true"
+    :isChecked="allMatched"
+    :successResult="successResultData"
+    @start="start"
+    @retry="retryGame"
+    @cleared="handleContinue"
+  >
     <MemoryBoard :cards="cards" @flip="flipCard" />
     <template #footer>
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
         <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
           Card Turns: {{ turns }}
         </span>
-        <UiButton v-if="allMatched || time <= 0" :size="buttonSize" text="Continue" variant="primary"
-          @click="emit('open-result')">
+        <UiButton
+          v-if="allMatched || time <= 0"
+          :size="buttonSize"
+          text="Continue"
+          variant="primary"
+          @click="emit('open-result')"
+        >
         </UiButton>
       </div>
     </template>

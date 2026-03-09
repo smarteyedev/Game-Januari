@@ -1,44 +1,85 @@
 <template>
-  <BaseGame title="Connections Game" moduleTitle="Lorem Sipsum" description="Connections game" :time="time"
-    v-model:showIntro="showIntro" :introData="introData.data[3]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isWin="isWon" :hasLost="isLost" :isChecked="isChecked" :successResult="successResult"
-    :failureResult="failureResult" @retry="handleRetry" @cleared="handleContinue">
+  <BaseGame
+    title="Connections Game"
+    moduleTitle="Lorem Sipsum"
+    description="Connections game"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[3]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+    :isWin="isWon"
+    :hasLost="isLost"
+    :isChecked="isChecked"
+    :successResult="successResult"
+    @retry="handleRetry"
+    @cleared="handleContinue"
+  >
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
-        <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
-          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)"
-          :clickable="false" />
+        <ConnectionsCard
+          v-for="index in 4"
+          :key="index"
+          :label="getSolvedGroup(index - 1)?.label || ''"
+          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
+          :color="getSolvedColor(index - 1)"
+          :clickable="false"
+        />
       </div>
     </div>
     <div>
-      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700">Create a group of four</span>
+      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700"
+        >Create a group of four</span
+      >
     </div>
     <div class="grid grid-cols-4 md:grid-cols-8 gap-5 place-items-center w-full">
-      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
+      <ConnectionsCard
+        v-for="item in items"
+        :key="item.label"
+        :label="item.label"
+        :state="item.state"
+        :color="categoryColorMap[item.category]"
+        :clickable="item.state !== 'solved'"
+        @click="toggleItem(item)"
+      />
     </div>
 
     <!-- Control Buttons -->
 
-    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
+    <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <!--Event message for user feedback-->
         <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
-          <UiLabel v-if="wrongCount !== null && !(isWon || isLost)"
-            :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-          <UiLabel v-if="solvedNewGroup !== null && !(isWon || isLost)"
-            :label="`You found a new group: ${solvedNewGroup.label}`" />
+          <UiLabel
+            v-if="wrongCount !== null && !(isWon || isLost)"
+            :label="`Wrong, you are ${wrongCount} away to form a correct group`"
+          />
+          <UiLabel
+            v-if="solvedNewGroup !== null && !(isWon || isLost)"
+            :label="`You found a new group: ${solvedNewGroup.label}`"
+          />
           <UiLabel v-if="isWon" :label="`You win`" />
           <UiLabel v-if="isLost" :label="`you lose`" />
         </div>
         <div class="flex gap-4">
-          <UiButton :size="buttonSize" text="Submit" variant="primary"
-            :disabled="selected.length !== 4 || isWon || isLost" @click="submitSelection">
+          <UiButton
+            :size="buttonSize"
+            text="Submit"
+            variant="primary"
+            :disabled="selected.length !== 4 || isWon || isLost"
+            @click="submitSelection"
+          >
           </UiButton>
 
           <!--Show continue button after submit/check, regardless of win or lose-->
-          <UiButton :size="buttonSize" text="Continue" v-if="isWon || isLost" :color="'success'"
-            @click="() => onOpenResult && onOpenResult()">
+          <UiButton
+            :size="buttonSize"
+            text="Continue"
+            v-if="isWon || isLost"
+            :color="'success'"
+            @click="() => onOpenResult && onOpenResult()"
+          >
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
@@ -129,7 +170,6 @@ const isLost = computed(() => _isLost.value)
 
 // Computed properties to unwrap refs for BaseGame props
 const successResult = computed(() => gameService.successResultData.value)
-const failureResult = computed(() => gameService.failureResultData.value)
 
 const categoryColorMap = ref<Record<string, string>>({})
 const categories = ref<Category[]>([])
@@ -267,7 +307,13 @@ async function submitSelection() {
       const total = categories.value.length
       const correct = solvedGroups.value.length
       const attemptsUsed = maxAttempts - attemptsLeft.value + 1
-      const totalScore = computeScore({ total, correct, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+      const totalScore = computeScore({
+        total,
+        correct,
+        attempts: attemptsUsed,
+        timeUsed: MAX_TIME - time.value,
+        maxTime: 180,
+      })
       isChecked.value = true
       await finish(false, undefined, totalScore)
     }
@@ -296,7 +342,12 @@ async function submitSelection() {
   // win condition
   if (solvedGroups.value.length === categories.value.length) {
     const total = categories.value.length
-    const totalScore = computeScore({ total, correct: solvedGroups.value.length, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    const totalScore = computeScore({
+      total,
+      correct: solvedGroups.value.length,
+      timeUsed: MAX_TIME - time.value,
+      maxTime: 180,
+    })
     await finish(true, undefined, totalScore)
   }
 }

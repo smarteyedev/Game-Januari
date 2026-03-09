@@ -1,19 +1,39 @@
 <template>
-  <BaseGame title="Scrambles Game" moduleTitle="Lorem Ipsum" :description="question" :time="time"
-    v-model:showIntro="showIntro" :introData="introData.data[4]" :loading="loading" :error="error" :retryFn="retryGame"
-    :isWin="isWin" :hasLost="isLose" :isChecked="isChecked" :successResult="successResultData"
-    :failureResult="failureResultData" @retry="handleRetry" @cleared="handleContinue">
+  <BaseGame
+    title="Scrambles Game"
+    moduleTitle="Lorem Ipsum"
+    :description="question"
+    :time="time"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[4]"
+    :loading="loading"
+    :error="error"
+    :retryFn="retryGame"
+    :isWin="isWin"
+    :hasLost="isLose"
+    :isChecked="isChecked"
+    :successResult="successResultData"
+    @retry="handleRetry"
+    @cleared="handleContinue"
+  >
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
         <BoxInput :value="userInput" :locked="hints" />
-        <span class="text-primary-700 font-semibold text-body-xs md:text-body-md">You have {{ attempts }} attempts
-          left</span>
+        <span class="text-primary-700 font-semibold text-body-xs md:text-body-md"
+          >You have {{ attempts }} attempts left</span
+        >
       </div>
 
       <div ref="scrollContainer" class="h-35 overflow-y-auto">
         <div class="flex flex-col justify-center items-center gap-6 py-3">
-          <div v-for="(s, i) in submissions" :key="i" class="flex w-full items-center justify-center gap-1.5 md:gap-5">
-            <div v-for="(char, j) in s.value.split('')" :key="j"
+          <div
+            v-for="(s, i) in submissions"
+            :key="i"
+            class="flex w-full items-center justify-center gap-1.5 md:gap-5"
+          >
+            <div
+              v-for="(char, j) in s.value.split('')"
+              :key="j"
               class="aspect-square min-w-8 min-h-8 md:min-w-12 md:min-h-12 grid place-items-center border-2 md:border-[3px] rounded-xl md:rounded-3xl shadow-xl text-body-xl md:text-h3 font-bold select-none transition-all"
               :class="{
                 // Correct guess (green styled)
@@ -21,7 +41,8 @@
 
                 // Wrong guess (muted + strike feeling)
                 'bg-gray-100 text-gray-400 border-gray-400 shadow-gray-400': !s.correct,
-              }">
+              }"
+            >
               {{ char }}
             </div>
           </div>
@@ -29,33 +50,66 @@
       </div>
 
       <div class="flex flex-wrap justify-center items-center gap-3 md:gap-5">
-        <CharacterKey v-for="{ c, i } in answerChars" :key="`${c}-${i}`" :char="c"
-          :disabled="isCharDisabled(c) || !isPlaying" @input="onCharInput" />
+        <CharacterKey
+          v-for="{ c, i } in answerChars"
+          :key="`${c}-${i}`"
+          :char="c"
+          :disabled="isCharDisabled(c) || !isPlaying"
+          @input="onCharInput"
+        />
       </div>
     </div>
 
-    <template #footer="{ onCleared, onCheck, onRetry, onOpenResult }">
+    <template #footer="{ onOpenResult }">
       <div v-if="!isXs" class="flex gap-2.5">
-        <UiButton :size="buttonSize" text="Delete" variant="danger" @click="deleteChar" :disabled="!isPlaying">
+        <UiButton
+          :size="buttonSize"
+          text="Delete"
+          variant="danger"
+          @click="deleteChar"
+          :disabled="!isPlaying"
+        >
         </UiButton>
         <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
         </UiButton>
 
-        <UiButton :size="buttonSize" text="Continue" v-if="isWin || isLose"
-          @click="() => onOpenResult && onOpenResult()">
+        <UiButton
+          :size="buttonSize"
+          text="Continue"
+          v-if="isWin || isLose"
+          @click="() => onOpenResult && onOpenResult()"
+        >
         </UiButton>
       </div>
       <div v-else class="flex flex-col gap-2.5 w-full justify-center items-center">
         <div class="flex gap-2.5 w-full justify-center items-center">
-          <UiButton class="w-full" :size="buttonSize" text="Delete" variant="danger" @click="deleteChar"
-            :disabled="!isPlaying">
+          <UiButton
+            class="w-full"
+            :size="buttonSize"
+            text="Delete"
+            variant="danger"
+            @click="deleteChar"
+            :disabled="!isPlaying"
+          >
           </UiButton>
-          <UiButton class="w-full" :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
+          <UiButton
+            class="w-full"
+            :size="buttonSize"
+            text="Submit"
+            @click="submitAnswer"
+            :disabled="!isPlaying"
+          >
           </UiButton>
         </div>
         <div class="flex w-full justify-center items-center">
-          <UiButton class="w-full" :size="buttonSize" text="Continue" v-if="isWin || isLose"
-            @click="() => onOpenResult && onOpenResult()"> </UiButton>
+          <UiButton
+            class="w-full"
+            :size="buttonSize"
+            text="Continue"
+            v-if="isWin || isLose"
+            @click="() => onOpenResult && onOpenResult()"
+          >
+          </UiButton>
         </div>
       </div>
     </template>
@@ -82,12 +136,12 @@ type Submission = {
 }
 
 const MAX_TIME = 180
-const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData, failureResultData } = useGameService({
-  maxTime: MAX_TIME,
-  minigameId: MINIGAME_IDS.scrambles,
-  offline: true,
-})
-
+const { time, _isWon, _isLost, _isPlaying, startGame, finish, retry, successResultData } =
+  useGameService({
+    maxTime: MAX_TIME,
+    minigameId: MINIGAME_IDS.scrambles,
+    offline: true,
+  })
 
 const isWin = computed(() => _isWon.value)
 const isLose = computed(() => _isLost.value)
@@ -221,7 +275,13 @@ async function submitAnswer() {
 
   if (correct) {
     const attemptsUsed = MAX_ATTEMPTS - attempts.value + 1
-    const totalScore = computeScore({ total: 1, correct: isWin ? 1 : 0, attempts: attemptsUsed, timeUsed: MAX_TIME - time.value, maxTime: MAX_TIME })
+    const totalScore = computeScore({
+      total: 1,
+      correct: isWin.value ? 1 : 0,
+      attempts: attemptsUsed,
+      timeUsed: MAX_TIME - time.value,
+      maxTime: MAX_TIME,
+    })
     isChecked.value = true
     await finish(true, undefined, totalScore)
     return
@@ -234,7 +294,13 @@ async function submitAnswer() {
     hints.value = answer.value.split('')
     userInput.value = Array(answer.value.length).fill(null)
     submissions.value.push({ value: answer.value, correct: true })
-    const totalScore = computeScore({ total: 1, correct: 0, attempts: MAX_ATTEMPTS - attempts.value + 1, timeUsed: MAX_TIME - time.value, maxTime: 180 })
+    const totalScore = computeScore({
+      total: 1,
+      correct: 0,
+      attempts: MAX_ATTEMPTS - attempts.value + 1,
+      timeUsed: MAX_TIME - time.value,
+      maxTime: 180,
+    })
     isChecked.value = true
     await finish(false, undefined, totalScore)
   }
@@ -280,10 +346,6 @@ async function restartGame() {
   userInput.value = Array(answer.value.length).fill(null)
   isChecked.value = false
   await retry()
-}
-
-function continueGame() {
-  handleContinue()
 }
 
 const emit = defineEmits<{

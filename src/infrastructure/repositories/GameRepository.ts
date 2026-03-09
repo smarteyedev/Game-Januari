@@ -10,7 +10,6 @@ import {
   MinigameId as MinigameIdEnum,
   type BaseLevelData,
   type LevelDataArrayResponse,
-  type LevelDataRootArrayResponse,
   type LevelDataKeyedResponse,
   type GameResultResponse,
 } from '@/domain/types'
@@ -56,9 +55,12 @@ export class GameRepository implements IGameRepository {
   }
 
   async getGameResult(sessionId: string, authToken: string): Promise<GameResultResponse> {
-    const response = await httpClient.get<GameResultResponse>(`/api/v1/hpl/session/${sessionId}/result`, {
-      headers: { Authorization: `Bearer ${authToken}` },
-    })
+    const response = await httpClient.get<GameResultResponse>(
+      `/api/v1/hpl/session/${sessionId}/result`,
+      {
+        headers: { Authorization: `Bearer ${authToken}` },
+      },
+    )
 
     return response.data
   }
@@ -103,8 +105,7 @@ export class LevelRepository {
         import('@/assets/gameData/automationSpotter/gamedata.json'),
       [MinigameIdEnum.DragAndDrop]: () => import('@/assets/gameData/dragAndDrop/gamedata.json'),
       [MinigameIdEnum.Memory]: () => import('@/assets/gameData/memoryGame/gamedata.json'),
-      [MinigameIdEnum.Connections]: () =>
-        import('@/assets/gameData/connectionsGame/gamedata.json'),
+      [MinigameIdEnum.Connections]: () => import('@/assets/gameData/connectionsGame/gamedata.json'),
       [MinigameIdEnum.Scrambles]: () => import('@/assets/gameData/scramblesGame/gamedata.json'),
       [MinigameIdEnum.Matrix]: () => import('@/assets/gameData/matrixGame/gamedata.json'),
     }
@@ -153,7 +154,7 @@ export class LevelRepository {
 
     // Type guard for root array format: [ { id, ... }, ... ]
     if (Array.isArray(raw)) {
-      const dataArray = raw as LevelDataRootArrayResponse
+      const dataArray = raw as Array<BaseLevelData>
       const found = dataArray.find((d: BaseLevelData) => d.id === level) || dataArray[0]
       logger.debug('Loaded level from root array format', { level, foundId: found?.id })
       return found as T

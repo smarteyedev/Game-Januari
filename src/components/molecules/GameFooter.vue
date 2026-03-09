@@ -37,26 +37,21 @@ function handleContinue() {
   } else {
     emit('check')
   }
-
 }
 </script>
 
 <template>
   <div class="w-full flex flex-col md:flex-row justify-between items-center">
     <!-- LEFT -->
-    <div class="w-full md:flex  flex-col sm:flex-row gap-2 md:gap-4 self-start">
+    <div class="w-full md:flex flex-col sm:flex-row gap-2 md:gap-4 self-start">
       <slot name="footer-left">
         <div>
-          <ProgressWithIcon v-if="showProgress && current !== undefined && target !== undefined" :current="current"
-            :target="target" />
+          <ProgressWithIcon
+            v-if="showProgress && current !== undefined && target !== undefined"
+            :current="current"
+            :target="target"
+          />
         </div>
-        <!-- SUBMIT 
-        <div v-if="!isXs && !isSm" class="grow flex justify-center items-center sm:inline-block">
-          <UiButton :size="buttonSize" v-if="!hideSubmit && !isChecked" variant="secondary" @click="emit('check')"
-            class="self-center " text="Check">
-          </UiButton>
-        </div>
-        -->
       </slot>
     </div>
 
@@ -64,13 +59,14 @@ function handleContinue() {
     <div class="flex items-end gap-3 sm:gap-4 mt-2 md:mt-0">
       <slot name="footer-right">
         <!-- CONTINUE / VIEW RESULT - show when game is won or lost (finished) -->
-        <UiButton v-if="isWin" :size="buttonSize" text="Continue" variant="primary" @click="emit('open-result')">
+        <UiButton
+          v-if="isWin"
+          :size="buttonSize"
+          text="Continue"
+          variant="primary"
+          @click="emit('open-result')"
+        >
         </UiButton>
-        <!-- 
-        <UiButton v-else-if="hasLost" :size="buttonSize" text="View Result" variant="primary"
-          @click="emit('open-result')">
-        </UiButton>
-      -->
         <UiButton :size="buttonSize" text="Continue" variant="primary" @click="handleContinue">
         </UiButton>
       </slot>

@@ -6,7 +6,13 @@
 import { ref, computed } from 'vue'
 import type { Ref, ComputedRef } from 'vue'
 import { Game } from '@/domain/entities/Game'
-import { GameState, type MinigameId, type GameResult, type GameResultResponse, type SuccessResultData, type FailureResultData } from '@/domain/types'
+import {
+  GameState,
+  type MinigameId,
+  type GameResult,
+  type GameResultResponse,
+  type SuccessResultData,
+} from '@/domain/types'
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
@@ -63,7 +69,6 @@ export type GameServiceReturn = {
 
   // Result data for modal
   successResultData: Ref<SuccessResultData | undefined>
-  failureResultData: Ref<FailureResultData | undefined>
 }
 
 // ============================================================================
@@ -124,7 +129,6 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
   // Result data for modal
   const successResultData = ref<SuccessResultData | undefined>(undefined)
-  const failureResultData = ref<FailureResultData | undefined>(undefined)
 
   // ==========================================================================
   // Private Methods
@@ -133,16 +137,16 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
   /**
    * Fetch game result data from API or use offline dummy data
    */
-  async function fetchGameResultData(won: boolean): Promise<{ success?: SuccessResultData; failure?: FailureResultData }> {
+  async function fetchGameResultData(
+    won: boolean,
+  ): Promise<{ success?: SuccessResultData; failure?: unknown }> {
     const session = sessionRepository.getCurrentSession()
-    
+
     if (offline || !session || !game.value.sessionId) {
       // Use offline dummy data
       logger.info('Using offline dummy result data', { won })
       const dummyData = dummyResultData as GameResultResponse
-      return won 
-        ? { success: dummyData.success }
-        : { failure: dummyData.failure }
+      return won ? { success: dummyData.success } : { failure: undefined }
     }
 
     try {
@@ -152,18 +156,14 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
         session.accessToken,
       )
       logger.info('Fetched game result data from API', { won, sessionId: game.value.sessionId })
-      return won 
-        ? { success: resultData.success }
-        : { failure: resultData.failure }
+      return won ? { success: resultData.success } : { failure: undefined }
     } catch (err) {
-  const error = err instanceof Error ? err : new Error(String(err))
-  logger.error('Failed to fetch game result from API, using offline data', error)
+      const error = err instanceof Error ? err : new Error(String(err))
+      logger.error('Failed to fetch game result from API, using offline data', error)
 
-  const dummyData = dummyResultData as GameResultResponse
-  return won
-    ? { success: dummyData.success }
-    : { failure: dummyData.failure }
-}
+      const dummyData = dummyResultData as GameResultResponse
+      return won ? { success: dummyData.success } : { failure: undefined }
+    }
   }
 
   /**
@@ -174,7 +174,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     game.value.setSubmitting()
 
     _didWin.value = won
-    const resolvedScore = typeof finalScore === 'number' ? finalScore : (won ? 100 : 0)
+    const resolvedScore = typeof finalScore === 'number' ? finalScore : won ? 100 : 0
 
     if (finalAnswers) {
       game.value.answers.push(...finalAnswers)
@@ -191,8 +191,10 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
       successResultData.value = resultData.success
     }
     if (resultData.failure) {
-      failureResultData.value = resultData.failure
-      logger.debug('useGameService: set failureResultData', { minigameId, failure: resultData.failure })
+      logger.debug('useGameService: set failureResultData', {
+        minigameId,
+        failure: resultData.failure,
+      })
     }
 
     game.value.finish(won, resolvedScore, finalAnswers)
@@ -362,9 +364,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
 
     // Result data for modal
     successResultData,
-    failureResultData,
   }
 }
 
 export default useGameService
-

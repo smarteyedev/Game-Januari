@@ -4,7 +4,7 @@ import GameHeader from '@/components/molecules/GameHeader.vue'
 import GameFooter from '@/components/molecules/GameFooter.vue'
 import GameIntroModal from '@/components/molecules/GameIntroModal.vue'
 import GameState from '@/components/molecules/GameState.vue'
-import type { FailureResultData, IntroData, SuccessResultData } from '@/domain/types'
+import type { IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
 import GameResultModal from '../molecules/GameResultModal.vue'
 import GameResultSummaryModal from '../molecules/GameResultSummaryModal.vue'
@@ -49,8 +49,6 @@ interface BaseGameProps {
   resultSummary?: any
   /** Success result data provided by game service */
   successResult?: SuccessResultData | null
-  /** Failure result data provided by game service */
-  failureResult?: FailureResultData | null
   /** Whether the game has been checked/submitted */
   isChecked?: boolean
   /** Whether the player won the game */
@@ -102,7 +100,7 @@ function openResultModal(useDelay = true) {
     resultTimer = undefined
   }
 
-  if (useDelay && props.showProgress) {
+  if (useDelay) {
     resultTimer = window.setTimeout(() => {
       showResultLocal.value = true
       resultTimer = undefined
@@ -116,14 +114,20 @@ function openResultModal(useDelay = true) {
 // Result modal should only open based on isWin or hasLost (win/lose state)
 
 // Also show result modal when game is won or lost
-watch(() => props.isWin, (val) => {
-  // Only open when we also have result data available
-  if (val && (props.successResult || props.failureResult)) openResultModal()
-})
+watch(
+  () => props.isWin,
+  (val) => {
+    // Only open when we also have result data available
+    if (val && props.successResult) openResultModal()
+  },
+)
 
-watch(() => props.hasLost, (val) => {
-  if (val && (props.successResult || props.failureResult)) openResultModal()
-})
+watch(
+  () => props.hasLost,
+  (val) => {
+    if (val && props.successResult) openResultModal()
+  },
+)
 
 const emit = defineEmits<{
   /** Emit when check/submit button is clicked */
@@ -192,23 +196,21 @@ onUnmounted(() => {
 })
 
 const successResult = ref<SuccessResultData | undefined>()
-const failureResult = ref<FailureResultData | undefined>()
 
 // Local control for summary modal
 const showSummaryLocal = ref(false)
-const summaryData = ref<SuccessResultData | FailureResultData | undefined>()
+const summaryData = ref<SuccessResultData | undefined>()
 
 function handleOpenResult() {
   // ensure latest result data is synced
   successResult.value = props.successResult ?? undefined
-  failureResult.value = props.failureResult ?? undefined
 
   openResultModal(false)
 }
 
 function handleViewSummary() {
-  // prefer success result if available
-  summaryData.value = successResult.value ?? failureResult.value
+  // Only show summary when player wins (use successResult only)
+  summaryData.value = successResult.value
 
   // If summary is currently shown, close both modals to go back to game content
   if (showSummaryLocal.value) {
@@ -234,63 +236,109 @@ function handleCheck() {
 }
 
 // Initialize local result refs from incoming props and update on changes
-watch(() => props.successResult, (val) => {
-  successResult.value = val ?? undefined
-  if (successResult.value) openResultModal()
-  console.debug('BaseGame: successResult prop changed', { value: successResult.value })
-})
-
-watch(() => props.failureResult, (val) => {
-  failureResult.value = val ?? undefined
-  if (failureResult.value) openResultModal()
-  console.debug('BaseGame: failureResult prop changed', { value: failureResult.value })
-})
-
+watch(
+  () => props.successResult,
+  (val) => {
+    successResult.value = val ?? undefined
+    if (successResult.value) openResultModal()
+    console.debug('BaseGame: successResult prop changed', { value: successResult.value })
+  },
+)
 </script>
 
 <template>
   <GameState :loading="loading" :error="error" :retryFn="retryFn">
-    <div ref="gameWrapper" class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
-      backgroundImage: `url(${Background})`,
-      backgroundPosition: 'center',
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-    }">
+    <div
+      ref="gameWrapper"
+      class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
+      :style="{
+        backgroundImage: `url(${Background})`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      }"
+    >
       <!-- Topbar (always visible) -->
-      <TopActionBar :text="moduleTitle" class="z-60" @toggle-fullscreen="toggleFullscreen"
-        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress" :isChecked="isChecked"
-        :isShown="showSummaryLocal" />
+      <TopActionBar
+        :text="moduleTitle"
+        class="z-60"
+        @toggle-fullscreen="toggleFullscreen"
+        @toggle-summary="handleViewSummary"
+        :current="currentProgress"
+        :target="targetProgress"
+        :isChecked="isChecked"
+        :isWin="isWin"
+        :isShown="showSummaryLocal"
+      />
 
       <!-- Content Area -->
       <div class="flex-1 flex flex-col relative">
-
         <!-- Intro Modal -->
 
-        <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
-          @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData"
-          @start="handleStart" containerPosition="relative" />
+        <GameIntroModal
+          v-if="showIntro && introData"
+          :modelValue="showIntro"
+          @update:modelValue="emit('update:showIntro', $event)"
+          :title="title"
+          :introData="introData"
+          @start="handleStart"
+          containerPosition="relative"
+        />
 
-        <GameResultModal v-else-if="showResultLocal" :success="isWin" :successResult="successResult"
-          :failureResult="failureResult" v-model:modelValue="showResultLocal" @continue="handleCleared"
-          @retry="handleRetry" containerPosition="relative" />
+        <GameResultModal
+          v-else-if="showResultLocal"
+          :success="isWin"
+          :successResult="successResult"
+          v-model:modelValue="showResultLocal"
+          @continue="handleCleared"
+          @retry="handleRetry"
+          containerPosition="relative"
+        />
 
-        <GameResultSummaryModal v-else-if="showSummaryLocal" :resultSummary="summaryData"
-          v-model:modelValue="showSummaryLocal" containerPosition="relative" @toggle-summary="handleViewSummary" />
+        <GameResultSummaryModal
+          v-else-if="showSummaryLocal"
+          :resultSummary="summaryData"
+          v-model:modelValue="showSummaryLocal"
+          containerPosition="relative"
+          @toggle-summary="handleViewSummary"
+        />
 
         <!-- Game Content -->
-        <div v-else
-          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700">
+        <div
+          v-else
+          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
+        >
           <slot name="header">
-            <GameHeader :title="title" :description="description" :question="question" :time="time" />
+            <GameHeader
+              :title="title"
+              :description="description"
+              :question="question"
+              :time="time"
+            />
           </slot>
 
           <slot />
 
-          <slot name="footer" :onCheck="handleCheck" :onRetry="handleRetry" :onCleared="handleCleared"
-            :onOpenResult="handleOpenResult">
-            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
-              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
-              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult()">
+          <slot
+            name="footer"
+            :onCheck="handleCheck"
+            :onRetry="handleRetry"
+            :onCleared="handleCleared"
+            :onOpenResult="handleOpenResult"
+          >
+            <GameFooter
+              :current="currentProgress"
+              :target="targetProgress"
+              :showProgress="showProgress"
+              :isChecked="isChecked"
+              :isWin="isWin"
+              :hasLost="hasLost"
+              :hideSubmit="hideSubmit"
+              @check="handleCheck"
+              @retry="handleRetry"
+              @cleared="handleCleared"
+              @open-result="handleOpenResult()"
+            >
               <template #footer-left>
                 <slot name="footer-left" />
               </template>

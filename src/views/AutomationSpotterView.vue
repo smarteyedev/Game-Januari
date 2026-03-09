@@ -47,18 +47,12 @@ const gameServiceOptions = {
   offline: true,
 }
 
-
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+  useGameService(gameServiceOptions)
 
 // Computed
 const matchedCount = computed(() => Object.values(checkedMap.value).filter(Boolean).length)
-const isLevelWin = computed(() => {
-  if (!isChecked.value) return false
-  return (
-    Object.keys(checkedMap.value).length === allCards.value.length &&
-    Object.values(checkedMap.value).every(Boolean)
-  )
-})
+
 // Use game service's _isLost for consistency
 const hasLost = computed(() => _isLost.value)
 
@@ -124,14 +118,19 @@ async function checkAnswers() {
   isChecked.value = true
 
   const isPerfect =
-    Object.values(result).every(Boolean) &&
-    Object.keys(result).length === allCards.value.length
+    Object.values(result).every(Boolean) && Object.keys(result).length === allCards.value.length
 
   if (isPerfect) {
     const total = allCards.value.length
     const correct = Object.values(checkedMap.value).filter(Boolean).length
     const totalScore = computeScore(
-      { total, correct, attempts: attempts.value, timeUsed: MAX_TIME - time.value, maxTime: gameServiceOptions.maxTime },
+      {
+        total,
+        correct,
+        attempts: attempts.value,
+        timeUsed: MAX_TIME - time.value,
+        maxTime: gameServiceOptions.maxTime,
+      },
       { timeTolerance: SCORING_TIME_TOLERANCE, answerWeight, timeWeight },
     )
     await finish(true, undefined, totalScore)
@@ -172,14 +171,37 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Automation Spotter'"
-    description="Masukkan kata ke dalam tempat yang benar!" :question="question" :time="time" :maxTime="180"
-    :loading="loading" :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[0]"
-    :isWin="_isWon" :hasLost="hasLost" :isChecked="isChecked" :currentProgress="matchedCount"
-    :targetProgress="allCards.length" :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers"
-    @cleared="handleContinue" :successResult="successResultData" :failureResult="failureResultData">
-    <TaskRow v-model="sourceCards" :checked-map="checkedMap" :is-checked="isChecked" :disabled="isChecked"
-      @moved="onMoved" />
+  <BaseGame
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    :title="'Automation Spotter'"
+    description="Masukkan kata ke dalam tempat yang benar!"
+    :question="question"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[0]"
+    :isWin="_isWon"
+    :hasLost="hasLost"
+    :isChecked="isChecked"
+    :currentProgress="matchedCount"
+    :targetProgress="allCards.length"
+    :showProgress="true"
+    @start="start"
+    @retry="retryGame"
+    @check="checkAnswers"
+    @cleared="handleContinue"
+    :successResult="successResultData"
+  >
+    <TaskRow
+      v-model="sourceCards"
+      :checked-map="checkedMap"
+      :is-checked="isChecked"
+      :disabled="isChecked"
+      @moved="onMoved"
+    />
     <SpotZones :zones="zones" :checked-map="checkedMap" :is-checked="isChecked" @moved="onMoved" />
   </BaseGame>
 </template>

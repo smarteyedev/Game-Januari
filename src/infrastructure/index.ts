@@ -12,9 +12,13 @@ export { logger, debug, info, warn, error, LogLevel } from './logging'
 export type { LogEntry, LoggerOptions } from './logging'
 
 // Repositories
-export { gameRepository, levelRepository, GameRepository, LevelRepository } from './repositories/GameRepository'
+export {
+  gameRepository,
+  levelRepository,
+  GameRepository,
+  LevelRepository,
+} from './repositories/GameRepository'
 export { sessionRepository, SessionRepository } from './repositories/SessionRepository'
 
 // Storage
 export { storage, LocalStorageService } from './storage/LocalStorageService'
-

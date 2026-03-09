@@ -194,11 +194,6 @@ export interface LevelDataArrayResponse {
 }
 
 /**
- * Response format for level data (root array format)
- */
-export interface LevelDataRootArrayResponse extends Array<BaseLevelData> {}
-
-/**
  * Response format for level data (keyed by id)
  */
 export interface LevelDataKeyedResponse {
@@ -210,7 +205,7 @@ export interface LevelDataKeyedResponse {
  */
 export type LevelDataResponse =
   | LevelDataArrayResponse
-  | LevelDataRootArrayResponse
+  | Array<BaseLevelData>
   | LevelDataKeyedResponse
   | BaseLevelData
 
@@ -228,4 +223,3 @@ export type MinigameLevelDataMap = {
 }
 
 export type MinigameLevelData = MinigameLevelDataMap[keyof MinigameLevelDataMap]
-

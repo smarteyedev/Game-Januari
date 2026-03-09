@@ -55,7 +55,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 }
 
@@ -65,7 +65,8 @@ const gameServiceOptions = {
   offline: true,
 }
 
-const { time, _isWon, _isLost, startGame, finish, retry, successResultData, failureResultData } = useGameService(gameServiceOptions)
+const { time, _isWon, _isLost, startGame, finish, retry, successResultData } =
+  useGameService(gameServiceOptions)
 
 // Computed - use game service's _isWon and _isLost for consistency
 const hasLost = computed(() => _isLost.value)
@@ -366,10 +367,15 @@ async function checkAnswers() {
   const won = count === totalSlots.value
   isLocked.value = true
 
-
   if (won) {
     const total = totalSlots.value
-    const totalScore = computeScore({ total, correct: count, timeUsed: MAX_TIME - time.value, attempts: attempts.value, maxTime: gameServiceOptions.maxTime })
+    const totalScore = computeScore({
+      total,
+      correct: count,
+      timeUsed: MAX_TIME - time.value,
+      attempts: attempts.value,
+      maxTime: gameServiceOptions.maxTime,
+    })
     await finish(true, undefined, totalScore)
   } else {
     // mark as finished/lost so GameService can fetch failure result data
@@ -404,29 +410,63 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="180" :loading="loading"
-    :error="error" :retryFn="fetchLevel" v-model:showIntro="showIntro" :introData="introData.data[1]" :isWin="_isWon"
-    :hasLost="hasLost" :isChecked="isChecked" :currentProgress="correctCount ?? 0" :targetProgress="totalSlots"
-    :showProgress="true" @start="start" @retry="retryGame" @check="checkAnswers" @cleared="handleContinue"
-    :successResult="successResultData" :failureResult="failureResultData">
+  <BaseGame
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
+    :time="time"
+    :maxTime="180"
+    :loading="loading"
+    :error="error"
+    :retryFn="fetchLevel"
+    v-model:showIntro="showIntro"
+    :introData="introData.data[1]"
+    :isWin="_isWon"
+    :hasLost="hasLost"
+    :isChecked="isChecked"
+    :currentProgress="correctCount ?? 0"
+    :targetProgress="totalSlots"
+    :showProgress="true"
+    @start="start"
+    @retry="retryGame"
+    @check="checkAnswers"
+    @cleared="handleContinue"
+    :successResult="successResultData"
+  >
     <!-- Sentence Board -->
 
     <div
-      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
-      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm"
+    >
+      <template
+        v-for="(part, index) in board"
+        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
+      >
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
-          :isTouchDevice="isTouchDevice" :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" />
+        <BlankSlot
+          v-else
+          :item="slots[part.id]"
+          :slotId="part.id"
+          :onDragStart="onDragStart"
+          :isTouchDevice="isTouchDevice"
+          :isCorrect="slotCorrectness[part.id]"
+          :disabled="isLocked"
+        />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem v-for="(item, _) in items" :key="item.id" :item="item" :inSlot="false" :disabled="isLocked"
-        @dragstart="onDragStart" />
+      <WordItem
+        v-for="(item, _) in items"
+        :key="item.id"
+        :item="item"
+        :inSlot="false"
+        :disabled="isLocked"
+        @dragstart="onDragStart"
+      />
     </div>
   </BaseGame>
   <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">
