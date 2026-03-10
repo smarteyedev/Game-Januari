@@ -62,14 +62,8 @@ const iconSizeClass = computed(() => {
 </script>
 
 <template>
-  <UiModal
-    :container-position="props.containerPosition"
-    :prevent-close="false"
-    :modelValue="modelValue"
-    size="md"
-    position="center"
-    scroll-mode="content"
-    :content-style="{
+  <UiModal :container-position="props.containerPosition" :prevent-close="false" :modelValue="modelValue" size="md"
+    position="center" scroll-mode="content" :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
@@ -78,22 +72,18 @@ const iconSizeClass = computed(() => {
       gap: '20px',
       display: 'flex',
       flexDirection: 'column',
-    }"
-    @update:modelValue="emit('update:modelValue', $event)"
-    @cancel="onClose"
-  >
+    }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex flex-col justify-center items-center w-full gap-2">
-        <SuccessIcon
-:class="iconSizeClass"
-v-if="success" />
-        <FailedIcon
-:class="iconSizeClass"
-v-else />
+        <SuccessIcon :class="iconSizeClass" v-if="success" />
+        <FailedIcon :class="iconSizeClass" v-else />
         <p class="text-body-lg font-extrabold text-primary-700 md:text-h2">
           {{ success ? 'SUCCESSFUL' : 'FAILED' }}
         </p>
+        <div v-if="successResult?.score !== undefined" class="text-center">
+          <p class="text-h2 font-black text-primary-700">Score: {{ successResult.score }}</p>
+        </div>
       </div>
     </template>
 
@@ -103,27 +93,14 @@ v-else />
 
     <!-- BODY -->
     <div class="flex-1 overflow-y-auto flex justify-center">
-      <GameResult
-:success="success"
-:successResult="successResult" />
+      <GameResult :success="success" :successResult="successResult" />
     </div>
 
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <UiButton
-          v-if="success"
-          text="Continue"
-          variant="primary"
-          :size="buttonSize"
-          @click="onContinue"
-        />
-        <UiButton
-v-else
-text="Retry"
-variant="danger"
-:size="buttonSize"
-@click="onRetry" />
+        <UiButton v-if="success" text="Continue" variant="primary" :size="buttonSize" @click="onContinue" />
+        <UiButton v-else text="Retry" variant="danger" :size="buttonSize" @click="onRetry" />
       </div>
     </template>
   </UiModal>

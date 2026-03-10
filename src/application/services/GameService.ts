@@ -16,7 +16,7 @@ import {
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
-import { computeScore, getFeedback, type ScoreContext, type ScoringParams } from './ScoringService'
+import { computeScore, getFeedback, getSpeedFeedback, type ScoreContext, type ScoringParams } from './ScoringService'
 import { logger } from '@/infrastructure/logging'
 import dummyResultData from '@/assets/gameData/dummyResult.json'
 
@@ -227,7 +227,12 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     // Fetch result data from API or use offline dummy data
     const resultData = await fetchGameResultData(won)
     if (resultData.success) {
-      successResultData.value = resultData.success
+      successResultData.value = {
+        ...resultData.success,
+        score: resolvedScore,
+        feedback: getFeedback(resolvedScore),
+        speedFeedback: getSpeedFeedback(time.value / maxTime),
+      }
     }
     if (resultData.failure) {
       logger.debug('useGameService: set failureResultData', {
