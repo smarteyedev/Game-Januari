@@ -71,7 +71,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
@@ -180,73 +180,33 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
-    :time="time"
-    :maxTime="MAX_TIME"
-    :loading="baseLoading || introLoading || gameLoading"
-    :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)"
-    v-model:showIntro="showIntro"
-    :introData="introData"
-    :isWin="_isWon"
-    :hasLost="_isLost"
-    :isChecked="isChecked"
-    :currentProgress="correctCount"
-    :targetProgress="totalSlots"
-    :showProgress="true"
-    @start="start"
-    @retry="retryGame(() => { checkResult = null; resetGame(); })"
-    @check="checkAnswers"
-    @cleared="handleContinue"
-    :successResult="successResultData"
-  >
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="MAX_TIME"
+    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)" v-model:showIntro="showIntro" :introData="introData" :isWin="_isWon"
+    :hasLost="_isLost" :isChecked="isChecked" :currentProgress="correctCount" :targetProgress="totalSlots"
+    :showProgress="true" @start="start" @retry="retryGame(() => { checkResult = null; resetGame(); })"
+    @check="checkAnswers" @cleared="handleContinue" :successResult="successResultData">
     <!-- Sentence Board -->
     <div
-      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm"
-    >
-      <template
-        v-for="(part, index) in board"
-        :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`"
-      >
+      class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
+      <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
         <span v-if="part.type === 'text'">
           {{ part.value }}
         </span>
-        <BlankSlot
-          v-else
-          :item="slots[part.id]"
-          :slotId="part.id"
-          :onDragStart="onDragStart"
-          :isTouchDevice="isTouchDevice"
-          :isCorrect="slotCorrectness[part.id]"
-          :disabled="isLocked"
-        />
+        <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :onDragStart="onDragStart"
+          :isTouchDevice="isTouchDevice" :isCorrect="slotCorrectness[part.id]" :disabled="isLocked" />
       </template>
     </div>
 
     <!-- Word Pool -->
     <div class="flex flex-wrap gap-3 justify-center">
-      <WordItem
-        v-for="item in items"
-        :key="item.id"
-        :item="item"
-        :inSlot="false"
-        :disabled="isLocked"
-        @dragstart="onDragStart"
-      />
+      <WordItem v-for="item in items" :key="item.id" :item="item" :inSlot="false" :disabled="isLocked"
+        @dragstart="onDragStart" />
     </div>
   </BaseGame>
-  <div
-    v-if="ghostVisible"
-    class="dd-ghost"
-    :style="{ left: ghostLeft, top: ghostTop }"
-  >
-    <Card
-      :label="ghostLabel"
-      :class="ghostClass"
-    />
+  <div v-if="ghostVisible" class="dd-ghost" :style="{ left: ghostLeft, top: ghostTop }">
+    <Card :label="ghostLabel" :class="ghostClass" />
   </div>
 </template>
 

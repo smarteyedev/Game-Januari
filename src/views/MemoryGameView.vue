@@ -29,7 +29,7 @@ function playClick() {
   if (audio) {
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => {})
+    audio.play().catch(() => { })
   }
 }
 
@@ -100,42 +100,20 @@ const buttonSize = computed(() => {
 </script>
 
 <template>
-  <BaseGame
-    module-title="Explore Artificial Intelligence (AI) Tools"
-    :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
-    :time="time"
-    :maxTime="MAX_TIME"
-    :loading="baseLoading || introLoading || gameLoading"
-    :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)"
-    v-model:showIntro="showIntro"
-    :introData="introData"
-    :isWin="isWon"
-    :hasLost="isLost"
-    :hideSubmit="true"
-    :isChecked="isAllMatched"
-    :successResult="successResultData"
-    @start="start"
-    @retry="retryGame(resetGame)"
-    @cleared="handleContinue"
-  >
-    <MemoryBoard
-      :cards="cards"
-      @flip="handleFlip"
-    />
+  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="MAX_TIME"
+    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)" v-model:showIntro="showIntro" :introData="introData" :isWin="isWon"
+    :hasLost="isLost" :hideSubmit="true" :isChecked="isAllMatched" :successResult="successResultData" @start="start"
+    @retry="retryGame(resetGame)" @cleared="handleContinue">
+    <MemoryBoard :cards="cards" @flip="handleFlip" />
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
-        <span class="text-body-xs md:text-body-md text-primary-700 font-bold w-full">
+        <span class="text-body-xs xl:text-body-md text-primary-700 font-bold w-full">
           Card Turns: {{ turns }}
         </span>
-        <UiButton
-          v-if="isAllMatched || time <= 0"
-          :size="buttonSize"
-          text="Continue"
-          variant="primary"
-          @click="onOpenResult"
-        >
+        <UiButton v-if="isAllMatched || time <= 0" :size="buttonSize" text="Continue" variant="primary"
+          @click="onOpenResult">
         </UiButton>
       </div>
     </template>

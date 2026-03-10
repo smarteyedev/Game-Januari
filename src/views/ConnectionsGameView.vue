@@ -97,95 +97,48 @@ function getSolvedColor(index: number) {
 </script>
 
 <template>
-  <BaseGame
-    title="Connections Game"
-    moduleTitle="Explore Artificial Intelligence (AI) Tools"
-    description="Connections game"
-    :time="time"
-    :maxTime="MAX_TIME"
-    v-model:showIntro="showIntro"
-    :introData="introData"
-    :loading="baseLoading || introLoading || gameLoading"
-    :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)"
-    :isWin="_isWon"
-    :hasLost="_isLost"
-    :isChecked="false"
-    :successResult="successResultData"
-    @start="start"
-    @retry="retryGame(resetGame)"
-    @check="submitSelection"
-    @cleared="handleContinue"
-  >
-    <div class="grid grid-cols-4 md:grid-cols-8 gap-5 w-full">
-      <div class="col-span-4 md:col-start-3 md:col-span-4 grid grid-cols-4 gap-5">
-        <ConnectionsCard
-          v-for="index in 4"
-          :key="index"
-          :label="getSolvedGroup(index - 1)?.label || ''"
-          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
-          :color="getSolvedColor(index - 1)"
-          :clickable="false"
-        />
+  <BaseGame title="Connections Game" moduleTitle="Explore Artificial Intelligence (AI) Tools"
+    description="Connections game" :time="time" :maxTime="MAX_TIME" v-model:showIntro="showIntro" :introData="introData"
+    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)" :isWin="_isWon" :hasLost="_isLost" :isChecked="false"
+    :successResult="successResultData" @start="start" @retry="retryGame(resetGame)" @check="submitSelection"
+    @cleared="handleContinue">
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 w-full">
+      <div class="col-span-4 lg:col-start-3 lg:col-span-4 grid grid-cols-4 gap-5">
+        <ConnectionsCard v-for="index in 4" :key="index" :label="getSolvedGroup(index - 1)?.label || ''"
+          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)"
+          :clickable="false" />
       </div>
     </div>
     <div>
-      <span class="text-body-xs md:text-body-xl font-semibold text-primary-700"
-        >Create a group of four</span
-      >
+      <span class="text-body-xs md:text-body-sm lg:text-body-xl font-semibold text-primary-700">Create a group of
+        four</span>
     </div>
-    <div class="grid grid-cols-4 md:grid-cols-8 gap-5 place-items-center w-full">
-      <ConnectionsCard
-        v-for="item in items"
-        :key="item.label"
-        :label="item.label"
-        :state="item.state"
-        :color="categoryColorMap[item.category]"
-        :clickable="item.state !== 'solved'"
-        @click="toggleItem(item)"
-      />
+    <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 place-items-center w-full">
+      <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
+        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
     </div>
 
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
-        <div class="text-primary-700 text-body-xs md:text-body-xl font-bold">
-          <UiLabel
-            v-if="wrongCount !== null && !(_isWon || _isLost)"
-            :label="`Wrong, you are ${wrongCount} away to form a correct group`"
-          />
-          <UiLabel
-            v-if="solvedNewGroup !== null && !(_isWon || _isLost)"
-            :label="`You found a new group: ${solvedNewGroup.label}`"
-          />
-          <UiLabel
-            v-if="_isWon"
-            :label="`You win`"
-          />
-          <UiLabel
-            v-if="_isLost"
-            :label="`you lose`"
-          />
+        <div class="text-primary-700 text-body-xs md:text-body-sm lg:text-body-xl font-bold">
+          <UiLabel v-if="wrongCount !== null && !(_isWon || _isLost)"
+            :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
+          <UiLabel v-if="solvedNewGroup !== null && !(_isWon || _isLost)"
+            :label="`You found a new group: ${solvedNewGroup.label}`" />
+          <UiLabel v-if="_isWon" :label="`You win`" />
+          <UiLabel v-if="_isLost" :label="`you lose`" />
         </div>
         <div class="flex gap-4">
-          <UiButton
-            :size="buttonSize"
-            text="Submit"
-            variant="primary"
-            :disabled="selected.length !== 4 || _isWon || _isLost"
-            @click="submitSelection"
-          >
+          <UiButton :size="buttonSize" text="Submit" variant="primary"
+            :disabled="selected.length !== 4 || _isWon || _isLost" @click="submitSelection">
           </UiButton>
 
-          <UiButton
-            :size="buttonSize"
-            text="Continue"
-            v-if="_isWon || _isLost"
-            :color="'success'"
-            @click="() => onOpenResult && onOpenResult()"
-          >
+          <UiButton :size="buttonSize" text="Continue" v-if="_isWon || _isLost" :color="'success'"
+            @click="() => onOpenResult && onOpenResult()">
           </UiButton>
         </div>
-        <div class="text-primary-700 font-semibold text-body-xs md:text-body-xl">
+        <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
           <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>

@@ -44,7 +44,7 @@ const sizes = {
   xl: 'h-[56px] text-[20px] active:text-[24px] active:h-[64px]',
   lg: 'h-[48px] text-[18px] active:text-[20px] active:h-[56px]',
   md: 'h-[44px] text-[16px] active:text-[18px] active:h-[48px]',
-  sm: 'h-[40px] text-[14px] active:text-[14px] active:h-[44px]',
+  sm: 'h-[40px] text-[14px] active:text-[16px] active:h-[44px]',
   xs: 'h-[36px] text-[12px] active:text-[14px] active:h-[40px]',
 }
 

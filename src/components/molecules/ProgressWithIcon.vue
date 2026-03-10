@@ -38,7 +38,7 @@ const isComplete = computed(() => props.target > 0 && props.current >= props.tar
         />
 
         <!-- Label -->
-        <span class="text-body-xs md:text-body-lg text-primary-700 font-semibold whitespace-nowrap">
+        <span class="text-body-xs md:text-body-sm xl:text-body-lg text-primary-700 font-semibold whitespace-nowrap">
           {{ current }} / {{ target }}
         </span>
       </div>
