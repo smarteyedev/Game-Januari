@@ -3,8 +3,12 @@ import TaskRow from '@/components/organisms/AutomationSpotter/TaskRow.vue'
 import SpotZones from '@/components/organisms/AutomationSpotter/SpotZones.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useAutomationSpotter } from '@/composables/games/useAutomationSpotter'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
+
+// Game UI Context
+const { playClick } = useGameViewContext()
 
 // Game Logic Composable
 const {
@@ -54,6 +58,7 @@ const {
 
 // Check answers
 async function checkAnswers() {
+  playClick()
   const result = gameCheckAnswers()
 
   if (result.isPerfect) {

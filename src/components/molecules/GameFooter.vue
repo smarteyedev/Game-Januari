@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import UiButton from '@/components/atoms/button/index.vue'
 import ProgressWithIcon from './ProgressWithIcon.vue'
-import { useBreakpoint } from '@/composables/useBreakpoint'
-import { computed } from 'vue'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 
 const props = defineProps<{
   current?: number
@@ -22,14 +21,7 @@ const emit = defineEmits<{
   (e: 'open-result'): void
 }>()
 
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'lg'
-})
+const { buttonSize } = useGameViewContext()
 
 function handleContinue() {
   if (props.hasLost || props.isWin) {

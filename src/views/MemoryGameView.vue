@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
 import MemoryBoard from '@/components/organisms/MemoryGame/MemoryBoard.vue'
-import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { UiButton } from '@/components/atoms/button'
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useMemoryGame } from '@/composables/games/useMemoryGame'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
 import type { MemoryCard } from '@/domain/types'
+
+// Game UI Context
+const { buttonSize, playClick } = useGameViewContext()
 
 // Game Logic Composable
 const {
@@ -21,17 +23,6 @@ const {
   flipCard: gameFlipCard,
   reset: resetGame
 } = useMemoryGame()
-
-// Audio
-const audio = new Audio(clickSound)
-
-function playClick() {
-  if (audio) {
-    audio.currentTime = 0
-    audio.volume = 1
-    audio.play().catch(() => { })
-  }
-}
 
 const MAX_TIME = 180
 
@@ -88,15 +79,6 @@ const emit = defineEmits<{
 function handleContinue() {
   emit('cleared')
 }
-
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
 </script>
 
 <template>

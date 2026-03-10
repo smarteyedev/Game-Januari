@@ -4,9 +4,12 @@ import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import MatrixQuestion from '@/components/organisms/MatrixQuestion.vue'
 import { UiButton } from '@/components/atoms/button'
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useMatrixGame } from '@/composables/games/useMatrixGame'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
+
+// Game UI Context
+const { buttonSize, playClick } = useGameViewContext()
 
 // Game Logic Composable
 const {
@@ -47,17 +50,9 @@ const {
   fetchLevel
 })
 
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
-
 // Submit answers
 async function submit() {
+  playClick()
   const result = gameCheckAnswers()
 
   await finishGame(result.won, {

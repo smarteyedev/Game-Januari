@@ -5,9 +5,12 @@ import CharacterKey from '@/components/atoms/CharacterKey.vue'
 import UiButton from '@/components/atoms/button/index.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useScramblesGame } from '@/composables/games/useScramblesGame'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
+
+// Game UI Context
+const { buttonSize, playClick } = useGameViewContext()
 
 // Game Logic Composable
 const {
@@ -22,8 +25,8 @@ const {
   loading: gameLoading,
   error,
   fetchLevel,
-  onCharInput,
-  deleteChar,
+  onCharInput: gameOnCharInput,
+  deleteChar: gameDeleteChar,
   submitAnswer: gameSubmitAnswer,
   resetBoard,
   isCharDisabled
@@ -53,19 +56,21 @@ const {
   fetchLevel
 })
 
-const { isXs, isSm, isMd } = useBreakpoint()
+function onCharInput(char: string) {
+  playClick()
+  gameOnCharInput(char)
+}
 
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
+function deleteChar() {
+  playClick()
+  gameDeleteChar()
+}
 
 const scrollContainer = useTemplateRef('scrollContainer')
 
 // Submit answer
 async function submitAnswer() {
+  playClick()
   const result = gameSubmitAnswer()
   
   nextTick(() => {
