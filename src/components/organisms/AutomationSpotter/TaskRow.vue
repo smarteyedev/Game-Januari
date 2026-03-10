@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import DraggableCard from './DraggableCard.vue'
 import type { DragCard } from '@/domain/types'
 import { computed } from 'vue'
-import clickSound from '@/assets/sounds/btn_click.ogg'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 
 const props = defineProps<{
   modelValue: DragCard[]
@@ -40,15 +40,7 @@ function getChecked(id: number): boolean | null {
   return props.checkedMap[id] !== undefined ? props.checkedMap[id] : null
 }
 
-const audio = new Audio(clickSound)
-
-function playClick() {
-  if (audio) {
-    audio.currentTime = 0
-    audio.volume = 1
-    audio.play()
-  }
-}
+const { playClick } = useGameViewContext()
 </script>
 
 <template>

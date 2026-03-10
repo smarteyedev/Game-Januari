@@ -18,11 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { UiButton } from '@/components/atoms/button'
 import { useRouter } from 'vue-router'
 
-const { isXs, isSm } = useBreakpoint()
+const { isXs, isSm } = useGameViewContext()
 
 defineProps<{
   text?: string

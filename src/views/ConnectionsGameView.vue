@@ -5,7 +5,7 @@ import ConnectionsCard from '@/components/atoms/ConnectionsCard.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { UiButton } from '@/components/atoms/button'
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useConnectionsGame } from '@/composables/games/useConnectionsGame'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
 
@@ -28,14 +28,7 @@ const {
   reset: resetGame
 } = useConnectionsGame()
 
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
+const { buttonSize, playClick } = useGameViewContext()
 
 const MAX_TIME = 180
 
@@ -69,8 +62,14 @@ function handleContinue() {
   emit('cleared')
 }
 
+function handleToggleItem(item: any) {
+  playClick()
+  toggleItem(item)
+}
+
 // Check Selection
 async function submitSelection() {
+  playClick()
   const result = gameSubmitSelection()
   if (!result) return
 
@@ -116,7 +115,7 @@ function getSolvedColor(index: number) {
     </div>
     <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 place-items-center w-full">
       <ConnectionsCard v-for="item in items" :key="item.label" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="toggleItem(item)" />
+        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="handleToggleItem(item)" />
     </div>
 
     <template #footer="{ onOpenResult }">

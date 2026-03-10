@@ -118,6 +118,9 @@ export interface SummaryData {
 
 export interface SuccessResultData {
   reviewpoint: Reviewpoint[]
+  score?: number
+  feedback?: string
+  speedFeedback?: string
 }
 
 export interface GameResultResponse {

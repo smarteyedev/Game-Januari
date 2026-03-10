@@ -3,10 +3,10 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import type { Blank } from '@/domain/types'
 import BlankSlot from '@/components/organisms/DragAndDrop/BlankSlot.vue'
 import WordItem from '@/components/organisms/DragAndDrop/WordItem.vue'
-import clickSound from '@/assets/sounds/btn_click.ogg'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import Card from '@/components/molecules/Card.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { useDragAndDrop } from '@/composables/games/useDragAndDrop'
 import { useBaseGameLogic } from '@/composables/useBaseGameLogic'
 
@@ -27,6 +27,8 @@ const {
   checkAnswers: gameCheckAnswers,
   reset: resetGame
 } = useDragAndDrop()
+
+const { playClick } = useGameViewContext()
 
 // Drag UI State
 const draggedItem = ref<Blank | null>(null)
@@ -64,16 +66,6 @@ const {
   introId: 1,
   fetchLevel
 })
-
-// Audio
-const audio = new Audio(clickSound)
-function playClick() {
-  if (audio) {
-    audio.currentTime = 0
-    audio.volume = 1
-    audio.play().catch(() => { })
-  }
-}
 
 const isTouchDevice = computed(() => 'ontouchstart' in window || navigator.maxTouchPoints > 0)
 

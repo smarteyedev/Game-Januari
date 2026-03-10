@@ -5,7 +5,7 @@ import type { IntroData } from '@/domain/types'
 import UnknownIcon from '@/components/atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
 import type { TContainerPosition } from './modal/types'
-import { useBreakpoint } from '@/composables/useBreakpoint'
+import { useGameViewContext } from '@/composables/useGameViewContext'
 import { computed } from 'vue'
 
 interface Props {
@@ -36,14 +36,7 @@ const onStart = () => {
   emit('update:modelValue', false)
 }
 
-const { isXs, isSm, isMd } = useBreakpoint()
-
-const buttonSize = computed(() => {
-  if (isXs.value) return 'xs'
-  if (isSm.value) return 'sm'
-  if (isMd.value) return 'md'
-  return 'xl'
-})
+const { isXs, isSm, isMd, buttonSize } = useGameViewContext()
 
 const iconSizeClass = computed(() => {
   if (isXs.value) return 'w-15 h-15'
