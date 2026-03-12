@@ -85,52 +85,6 @@ const emit = defineEmits<{
 const showResultLocal = ref<boolean>(props.showResult ?? false)
 const showSummaryLocal = ref<boolean>(props.showSummary ?? false)
 
-// when progress bar is displayed, we want to wait a moment so the animation
-// can finish before showing the result popup.
-const RESULT_MODAL_DELAY = 2000 //ms
-let resultTimer: number | undefined
-const isDelayActive = ref(false)
-
-function openResultModal(useDelay = true) {
-  if (resultTimer) {
-    clearTimeout(resultTimer)
-    resultTimer = undefined
-  }
-
-  if (useDelay) {
-    isDelayActive.value = true
-    resultTimer = window.setTimeout(() => {
-      showResultLocal.value = true
-      resultTimer = undefined
-      isDelayActive.value = false
-    }, RESULT_MODAL_DELAY)
-  } else {
-    showResultLocal.value = true
-    isDelayActive.value = false
-  }
-}
-
-watch(
-  () => props.isWin,
-  (val) => {
-    if (val && props.successResult) openResultModal()
-  },
-)
-
-watch(
-  () => props.hasLost,
-  (val) => {
-    if (val && props.successResult) openResultModal()
-  },
-)
-
-watch(
-  () => props.successResult,
-  (val) => {
-    if (val) openResultModal()
-  },
-)
-
 function handleStart() {
   emit('update:showIntro', false)
   emit('start')
@@ -172,7 +126,7 @@ onUnmounted(() => {
 })
 
 function handleOpenResult() {
-  openResultModal(false)
+  showResultLocal.value = true
 }
 
 function handleViewSummary() {
@@ -222,7 +176,7 @@ function handleCheck() {
             :onOpenResult="handleOpenResult">
             <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
               :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
-              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult" :delay="isDelayActive">
+              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult">
               <template #footer-left>
                 <slot name="footer-left" />
               </template>

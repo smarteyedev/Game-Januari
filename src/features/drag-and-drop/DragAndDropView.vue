@@ -63,20 +63,19 @@ async function checkAnswers() {
     // First click: Just check and show on board
     checkResult.value = gameCheckAnswers()
     stopTimer()
-  } else {
-    // Second click: Show result modal
-    if (checkResult.value) {
-      await finishGame(checkResult.value.won, {
-        scoreContext: {
-          total: checkResult.value.totalSlots,
-          correct: checkResult.value.correctCount,
-          attempts: attempts.value,
-        }
-      })
-    } else {
-      await finishGame(false)
-    }
   }
+  if (checkResult.value) {
+    await finishGame(checkResult.value.won, {
+      scoreContext: {
+        total: checkResult.value.totalSlots,
+        correct: checkResult.value.correctCount,
+        attempts: attempts.value,
+      }
+    })
+  } else {
+    await finishGame(false)
+  }
+
 }
 
 function handleContinue() {
