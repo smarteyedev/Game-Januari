@@ -2,7 +2,7 @@
 import UiModal from '@/components/organisms/modal/index.vue'
 import type { SuccessResultData } from '@/domain/types'
 import UiButton from '@/components/atoms/button/index.vue'
-import type { TContainerPosition } from '@components/organisms/modal/types'
+import type { TContainerPosition } from '@/components/organisms/modal/types'
 import { useGameViewContext } from '@/composables/useGameViewContext'
 import { computed } from 'vue'
 import FailedIcon from '@/components/atoms/svg/FailedIcon.vue'

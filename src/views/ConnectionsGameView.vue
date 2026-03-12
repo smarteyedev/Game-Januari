@@ -138,7 +138,10 @@ function getSolvedColor(index: number) {
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
+          <<<<<<< HEAD <span :label="`You have ${attemptsLeft} attempts left`" />
+          =======
           <span> You have {{ attemptsLeft }} attempts left</span>
+          >>>>>>> dev
         </div>
       </div>
     </template>
