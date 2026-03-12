@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref, watch } from 'vue'
-import GameHeader from '@/components/molecules/GameHeader.vue'
-import GameFooter from '@/components/molecules/GameFooter.vue'
-import GameOverlayManager from '@/views/GameOverlayManager.vue'
-import GameState from '@/components/molecules/GameState.vue'
+import { GameHeader, GameFooter, GameState, TopNavigation } from '@/components/molecules'
+import { GameOverlayManager } from '@/views/Modal'
 import type { IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
-import TopNavigation from '@/components/molecules/TopNavigation.vue'
 
 /**
  * BaseGame Component Props

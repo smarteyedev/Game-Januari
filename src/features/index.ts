@@ -1,0 +1,6 @@
+export { default as AutomationSpotterView } from './automation-spotter/AutomationSpotterView.vue'
+export { default as ConnectionsGameView } from './connections-game/ConnectionsGameView.vue'
+export { default as DragAndDropView } from './drag-and-drop/DragAndDropView.vue'
+export { default as MatrixGameView } from './matrix-game/MatrixGameView.vue'
+export { default as MemoryGameView } from './memory-game/MemoryGameView.vue'
+export { default as ScramblesGameView } from './scrambles-game/ScramblesGameView.vue'
