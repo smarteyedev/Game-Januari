@@ -44,20 +44,32 @@ const {
   minigameId: MINIGAME_IDS.memory,
   offline: true,
   introId: 2,
-  fetchLevel
+  fetchLevel,
+  scoringStrategy: 'memory-game',
 })
 
 // Watch for win condition
 watch(isAllMatched, async (matched) => {
   if (matched && !isWon.value && !isLost.value) {
     const totalPairs = cards.value.length / 2
-    const scoringAttempts = Math.max(0, (turns.value / 2) - 5) // 5 free attempts
+    // Calculate penalties: every turn above minimum possible turns (totalPairs)
+    const penalties = Math.max(0, turns.value - totalPairs)
 
     await finishGame(true, {
       scoreContext: {
-        total: totalPairs,
-        correct: totalPairs,
-        attempts: scoringAttempts,
+        attempts: turns.value,
+        timeUsed: MAX_TIME - time.value,
+      }
+    })
+  }
+})
+
+watch(turns, async (turn) => {
+  if (turn > 30 && !isWon.value && !isLost.value) {
+    await finishGame(false, {
+      scoreContext: {
+        attempts: turns.value,
+        timeUsed: MAX_TIME,
       }
     })
   }
