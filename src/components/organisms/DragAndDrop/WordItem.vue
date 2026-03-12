@@ -1,18 +1,12 @@
 <template>
-  <div
-@pointerdown="pointerStart"
-@touchstart.prevent="touchStart"
-@mousedown="pointerStart">
-    <Card
-:label="item.word"
-:custom-class="customClass"
-:disabled="disabled" />
+  <div @pointerdown="pointerStart" @touchstart.prevent="touchStart" @mousedown="pointerStart">
+    <Card :label="item.word" :custom-class="customClass" :disabled="disabled" />
   </div>
 </template>
 
 <script setup lang="ts">
 import type { Blank } from '@/domain/types'
-import Card from '@/components/molecules/Card.vue'
+import Card from '@/components/atoms/Card.vue'
 import { computed } from 'vue'
 
 const { item, slotId, inSlot, disabled } = defineProps<{

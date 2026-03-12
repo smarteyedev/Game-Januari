@@ -20,6 +20,7 @@ const {
   categoryColorMap,
   loading: gameLoading,
   error,
+  isChecked,
   fetchLevel,
   toggleItem,
   submitSelection: gameSubmitSelection,
@@ -97,7 +98,7 @@ function getSolvedColor(index: number) {
   <BaseGame title="Connections Game" moduleTitle="Explore Artificial Intelligence (AI) Tools"
     description="Connections game" :time="time" :maxTime="MAX_TIME" v-model:showIntro="showIntro" :introData="introData"
     :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)" :isWin="_isWon" :hasLost="_isLost" :isChecked="false"
+    :retryFn="() => fetchLevel(1, true)" :isWin="_isWon" :hasLost="_isLost" :isChecked="isChecked"
     :successResult="successResultData" @start="start" @retry="retryGame(resetGame)" @check="submitSelection"
     @cleared="handleContinue">
     <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 w-full">
@@ -119,7 +120,8 @@ function getSolvedColor(index: number) {
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <div class="text-primary-700 text-body-xs md:text-body-sm lg:text-body-xl font-bold">
-          <span v-if="wrongCount !== null && !(_isWon || _isLost)">Wrong, you are {{ wrongCount }} away to form a correct
+          <span v-if="wrongCount !== null && !(_isWon || _isLost)">Wrong, you are {{ wrongCount }} away to form a
+            correct
             group</span>
           <span v-if="solvedNewGroup !== null && !(_isWon || _isLost)">You found a new group:
             {{ solvedNewGroup.label }}</span>
@@ -136,7 +138,7 @@ function getSolvedColor(index: number) {
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
-          <span :label="`You have ${attemptsLeft} attempts left`" />
+          <span> You have {{ attemptsLeft }} attempts left</span>
         </div>
       </div>
     </template>
