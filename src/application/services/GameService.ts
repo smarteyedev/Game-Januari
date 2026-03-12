@@ -41,6 +41,8 @@ export type GameServiceOptions = {
   autoSubmit?: boolean
   /** Default scoring parameters */
   scoringParams?: ScoringParams
+  /** Scoring strategy name to use */
+  scoringStrategy?: string
 }
 
 export interface FinishOptions {
@@ -48,6 +50,7 @@ export interface FinishOptions {
   score?: number
   scoreContext?: ScoreContext
   scoringParams?: ScoringParams
+  scoringStrategy?: string
 }
 
 export type GameServiceReturn = {
@@ -103,7 +106,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     onLose,
     onSubmit,
     autoSubmit = true,
-    scoringParams: defaultScoringParams = {}
+    scoringParams: defaultScoringParams = {},
+    scoringStrategy: defaultScoringStrategy = 'default'
   } = options
 
   // Game entity
@@ -187,7 +191,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     finalAnswers?: unknown[], 
     finalScore?: number,
     scoreContext?: ScoreContext,
-    scoringParams?: ScoringParams
+    scoringParams?: ScoringParams,
+    scoringStrategy?: string
   ) {
     stopTimer()
     game.value.setSubmitting()
@@ -208,7 +213,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
           { 
             ...defaultScoringParams, 
             ...scoringParams 
-          }
+          },
+          scoringStrategy ?? defaultScoringStrategy
         )
       } else {
         resolvedScore = 100
@@ -360,7 +366,8 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
       finishOptions?.answers, 
       finishOptions?.score, 
       finishOptions?.scoreContext, 
-      finishOptions?.scoringParams
+      finishOptions?.scoringParams,
+      finishOptions?.scoringStrategy
     )
   }
 

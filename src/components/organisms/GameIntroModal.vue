@@ -39,10 +39,10 @@ const onStart = () => {
 const { isXs, isSm, isMd, buttonSize } = useGameViewContext()
 
 const iconSizeClass = computed(() => {
-  if (isXs.value) return 'w-15 h-15'
-  if (isSm.value) return 'w-18.5 h-18.5'
-  if (isMd.value) return 'w-21 h-21'
-  return 'w-24.5 h-24.5'
+  if (isXs.value) return 'w-12 h-12'
+  if (isSm.value) return 'w-12 h-12'
+  if (isMd.value) return 'w-14 h-14'
+  return 'w-[96px] h-[96px]'
 })
 </script>
 

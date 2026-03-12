@@ -103,24 +103,40 @@ const textEffects = computed(() => {
 </script>
 
 <template>
-  <button :class="classes" :disabled="isDisabled" :aria-disabled="isDisabled">
+  <button
+:class="classes"
+:disabled="isDisabled"
+:aria-disabled="isDisabled">
     <!-- Prepend -->
-    <span v-if="props.loading || props.icon" class="flex items-center">
-      <UiIcon :name="props.loading ? 'uil-spinner' : props.icon"
+    <span
+v-if="props.loading || props.icon"
+class="flex items-center">
+      <UiIcon
+        :name="props.loading ? 'uil-spinner' : props.icon"
         :width="props.iconSize ?? getIconSize(props.size ?? 'xl')"
-        :height="props.iconSize ?? getIconSize(props.size ?? 'xl')" mode="svg"
-        :class="{ 'animate-spin': props.loading }" />
+        :height="props.iconSize ?? getIconSize(props.size ?? 'xl')"
+        mode="svg"
+        :class="{ 'animate-spin': props.loading }"
+      />
     </span>
 
     <!-- Label -->
-    <span v-if="!props.square" :class="textEffects">
+    <span
+v-if="!props.square"
+:class="textEffects">
       {{ props.text || 'Button Label' }}
     </span>
 
     <!-- Append -->
-    <span v-if="props.iconAppend" class="ml-2 flex items-center">
-      <UiIcon :name="props.iconAppend" :width="getIconSize(props.size ?? 'xl')"
-        :height="getIconSize(props.size ?? 'xl')" mode="svg" />
+    <span
+v-if="props.iconAppend"
+class="ml-2 flex items-center">
+      <UiIcon
+        :name="props.iconAppend"
+        :width="getIconSize(props.size ?? 'xl')"
+        :height="getIconSize(props.size ?? 'xl')"
+        mode="svg"
+      />
     </span>
   </button>
 </template>

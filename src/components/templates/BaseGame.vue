@@ -6,7 +6,7 @@ import GameOverlayManager from '@/components/organisms/GameOverlayManager.vue'
 import GameState from '@/components/molecules/GameState.vue'
 import type { IntroData, SuccessResultData } from '@/domain/types'
 import Background from '@/assets/img/bg.jpg'
-import TopActionBar from '@/components/molecules/TopActionBar.vue'
+import TopNavigation from '@/components/molecules/TopNavigation.vue'
 
 /**
  * BaseGame Component Props
@@ -90,7 +90,7 @@ const showSummaryLocal = ref<boolean>(props.showSummary ?? false)
 
 // when progress bar is displayed, we want to wait a moment so the animation
 // can finish before showing the result popup.
-const RESULT_MODAL_DELAY = 3000
+const RESULT_MODAL_DELAY = 2000 //ms
 let resultTimer: number | undefined
 const isDelayActive = ref(false)
 
@@ -195,86 +195,37 @@ function handleCheck() {
 </script>
 
 <template>
-  <GameState
-:loading="loading"
-:error="error"
-:retryFn="retryFn">
-    <div
-      ref="gameWrapper"
-      class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
-      :style="{
-        backgroundImage: `url(${Background})`,
-        backgroundPosition: 'center',
-        backgroundSize: 'cover',
-        backgroundRepeat: 'no-repeat',
-      }"
-    >
-      <TopActionBar
-        :text="moduleTitle"
-        class="z-60"
-        @toggle-fullscreen="toggleFullscreen"
-        @toggle-summary="handleViewSummary"
-        :current="currentProgress"
-        :target="targetProgress"
-        :isChecked="isChecked"
-        :isWin="isWin"
-        :isShown="showSummaryLocal"
-      />
+  <GameState :loading="loading" :error="error" :retryFn="retryFn">
+    <div ref="gameWrapper" class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full" :style="{
+      backgroundImage: `url(${Background})`,
+      backgroundPosition: 'center',
+      backgroundSize: 'cover',
+      backgroundRepeat: 'no-repeat',
+    }">
+      <TopNavigation :text="moduleTitle" :is-intro="showIntro" class="z-60" @toggle-fullscreen="toggleFullscreen"
+        @toggle-summary="handleViewSummary" :current="currentProgress" :target="targetProgress" :isChecked="isChecked"
+        :isWin="isWin" :isShown="showSummaryLocal" />
 
       <div class="flex-1 flex flex-col relative">
-        <GameOverlayManager
-          :show-intro="showIntro"
-          :show-result="showResultLocal"
-          :show-summary="showSummaryLocal"
-          :title="title"
-          :intro-data="introData"
-          :is-win="isWin"
-          :success-result="successResult"
-          @update:show-intro="emit('update:showIntro', $event)"
-          @update:show-result="showResultLocal = $event"
-          @update:show-summary="showSummaryLocal = $event"
-          @start="handleStart"
-          @retry="handleRetry"
-          @cleared="handleCleared"
-          @toggle-summary="handleViewSummary"
-        />
+        <GameOverlayManager :show-intro="showIntro" :show-result="showResultLocal" :show-summary="showSummaryLocal"
+          :title="title" :intro-data="introData" :is-win="isWin" :success-result="successResult"
+          @update:show-intro="emit('update:showIntro', $event)" @update:show-result="showResultLocal = $event"
+          @update:show-summary="showSummaryLocal = $event" @start="handleStart" @retry="handleRetry"
+          @cleared="handleCleared" @toggle-summary="handleViewSummary" />
 
-        <div
-          v-if="!showIntro && !showResultLocal && !showSummaryLocal"
-          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
-        >
+        <div v-if="!showIntro && !showResultLocal && !showSummaryLocal"
+          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700">
           <slot name="header">
-            <GameHeader
-              :title="title"
-              :description="description"
-              :question="question"
-              :time="time"
-            />
+            <GameHeader :title="title" :description="description" :question="question" :time="time" />
           </slot>
 
           <slot />
 
-          <slot
-            name="footer"
-            :onCheck="handleCheck"
-            :onRetry="handleRetry"
-            :onCleared="handleCleared"
-            :onOpenResult="handleOpenResult"
-          >
-            <GameFooter
-              :current="currentProgress"
-              :target="targetProgress"
-              :showProgress="showProgress"
-              :isChecked="isChecked"
-              :isWin="isWin"
-              :hasLost="hasLost"
-              :hideSubmit="hideSubmit"
-              @check="handleCheck"
-              @retry="handleRetry"
-              @cleared="handleCleared"
-              @open-result="handleOpenResult"
-              :delay="isDelayActive"
-            >
+          <slot name="footer" :onCheck="handleCheck" :onRetry="handleRetry" :onCleared="handleCleared"
+            :onOpenResult="handleOpenResult">
+            <GameFooter :current="currentProgress" :target="targetProgress" :showProgress="showProgress"
+              :isChecked="isChecked" :isWin="isWin" :hasLost="hasLost" :hideSubmit="hideSubmit" @check="handleCheck"
+              @retry="handleRetry" @cleared="handleCleared" @open-result="handleOpenResult" :delay="isDelayActive">
               <template #footer-left>
                 <slot name="footer-left" />
               </template>
