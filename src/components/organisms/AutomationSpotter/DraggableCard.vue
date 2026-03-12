@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { DragCard } from '@/domain/types'
-import Card from '@/components/molecules/Card.vue'
+import Card from '@/components/atoms/Card.vue'
 import { computed } from 'vue'
 
 const props = defineProps<{
@@ -35,8 +35,5 @@ const customClass = computed(() => {
 </script>
 
 <template>
-  <Card
-:label="card.label"
-:custom-class="customClass"
-:draggable="true" />
+  <Card :label="card.label" :custom-class="customClass" :draggable="true" />
 </template>
