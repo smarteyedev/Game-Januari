@@ -1,0 +1,104 @@
+<script setup lang="ts">
+import UiModal from '@/components/molecules/modal/index.vue'
+import type { SuccessResultData } from '@/domain/types'
+import UiButton from '@/components/atoms/button/index.vue'
+<<<<<<<< HEAD:src/views/GameResultModal.vue
+import type { TContainerPosition } from '@/components/organisms/modal/types'
+========
+import type { TContainerPosition } from '@/components/molecules/modal/types'
+>>>>>>>> dev:src/views/Modal/GameResultModal.vue
+import { useGameViewContext } from '@/composables/useGameViewContext'
+import { computed } from 'vue'
+import FailedIcon from '@/components/atoms/svg/FailedIcon.vue'
+import SuccessIcon from '@/components/atoms/svg/SuccessIcon.vue'
+import GameResult from './GameResult.vue'
+
+interface Props {
+  success: boolean
+  successResult?: SuccessResultData
+  modelValue: boolean
+  containerPosition: TContainerPosition
+}
+
+interface Emits {
+  (e: 'update:modelValue', value: boolean): void
+  (e: 'close'): void
+  (e: 'continue'): void
+  (e: 'retry'): void
+  (e: 'cleared'): void
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  containerPosition: 'fixed',
+})
+const emit = defineEmits<Emits>()
+
+const onClose = () => {
+  emit('update:modelValue', false)
+  emit('close')
+}
+
+const onContinue = () => {
+  emit('cleared')
+  emit('update:modelValue', false)
+}
+
+const onRetry = () => {
+  emit('retry')
+  emit('update:modelValue', false)
+}
+
+const { isXs, isSm, isMd, buttonSize } = useGameViewContext()
+
+const iconSizeClass = computed(() => {
+  if (isXs.value) return 'w-15 h-15'
+  if (isSm.value) return 'w-18.5 h-18.5'
+  if (isMd.value) return 'w-21 h-21'
+  return 'w-24.5 h-24.5'
+})
+</script>
+
+<template>
+  <UiModal :container-position="props.containerPosition" :prevent-close="false" :modelValue="modelValue" size="md"
+    position="center" scroll-mode="content" :content-style="{
+      border: '6px solid #006082',
+      boxShadow: '0px 8px 0px #006082',
+      borderRadius: '40px',
+      background: '#FFFCF6',
+      maxHeight: '85vh',
+      gap: '20px',
+      display: 'flex',
+      flexDirection: 'column',
+    }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
+    <!-- HEADER ICON -->
+    <template #header-title>
+      <div class="flex flex-col justify-center items-center w-full gap-2">
+        <SuccessIcon :class="iconSizeClass" v-if="success" />
+        <FailedIcon :class="iconSizeClass" v-else />
+        <p class="text-body-lg font-extrabold text-primary-700 md:text-h2">
+          {{ success ? 'SUCCESSFUL' : 'FAILED' }}
+        </p>
+        <div v-if="successResult?.score !== undefined" class="text-center">
+          <p class="text-h2 font-black text-primary-700">Score: {{ successResult.score }}</p>
+        </div>
+      </div>
+    </template>
+
+    <template #close-btn>
+      <span class="hidden" />
+    </template>
+
+    <!-- BODY -->
+    <div class="flex-1 overflow-y-auto flex justify-center">
+      <GameResult :success="success" :successResult="successResult" />
+    </div>
+
+    <!-- FOOTER -->
+    <template #footer>
+      <div class="flex justify-center shrink-0">
+        <UiButton v-if="success" text="Continue" variant="primary" :size="buttonSize" @click="onContinue" />
+        <UiButton v-else text="Retry" variant="danger" :size="buttonSize" @click="onRetry" />
+      </div>
+    </template>
+  </UiModal>
+</template>
