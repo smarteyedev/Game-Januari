@@ -29,7 +29,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { SuccessResultData, Reviewpoint } from '@/domain/types'
-import { UiButton } from '../atoms/button'
+import { UiButton } from '@/components/atoms/button'
 
 const props = defineProps<{
   resultSummary?: SuccessResultData

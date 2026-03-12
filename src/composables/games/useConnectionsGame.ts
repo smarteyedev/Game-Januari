@@ -41,6 +41,7 @@ export function useConnectionsGame() {
   const items = ref<Item[]>([])
   const selected = ref<Item[]>([])
   const solvedGroups = ref<SolvedGroup[]>([])
+  const isChecked = ref(false)
   
   const attemptsLeft = ref(4)
   const maxAttempts = ref(4)
@@ -110,6 +111,7 @@ export function useConnectionsGame() {
     solvedNewGroup.value = null
     solvedGroups.value = []
     selected.value = []
+    isChecked.value = false
     items.value.forEach(i => i.state = 'idle')
     items.value = shuffle(items.value)
   }
@@ -174,6 +176,9 @@ export function useConnectionsGame() {
     selected.value = []
 
     const win = solvedGroups.value.length === categories.value.length
+    if(win){
+      isChecked.value = true
+    }
     return { success: true, win, gameOver: win }
   }
 
@@ -203,6 +208,7 @@ export function useConnectionsGame() {
     categoryColorMap,
     loading,
     error,
+    isChecked,
     fetchLevel,
     toggleItem,
     submitSelection,

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, watch } from 'vue'
-import MemoryBoard from '@/components/organisms/MemoryGame/MemoryBoard.vue'
+import MemoryCardItem from '@/components/organisms/MemoryGame/MemoryCardItem.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import { UiButton } from '@/components/atoms/button'
@@ -100,7 +100,12 @@ function handleContinue() {
     :retryFn="() => fetchLevel(1, true)" v-model:showIntro="showIntro" :introData="introData" :isWin="isWon"
     :hasLost="isLost" :hideSubmit="true" :isChecked="isAllMatched" :successResult="successResultData" @start="start"
     @retry="retryGame(resetGame)" @cleared="handleContinue">
-    <MemoryBoard :cards="cards" @flip="handleFlip" />
+    <div class="flex flex-wrap justify-center gap-4.5 max-w-screen-3xl mx-auto basis-1/5">
+      <MemoryCardItem v-for="card in cards" :key="card.id" :content-type="card.contentType"
+        :logo="card.contentType === 'svg' ? card.value : undefined"
+        :text="card.contentType === 'text' ? card.value : undefined" :flipped="card.flipped || false"
+        :matched="card.matched || false" @flip="handleFlip(card)" />
+    </div>
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
         <span class="text-body-xs xl:text-body-md text-primary-700 font-bold w-full">
