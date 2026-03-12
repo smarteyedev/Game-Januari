@@ -4,7 +4,7 @@ import GameIntro from './GameIntro.vue'
 import type { IntroData } from '@/domain/types'
 import UnknownIcon from '@/components/atoms/svg/UnknownIcon.vue'
 import UiButton from '@/components/atoms/button/index.vue'
-import type { TContainerPosition } from './modal/types'
+import type { TContainerPosition } from '../components/organisms/modal/types'
 import { useGameViewContext } from '@/composables/useGameViewContext'
 import { computed } from 'vue'
 
