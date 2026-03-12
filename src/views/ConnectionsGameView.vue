@@ -120,12 +120,8 @@ function getSolvedColor(index: number) {
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <div class="text-primary-700 text-body-xs md:text-body-sm lg:text-body-xl font-bold">
-<<<<<<< HEAD
-          <span v-if="wrongCount !== null && !(_isWon || _isLost)">Wrong, you are {{ wrongCount }} away to form a correct
-=======
           <span v-if="wrongCount !== null && !(_isWon || _isLost)">Wrong, you are {{ wrongCount }} away to form a
             correct
->>>>>>> dev
             group</span>
           <span v-if="solvedNewGroup !== null && !(_isWon || _isLost)">You found a new group:
             {{ solvedNewGroup.label }}</span>
@@ -142,11 +138,10 @@ function getSolvedColor(index: number) {
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
-<<<<<<< HEAD
-          <span :label="`You have ${attemptsLeft} attempts left`" />
-=======
+          <<<<<<< HEAD <span :label="`You have ${attemptsLeft} attempts left`" />
+          =======
           <span> You have {{ attemptsLeft }} attempts left</span>
->>>>>>> dev
+          >>>>>>> dev
         </div>
       </div>
     </template>
