@@ -78,11 +78,10 @@ export const DefaultScoringStrategy: ScoringStrategy = {
     }
 
     const finalRatio =
-      adjustedCorrect * answerWeight +
-      (adjustedCorrect > 0 ? timeRatio * timeWeight : 0)
+      adjustedCorrect * answerWeight + (adjustedCorrect > 0 ? timeRatio * timeWeight : 0)
 
     return Math.round(clamp(finalRatio, 0, 1) * 100)
-  }
+  },
 }
 
 /**
@@ -94,10 +93,10 @@ export const AccuracyScoringStrategy: ScoringStrategy = {
   computeScore(context) {
     const total = Math.max(0, safeNumber(context.total))
     const correct = clamp(safeNumber(context.correct), 0, total)
-    
+
     if (total === 0) return 0
     return Math.round((correct / total) * 100)
-  }
+  },
 }
 
 /**
@@ -106,28 +105,28 @@ export const AccuracyScoringStrategy: ScoringStrategy = {
 export const MemoryGameScoringStrategy: ScoringStrategy = {
   name: 'memory-game',
   computeScore(context, _ = {}) {
-    if(safeNumber(context.timeUsed) <= 0) return 0
+    if (safeNumber(context.timeUsed) <= 0) return 0
 
     const attempts = safeNumber(context.attempts, Number.MAX_VALUE)
-    if (attempts <= 18) return 100;
-    if (attempts > 30) return 0;
+    if (attempts <= 18) return 100
+    if (attempts > 30) return 0
     const scores = [
-    100, // 18
-    95,  // 19
-    90,  // 20
-    85,  // 21
-    82,  // 22
-    79,  // 23
-    76,  // 24
-    73,  // 25
-    69,  // 26
-    65,  // 27
-    61,  // 28
-    57,  // 29
-    53   // 30
-    ];
-    return scores[attempts - 18] ?? 0;
-  }
+      100, // 18
+      95, // 19
+      90, // 20
+      85, // 21
+      82, // 22
+      79, // 23
+      76, // 24
+      73, // 25
+      69, // 26
+      65, // 27
+      61, // 28
+      57, // 29
+      53, // 30
+    ]
+    return scores[attempts - 18] ?? 0
+  },
 }
 
 /**
@@ -149,7 +148,7 @@ const strategies: Record<string, ScoringStrategy> = {
 export function computeScore(
   context: ScoreContext,
   params: ScoringParams = {},
-  strategyName: string = 'default'
+  strategyName: string = 'default',
 ): number {
   const strategy = strategies[strategyName] || DefaultScoringStrategy
   return strategy.computeScore(context, params)
@@ -164,26 +163,26 @@ export function registerScoringStrategy(strategy: ScoringStrategy) {
 
 export function getFeedback(score: number): string {
   if (score >= 99)
-    return "Selamat! Anda telah menunjukkan hasil yang sempurna. Semua jawaban dieksekusi dengan sangat baik."
+    return 'Selamat! Anda telah menunjukkan hasil yang sempurna. Semua jawaban dieksekusi dengan sangat baik.'
   if (score >= 95)
-    return "Hasil yang sangat memuaskan dengan tingkat ketelitian yang tinggi. Performa Anda sudah sangat baik."
+    return 'Hasil yang sangat memuaskan dengan tingkat ketelitian yang tinggi. Performa Anda sudah sangat baik.'
   if (score >= 80)
-    return "Performa sangat baik dan menunjukkan pemahaman kuat terhadap sebagian besar konsep."
+    return 'Performa sangat baik dan menunjukkan pemahaman kuat terhadap sebagian besar konsep.'
   if (score >= 65)
-    return "Pemahaman dasar sudah cukup baik, namun masih perlu penguatan agar lebih konsisten."
+    return 'Pemahaman dasar sudah cukup baik, namun masih perlu penguatan agar lebih konsisten.'
   if (score >= 50)
-    return "Performa menunjukkan beberapa ketidaktepatan. Pemahaman dasar sudah ada tetapi perlu ditingkatkan."
-  return "Pemahaman terhadap konsep masih perlu ditingkatkan. Disarankan lebih teliti dalam membaca dan mengerjakan."
+    return 'Performa menunjukkan beberapa ketidaktepatan. Pemahaman dasar sudah ada tetapi perlu ditingkatkan.'
+  return 'Pemahaman terhadap konsep masih perlu ditingkatkan. Disarankan lebih teliti dalam membaca dan mengerjakan.'
 }
 
 export function getSpeedFeedback(speedRatio: number): string {
-  if(speedRatio >= 0.8) {
-    return "Waktu yang digunakan mencerminkan kecepatan dan efisiensi pengerjaan yang sangat baik. Performa ini mencerminkan kemampuan dalam pemahaman dan pengelolaan waktu yang baik."
+  if (speedRatio >= 0.8) {
+    return 'Waktu yang digunakan mencerminkan kecepatan dan efisiensi pengerjaan yang sangat baik. Performa ini mencerminkan kemampuan dalam pemahaman dan pengelolaan waktu yang baik.'
   }
-  if(speedRatio >= 0.51) {
-    return "Waktu yang digunakan sudah cukup memadai dan menunjukkan kemampuan pemahaman serta pengelolaan waktu yang cukup baik. Masih terdapat ruang untuktin tingkat yang lebih optimal"
+  if (speedRatio >= 0.51) {
+    return 'Waktu yang digunakan sudah cukup memadai dan menunjukkan kemampuan pemahaman serta pengelolaan waktu yang cukup baik. Masih terdapat ruang untuktin tingkat yang lebih optimal'
   }
-  return "Waktu yang digunakan masih belum efisien. Performa ini menjadi indikator adanya ruang yang signifikan untuk perbaikan, khususnya dalam kecepatan."
+  return 'Waktu yang digunakan masih belum efisien. Performa ini menjadi indikator adanya ruang yang signifikan untuk perbaikan, khususnya dalam kecepatan.'
 }
 
 export default {
@@ -193,5 +192,5 @@ export default {
   getSpeedFeedback,
   DefaultScoringStrategy,
   AccuracyScoringStrategy,
-  MemoryGameScoringStrategy
+  MemoryGameScoringStrategy,
 }

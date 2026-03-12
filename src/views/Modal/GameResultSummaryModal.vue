@@ -29,13 +29,13 @@ const onClose = () => {
 
 <template>
   <UiModal
-:container-position="props.containerPosition"
-:prevent-close="true"
-:modelValue="modelValue"
-size="md"
+    :container-position="props.containerPosition"
+    :prevent-close="true"
+    :modelValue="modelValue"
+    size="md"
     position="center"
-scroll-mode="content"
-:content-style="{
+    scroll-mode="content"
+    :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
@@ -44,13 +44,15 @@ scroll-mode="content"
       display: 'flex',
       flexDirection: 'column',
     }"
-@update:modelValue="emit('update:modelValue', $event)"
-@cancel="onClose">
+    @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose"
+  >
     <!-- BODY -->
     <div class="flex-1 overflow-y-auto flex justify-center">
       <GameResultSummary
-:resultSummary="props.resultSummary"
-@toggle-summary="emit('toggle-summary')" />
+        :resultSummary="props.resultSummary"
+        @toggle-summary="emit('toggle-summary')"
+      />
     </div>
   </UiModal>
 </template>

@@ -3,12 +3,14 @@
     <div class="mb-5 flex flex-col gap-4">
       <!-- If we have review points, show them -->
       <div
-v-if="successResult?.reviewpoint && successResult.reviewpoint.length > 0"
-class="flex flex-col gap-3 mt-2">
+        v-if="successResult?.reviewpoint && successResult.reviewpoint.length > 0"
+        class="flex flex-col gap-3 mt-2"
+      >
         <div
-v-for="(item, index) in successResult.reviewpoint"
-:key="index"
-class=" border-gray-100 pt-2">
+          v-for="(item, index) in successResult.reviewpoint"
+          :key="index"
+          class="border-gray-100 pt-2"
+        >
           <span class="font-extrabold">{{ item.point }} : </span>
           <p class="font-semibold">{{ item.review }}</p>
         </div>

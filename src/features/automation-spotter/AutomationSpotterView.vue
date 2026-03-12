@@ -25,7 +25,7 @@ const {
   onMoved,
   moveCard,
   checkAnswers: gameCheckAnswers,
-  resetBoard
+  resetBoard,
 } = useAutomationSpotter()
 
 // Game Meta State
@@ -46,7 +46,7 @@ const {
   successResultData,
   start,
   retryGame,
-  finishGame
+  finishGame,
 } = useBaseGameLogic({
   maxTime: MAX_TIME,
   minigameId: MINIGAME_IDS.automationSpotter,
@@ -54,9 +54,9 @@ const {
   scoringParams: {
     timeTolerance: SCORING_TIME_TOLERANCE,
     answerWeight,
-    timeWeight
+    timeWeight,
   },
-  fetchLevel
+  fetchLevel,
 })
 
 // Check answers
@@ -69,7 +69,7 @@ async function checkAnswers() {
       scoreContext: {
         total: result.totalCount,
         correct: result.correctCount,
-      }
+      },
     })
   } else {
     await finishGame(false)
@@ -88,58 +88,58 @@ const emit = defineEmits<{
 
 <template>
   <BaseGame
-module-title="Explore Artificial Intelligence (AI) Tools"
-title="Automation Spotter"
+    module-title="Explore Artificial Intelligence (AI) Tools"
+    title="Automation Spotter"
     description="Masukkan kata ke dalam tempat yang benar!"
-:question="question"
-:time="time"
-:maxTime="MAX_TIME"
+    :question="question"
+    :time="time"
+    :maxTime="MAX_TIME"
     :loading="gameLoading || introLoading"
-:error="gameError"
-:retryFn="() => fetchLevel(1, true)"
+    :error="gameError"
+    :retryFn="() => fetchLevel(1, true)"
     v-model:showIntro="showIntro"
-:introData="introData"
-:isWin="_isWon"
-:hasLost="_isLost"
-:isChecked="isChecked"
+    :introData="introData"
+    :isWin="_isWon"
+    :hasLost="_isLost"
+    :isChecked="isChecked"
     :currentProgress="matchedCount"
-:targetProgress="allCards.length"
-:showProgress="true"
-@start="start"
+    :targetProgress="allCards.length"
+    :showProgress="true"
+    @start="start"
     @retry="retryGame(resetBoard)"
-@check="checkAnswers"
-@cleared="handleContinue"
-:successResult="successResultData">
+    @check="checkAnswers"
+    @cleared="handleContinue"
+    :successResult="successResultData"
+  >
     <DragProvider>
       <TaskRow
-v-model="sourceCards"
-:checked-map="checkedMap"
-:is-checked="isChecked"
-:disabled="isChecked"
+        v-model="sourceCards"
+        :checked-map="checkedMap"
+        :is-checked="isChecked"
+        :disabled="isChecked"
         @moved="onMoved"
-@move="moveCard" />
+        @move="moveCard"
+      />
       <div class="flex flex-col md:flex-row w-full gap-2.5 md:gap-5 xl:gap-8">
         <DropZone
-v-for="zone in zones"
-:key="zone.label"
-:id="String(zone.id)"
-:text="zone.label"
-v-model="zone.cards"
+          v-for="zone in zones"
+          :key="zone.label"
+          :id="String(zone.id)"
+          :text="zone.label"
+          v-model="zone.cards"
           :checked-map="checkedMap"
-:is-checked="isChecked"
-:disabled="isChecked"
-:className="zone.id ? 'bg-green-100 flex-1 text-primary-500' : 'bg-red-100  flex-1 text-[#DA4A4A]'
-            "
-@moved="onMoved($event)"
-@move="moveCard" />
+          :is-checked="isChecked"
+          :disabled="isChecked"
+          :className="
+            zone.id ? 'bg-green-100 flex-1 text-primary-500' : 'bg-red-100  flex-1 text-[#DA4A4A]'
+          "
+          @moved="onMoved($event)"
+          @move="moveCard"
+        />
       </div>
 
       <template #preview="{ item }">
-        <DraggableCard
-v-if="item"
-:card="(item as any)"
-:is-in-zone="false"
-:checked="null" />
+        <DraggableCard v-if="item" :card="item as any" :is-in-zone="false" :checked="null" />
       </template>
     </DragProvider>
   </BaseGame>

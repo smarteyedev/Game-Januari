@@ -18,7 +18,7 @@ interface Props {
 
 withDefaults(defineProps<Props>(), {
   containerPosition: 'relative',
-  successResult: null
+  successResult: null,
 })
 
 const emit = defineEmits<{
@@ -34,29 +34,32 @@ const emit = defineEmits<{
 
 <template>
   <GameIntroModal
-v-if="showIntro && introData"
-:modelValue="showIntro"
+    v-if="showIntro && introData"
+    :modelValue="showIntro"
     @update:modelValue="emit('update:showIntro', $event)"
-:title="title"
-:introData="introData"
-@start="emit('start')"
-    :containerPosition="containerPosition" />
+    :title="title"
+    :introData="introData"
+    @start="emit('start')"
+    :containerPosition="containerPosition"
+  />
 
   <GameResultModal
-v-else-if="showResult"
-:success="isWin"
-:successResult="successResult ?? undefined"
+    v-else-if="showResult"
+    :success="isWin"
+    :successResult="successResult ?? undefined"
     :modelValue="showResult"
-@update:modelValue="emit('update:showResult', $event)"
-@retry="emit('retry')"
+    @update:modelValue="emit('update:showResult', $event)"
+    @retry="emit('retry')"
     @cleared="emit('cleared')"
-:containerPosition="containerPosition" />
+    :containerPosition="containerPosition"
+  />
 
   <GameResultSummaryModal
-v-else-if="showSummary"
-:resultSummary="successResult"
-:modelValue="showSummary"
+    v-else-if="showSummary"
+    :resultSummary="successResult"
+    :modelValue="showSummary"
     @update:modelValue="emit('update:showSummary', $event)"
-@toggle-summary="emit('toggle-summary')"
-    :containerPosition="containerPosition" />
+    @toggle-summary="emit('toggle-summary')"
+    :containerPosition="containerPosition"
+  />
 </template>

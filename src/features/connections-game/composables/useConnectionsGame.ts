@@ -42,15 +42,15 @@ export function useConnectionsGame() {
   const selected = ref<Item[]>([])
   const solvedGroups = ref<SolvedGroup[]>([])
   const isChecked = ref(false)
-  
+
   const attemptsLeft = ref(4)
   const maxAttempts = ref(4)
   const wrongCount = ref<number | null>(null)
   const solvedNewGroup = ref<{ id: string; label: string } | null>(null)
-  
+
   const categoryColorMap = ref<Record<string, string>>({})
   const categoryLabelMap = ref<Record<string, string>>({})
-  
+
   const loading = ref(false)
   const error = ref<unknown>(null)
 
@@ -69,33 +69,38 @@ export function useConnectionsGame() {
       const data = await levelRepository.getLevel<ConnectionsLevelData>(
         MinigameId.Connections,
         levelId,
-        offline
+        offline,
       )
-      
+
       const content = data.content
       const config = data.config
-      
+
       maxAttempts.value = config?.max_attempt || 4
       attemptsLeft.value = maxAttempts.value
-      
+
       categories.value = content?.target_category || []
-      
+
       // Assign colors and labels
       categoryColorMap.value = {}
       categoryLabelMap.value = {}
-      categories.value.forEach(cat => {
+      categories.value.forEach((cat) => {
         categoryColorMap.value[cat.category] = colorFromCategory(cat.category)
         categoryLabelMap.value[cat.category] = cat.label
       })
 
       const rawItems = content?.items || []
-      items.value = shuffle(rawItems.map(item => ({
-        ...item,
-        state: 'idle'
-      } as Item)))
-      
+      items.value = shuffle(
+        rawItems.map(
+          (item) =>
+            ({
+              ...item,
+              state: 'idle',
+            }) as Item,
+        ),
+      )
+
       resetLocalState()
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -112,16 +117,16 @@ export function useConnectionsGame() {
     solvedGroups.value = []
     selected.value = []
     isChecked.value = false
-    items.value.forEach(i => i.state = 'idle')
+    items.value.forEach((i) => (i.state = 'idle'))
     items.value = shuffle(items.value)
   }
 
   function toggleItem(item: Item) {
     if (item.state === 'solved') return
-    
+
     if (item.state === 'selected') {
       item.state = 'idle'
-      selected.value = selected.value.filter(i => i !== item)
+      selected.value = selected.value.filter((i) => i !== item)
       return
     }
 
@@ -133,7 +138,7 @@ export function useConnectionsGame() {
 
   function countAway(selectedItems: Item[]) {
     const freq: Record<string, number> = {}
-    selectedItems.forEach(item => {
+    selectedItems.forEach((item) => {
       freq[item.category] = (freq[item.category] || 0) + 1
     })
     const maxSame = Math.max(...Object.values(freq))
@@ -147,14 +152,14 @@ export function useConnectionsGame() {
     wrongCount.value = null
 
     const categoryId = selected.value[0]!.category
-    const isMatch = selected.value.every(item => item.category === categoryId)
+    const isMatch = selected.value.every((item) => item.category === categoryId)
 
     if (!isMatch) {
       attemptsLeft.value--
       wrongCount.value = countAway(selected.value)
-      selected.value.forEach(i => i.state = 'idle')
+      selected.value.forEach((i) => (i.state = 'idle'))
       selected.value = []
-      
+
       if (attemptsLeft.value <= 0) {
         revealAllGroups()
         return { success: false, gameOver: true }
@@ -163,34 +168,36 @@ export function useConnectionsGame() {
     }
 
     // Success
-    selected.value.forEach(item => { item.state = 'solved' })
+    selected.value.forEach((item) => {
+      item.state = 'solved'
+    })
     solvedGroups.value.push({
       id: categoryId,
       label: categoryLabelMap.value[categoryId]!,
-      color: categoryColorMap.value[categoryId]!
+      color: categoryColorMap.value[categoryId]!,
     })
     solvedNewGroup.value = {
       id: categoryId,
-      label: categoryLabelMap.value[categoryId]!
+      label: categoryLabelMap.value[categoryId]!,
     }
     selected.value = []
 
     const win = solvedGroups.value.length === categories.value.length
-    if(win){
+    if (win) {
       isChecked.value = true
     }
     return { success: true, win, gameOver: win }
   }
 
   function revealAllGroups() {
-    const solvedIds = new Set(solvedGroups.value.map(g => g.id))
-    items.value.forEach(i => i.state = 'solved')
-    categories.value.forEach(cat => {
+    const solvedIds = new Set(solvedGroups.value.map((g) => g.id))
+    items.value.forEach((i) => (i.state = 'solved'))
+    categories.value.forEach((cat) => {
       if (!solvedIds.has(cat.category)) {
         solvedGroups.value.push({
           id: cat.category,
           label: cat.label,
-          color: categoryColorMap.value[cat.category]!
+          color: categoryColorMap.value[cat.category]!,
         })
       }
     })
@@ -212,6 +219,6 @@ export function useConnectionsGame() {
     fetchLevel,
     toggleItem,
     submitSelection,
-    reset: resetLocalState
+    reset: resetLocalState,
   }
 }

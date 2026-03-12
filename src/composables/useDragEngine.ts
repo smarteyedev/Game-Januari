@@ -1,4 +1,4 @@
-import { reactive, nextTick } from "vue"
+import { reactive, nextTick } from 'vue'
 
 export interface DragPayload<T = unknown> {
   item: T
@@ -26,7 +26,7 @@ export const dragState = reactive({
 
   activeZone: null as string | null,
 
-  zones: new Map<string, ZoneMeta>()
+  zones: new Map<string, ZoneMeta>(),
 })
 
 export function registerZone(id: string, el: HTMLElement) {
@@ -50,7 +50,7 @@ export function startDrag(payload: DragPayload, e: PointerEvent) {
 
   dragState.offsetX = e.clientX - rect.left
   dragState.offsetY = e.clientY - rect.top
-  
+
   detectZone()
 }
 
@@ -64,12 +64,12 @@ export function moveDrag(e: PointerEvent) {
 export async function endDrag() {
   // Call detectZone one last time to be sure
   detectZone()
-  
+
   dragState.dragging = false
-  
+
   // Wait for watchers in dropZone.vue to fire before clearing data
   await nextTick()
-  
+
   dragState.payload = null
   dragState.activeZone = null
 }

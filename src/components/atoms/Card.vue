@@ -1,28 +1,24 @@
 <template>
   <!-- FLIP VARIANT -->
   <div
-v-if="variant === 'flip'"
-class="perspective cursor-pointer"
-:class="[sizeClass, customClass]"
-    @click="handleClick">
+    v-if="variant === 'flip'"
+    class="perspective cursor-pointer"
+    :class="[sizeClass, customClass]"
+    @click="handleClick"
+  >
     <div
-class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
-      :class="{ 'rotate-y-180': flipped }">
+      class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
+      :class="{ 'rotate-y-180': flipped }"
+    >
       <!-- BACK -->
-      <div
-class="absolute inset-0 backface-hidden"
-:class="backClass">
+      <div class="absolute inset-0 backface-hidden" :class="backClass">
         <slot name="back">
-          <div class="flex items-center justify-center w-full h-full">
-            ?
-          </div>
+          <div class="flex items-center justify-center w-full h-full">?</div>
         </slot>
       </div>
 
       <!-- FRONT -->
-      <div
-class="absolute inset-0 backface-hidden rotate-y-180"
-:class="frontClass">
+      <div class="absolute inset-0 backface-hidden rotate-y-180" :class="frontClass">
         <slot name="front" />
       </div>
     </div>
@@ -36,7 +32,7 @@ class="absolute inset-0 backface-hidden rotate-y-180"
       'min-w-[72px] min-h-[72px] w-full font-bold border-gray-500 border rounded-2xl gap-2.5 transition-all',
       connectionsStateClass,
       clickable && !disabled ? 'cursor-pointer hover:brightness-110' : 'cursor-default',
-      customClass
+      customClass,
     ]"
   >
     <span class="text-center font-semibold text-body-xs md:text-body-xl">
@@ -51,15 +47,9 @@ class="absolute inset-0 backface-hidden rotate-y-180"
     :index="dragData?.index ?? 0"
     :zone-id="dragData?.zoneId ?? ''"
     @drag-end="emit('drag-end')"
-    :class="[
-      baseClass,
-      customClass,
-      'cursor-grab'
-    ]"
+    :class="[baseClass, customClass, 'cursor-grab']"
   >
-    <div
-@click="handleClick"
-:class="{ 'flex items-center justify-center': centered }">
+    <div @click="handleClick" :class="{ 'flex items-center justify-center': centered }">
       <slot>
         {{ label }}
       </slot>
@@ -68,16 +58,17 @@ class="absolute inset-0 backface-hidden rotate-y-180"
 
   <!-- NON-DRAGGABLE DEFAULT VARIANT -->
   <div
-v-else
-@click="handleClick"
-:class="[
-    baseClass,
-    customClass,
-    {
-      'cursor-default': disabled,
-      'flex items-center justify-center': centered,
-    },
-  ]">
+    v-else
+    @click="handleClick"
+    :class="[
+      baseClass,
+      customClass,
+      {
+        'cursor-default': disabled,
+        'flex items-center justify-center': centered,
+      },
+    ]"
+  >
     <slot>
       {{ label }}
     </slot>
@@ -135,8 +126,7 @@ const emit = defineEmits<{
   (e: 'drag-end'): void
 }>()
 
-const baseClass =
-  'select-none break-words flex items-center justify-center'
+const baseClass = 'select-none break-words flex items-center justify-center'
 
 function handleClick(ev?: MouseEvent) {
   if (props.disabled) return

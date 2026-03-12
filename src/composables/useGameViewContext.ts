@@ -29,17 +29,17 @@ export function useGameViewContext() {
 
   // Audio handling
   let audio: HTMLAudioElement | null = null
-  
+
   function playClick() {
     if (typeof window === 'undefined') return
-    
+
     if (!audio) {
       audio = new Audio(clickSound)
     }
-    
+
     audio.currentTime = 0
     audio.volume = 1
-    audio.play().catch(() => { })
+    audio.play().catch(() => {})
   }
 
   return {
@@ -47,6 +47,6 @@ export function useGameViewContext() {
     playClick,
     isXs,
     isSm,
-    isMd
+    isMd,
   }
 }

@@ -1,7 +1,5 @@
 <template>
-  <div
-class="flex gap-1.5 md:gap-5 cursor-text relative"
-@click="focusInput">
+  <div class="flex gap-1.5 md:gap-5 cursor-text relative" @click="focusInput">
     <div
       v-for="(char, i) in value"
       :key="i"
@@ -10,11 +8,7 @@ class="flex gap-1.5 md:gap-5 cursor-text relative"
       {{ locked[i] ?? char ?? '' }}
     </div>
 
-    <input
-ref="input"
-class="absolute opacity-0 pointer-events-none"
-readonly
-@keydown.prevent />
+    <input ref="input" class="absolute opacity-0 pointer-events-none" readonly @keydown.prevent />
   </div>
 </template>
 

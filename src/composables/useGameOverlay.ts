@@ -47,6 +47,6 @@ export const useGameOverlay = () => {
     openResult,
     openSummary,
     closeAll,
-    toggleSummary
+    toggleSummary,
   }
 }

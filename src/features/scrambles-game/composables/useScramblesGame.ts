@@ -18,7 +18,7 @@ export function useScramblesGame() {
   const attempts = ref(4)
   const maxAttempts = ref(4)
   const junkLettersCount = ref(3)
-  
+
   const loading = ref(false)
   const error = ref<unknown>(null)
   const isChecked = ref(false)
@@ -30,11 +30,9 @@ export function useScramblesGame() {
   const answerChars = computed(() => {
     const realChars = answer.value.split('')
     const exclude = new Set(realChars)
-    
-    const junkChars = Array.from({ length: junkLettersCount.value }, () => 
-      getRandomLetter(exclude)
-    )
-    
+
+    const junkChars = Array.from({ length: junkLettersCount.value }, () => getRandomLetter(exclude))
+
     return shuffle([...realChars, ...junkChars]).map((c, i) => ({ c, i }))
   })
 
@@ -52,20 +50,20 @@ export function useScramblesGame() {
       const data = await levelRepository.getLevel<ScramblesLevelData>(
         MinigameId.Scrambles,
         levelId,
-        offline
+        offline,
       )
-      
+
       const content = data.content
       const config = data.config
-      
+
       question.value = content?.question || ''
       answer.value = (content?.answer || '').toUpperCase()
-      
+
       maxAttempts.value = config?.max_attempt || 4
       junkLettersCount.value = config?.junk_letter || 3
-      
+
       resetBoard()
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -126,7 +124,7 @@ export function useScramblesGame() {
     // reveal one random hint
     revealRandomHint()
     userInput.value = Array(answer.value.length).fill(null)
-    
+
     return { correct: false, gameOver: false }
   }
 
@@ -176,6 +174,6 @@ export function useScramblesGame() {
     deleteChar,
     submitAnswer,
     resetBoard,
-    isCharDisabled
+    isCharDisabled,
   }
 }

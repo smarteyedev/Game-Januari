@@ -1,4 +1,4 @@
-import { reactive } from "vue"
+import { reactive } from 'vue'
 
 export interface DragPayload<T = unknown> {
   item: T
@@ -23,7 +23,7 @@ export const dragState = reactive({
 
   activeZone: null as string | null,
 
-  zones: new Map<string, ZoneMeta>()
+  zones: new Map<string, ZoneMeta>(),
 })
 
 export function registerZone(id: string, el: HTMLElement) {
@@ -60,11 +60,9 @@ export function endDrag() {
 }
 
 function detectZone() {
-
   dragState.activeZone = null
 
   for (const zone of dragState.zones.values()) {
-
     const rect = zone.el.getBoundingClientRect()
 
     if (

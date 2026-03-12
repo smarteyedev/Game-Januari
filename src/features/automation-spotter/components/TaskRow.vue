@@ -26,12 +26,25 @@ const { playClick } = useGameViewContext()
 </script>
 
 <template>
-  <DropZone zone-id="pool" :items="modelValue" :max-drag-item="99" @move="$emit('move', $event)"
-    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2">
-    <DraggableCard v-for="(c, index) in modelValue" :key="c.id" :card="c" :is-in-zone="false"
-      :checked="getChecked(c.id)" :drag-data="{ item: c, index: index, zoneId: 'pool' }" @drag-end="playClick" :class="{
+  <DropZone
+    zone-id="pool"
+    :items="modelValue"
+    :max-drag-item="99"
+    @move="$emit('move', $event)"
+    class="grid grid-cols-2 md:flex md:flex-wrap justify-center items-center gap-2.5 md:gap-4 2xl:gap-8 w-full [&>*:last-child:nth-child(odd)]:col-span-2"
+  >
+    <DraggableCard
+      v-for="(c, index) in modelValue"
+      :key="c.id"
+      :card="c"
+      :is-in-zone="false"
+      :checked="getChecked(c.id)"
+      :drag-data="{ item: c, index: index, zoneId: 'pool' }"
+      @drag-end="playClick"
+      :class="{
         'cursor-grab active:cursor-grabbing': !disabled,
         'cursor-default': disabled,
-      }" />
+      }"
+    />
   </DropZone>
 </template>

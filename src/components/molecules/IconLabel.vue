@@ -33,9 +33,7 @@ const showIcon = computed(() => !!props.iconName || hasIconSlot)
       </slot>
     </template>
 
-    <span
-v-if="!showIcon && props.bullet"
-class="bullet-list-item">{{ props.label }}</span>
+    <span v-if="!showIcon && props.bullet" class="bullet-list-item">{{ props.label }}</span>
     <span v-else>{{ props.label }}</span>
 
     <!-- append icon -->

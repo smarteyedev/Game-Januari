@@ -16,7 +16,13 @@ import {
 import { gameRepository, sessionRepository } from '@/infrastructure'
 import { useTimer } from '@/composables/useTimer'
 import { useSessionStore } from '@/stores/session'
-import { computeScore, getFeedback, getSpeedFeedback, type ScoreContext, type ScoringParams } from './ScoringService'
+import {
+  computeScore,
+  getFeedback,
+  getSpeedFeedback,
+  type ScoreContext,
+  type ScoringParams,
+} from './ScoringService'
 import { logger } from '@/infrastructure/logging'
 import dummyResultData from '@/assets/gameData/dummyResult.json'
 
@@ -107,7 +113,7 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
     onSubmit,
     autoSubmit = true,
     scoringParams: defaultScoringParams = {},
-    scoringStrategy: defaultScoringStrategy = 'default'
+    scoringStrategy: defaultScoringStrategy = 'default',
   } = options
 
   // Game entity
@@ -187,34 +193,34 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
    * Handle game over - win or lose
    */
   async function handleGameOver(
-    won: boolean, 
-    finalAnswers?: unknown[], 
+    won: boolean,
+    finalAnswers?: unknown[],
     finalScore?: number,
     scoreContext?: ScoreContext,
     scoringParams?: ScoringParams,
-    scoringStrategy?: string
+    scoringStrategy?: string,
   ) {
     stopTimer()
     game.value.setSubmitting()
 
     _didWin.value = won
-    
+
     let resolvedScore = 0
     if (typeof finalScore === 'number') {
       resolvedScore = finalScore
     } else if (won) {
       if (scoreContext) {
         resolvedScore = computeScore(
-          { 
-            timeUsed: maxTime - time.value, 
-            maxTime, 
-            ...scoreContext 
-          }, 
-          { 
-            ...defaultScoringParams, 
-            ...scoringParams 
+          {
+            timeUsed: maxTime - time.value,
+            maxTime,
+            ...scoreContext,
           },
-          scoringStrategy ?? defaultScoringStrategy
+          {
+            ...defaultScoringParams,
+            ...scoringParams,
+          },
+          scoringStrategy ?? defaultScoringStrategy,
         )
       } else {
         resolvedScore = 100
@@ -362,12 +368,12 @@ export function useGameService(options: GameServiceOptions): GameServiceReturn {
    */
   function finish(won: boolean, finishOptions?: FinishOptions) {
     return handleGameOver(
-      won, 
-      finishOptions?.answers, 
-      finishOptions?.score, 
-      finishOptions?.scoreContext, 
+      won,
+      finishOptions?.answers,
+      finishOptions?.score,
+      finishOptions?.scoreContext,
       finishOptions?.scoringParams,
-      finishOptions?.scoringStrategy
+      finishOptions?.scoringStrategy,
     )
   }
 

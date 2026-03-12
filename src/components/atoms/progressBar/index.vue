@@ -3,17 +3,22 @@ import type { IProgressBarProps } from '@/components/atoms/progressBar/types.ts'
 import { computed, toRefs } from 'vue'
 import { UiIcon } from '../icon'
 
-const props = withDefaults(defineProps<IProgressBarProps & {
-  variant?: 'default' | 'with-icon'
-  current?: number
-  target?: number
-}>(), {
-  progress: 0,
-  max: 100,
-  showLabel: false,
-  variant: 'default',
-  ui: () => ({}),
-})
+const props = withDefaults(
+  defineProps<
+    IProgressBarProps & {
+      variant?: 'default' | 'with-icon'
+      current?: number
+      target?: number
+    }
+  >(),
+  {
+    progress: 0,
+    max: 100,
+    showLabel: false,
+    variant: 'default',
+    ui: () => ({}),
+  },
+)
 
 const { progress, max, current, target } = toRefs(props)
 
@@ -27,46 +32,38 @@ const isComplete = computed(() => {
 </script>
 
 <template>
-  <div
-class="ui-progress-wrapper"
-:class="`ui-progress--${variant}`">
-
+  <div class="ui-progress-wrapper" :class="`ui-progress--${variant}`">
     <!-- BAR -->
     <div
-class="ui-progress-bar"
-:style="{
-      '--progress-total': progress || 0,
-      '--progress-max': max || 100,
-      '--progress-background-color': ui?.backgroundColor,
-      '--progress-color': ui?.color,
-    }">
+      class="ui-progress-bar"
+      :style="{
+        '--progress-total': progress || 0,
+        '--progress-max': max || 100,
+        '--progress-background-color': ui?.backgroundColor,
+        '--progress-color': ui?.color,
+      }"
+    >
       <div class="ui-progress-bar__meter"></div>
       <div class="ui-progress-bar__value"></div>
 
-      <div
-class="ui-progress-bar__text"
-v-if="showLabel">
-        <slot
-name="label"
-v-bind="{ percent }">{{ percent }}%</slot>
+      <div class="ui-progress-bar__text" v-if="showLabel">
+        <slot name="label" v-bind="{ percent }">{{ percent }}%</slot>
       </div>
     </div>
 
     <!-- ICON VARIANT -->
     <template v-if="variant === 'with-icon'">
       <UiIcon
-name="mdi:star"
-size="20"
-:class="[
-        'shrink-0 transition-all duration-300',
-        isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300'
-      ]" />
+        name="mdi:star"
+        size="20"
+        :class="[
+          'shrink-0 transition-all duration-300',
+          isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300',
+        ]"
+      />
 
-      <span class="ui-progress-counter">
-        {{ current }} / {{ target }}
-      </span>
+      <span class="ui-progress-counter"> {{ current }} / {{ target }} </span>
     </template>
-
   </div>
 </template>
 

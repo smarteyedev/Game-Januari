@@ -38,15 +38,18 @@ function handleContinue() {
     <div class="w-full h-full md:flex flex-col sm:flex-row gap-2 md:gap-4">
       <slot name="footer-left">
         <div class="flex flex-col gap-1.5">
-          <span class="text-body-xs font-bold text-primary-700">You got {{ current }} out of {{ target }} correct</span>
+          <span class="text-body-xs font-bold text-primary-700"
+            >You got {{ current }} out of {{ target }} correct</span
+          >
           <UiProgressBar
-variant="with-icon"
-:progress="current"
-:max="target"
-:current="current"
-:target="target"
+            variant="with-icon"
+            :progress="current"
+            :max="target"
+            :current="current"
+            :target="target"
             :ui="{ color: '#00A3B5' }"
-            class="rounded-full max-w-45 min-h-4 text-primary-700 text-body-xs md:text-body-sm xl:text-body-lg font-semibold whitespace-nowrap" />
+            class="rounded-full max-w-45 min-h-4 text-primary-700 text-body-xs md:text-body-sm xl:text-body-lg font-semibold whitespace-nowrap"
+          />
         </div>
       </slot>
     </div>
@@ -56,11 +59,12 @@ variant="with-icon"
       <slot name="footer-right">
         <!-- CONTINUE / VIEW RESULT - show when game is won or lost (finished) -->
         <UiButton
-:disabled="delay"
-:size="buttonSize"
-text="Continue"
-variant="primary"
-@click="handleContinue">
+          :disabled="delay"
+          :size="buttonSize"
+          text="Continue"
+          variant="primary"
+          @click="handleContinue"
+        >
         </UiButton>
       </slot>
     </div>

@@ -28,16 +28,16 @@ export function useAutomationSpotter() {
       const data = await levelRepository.getLevel<AutomationSpotterLevelData>(
         MinigameId.AutomationSpotter,
         levelId,
-        offline
+        offline,
       )
-      
+
       const content = data.content
       question.value = content?.question ?? ''
       const rawCards = content?.card ?? []
-      
+
       allCards.value = shuffle(rawCards.map((c) => ({ ...c, matched: false })))
       resetBoard()
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -94,7 +94,7 @@ export function useAutomationSpotter() {
 
   function checkAnswers() {
     const result: Record<number, boolean> = {}
-    
+
     zones.value.forEach((zone) => {
       zone.cards.forEach((card) => {
         result[card.id] = card.answer === zone.id
@@ -104,14 +104,13 @@ export function useAutomationSpotter() {
     checkedMap.value = result
     isChecked.value = true
 
-    const isPerfect = 
-      Object.values(result).every(Boolean) && 
-      Object.keys(result).length === allCards.value.length
+    const isPerfect =
+      Object.values(result).every(Boolean) && Object.keys(result).length === allCards.value.length
 
     return {
       isPerfect,
       correctCount: Object.values(result).filter(Boolean).length,
-      totalCount: allCards.value.length
+      totalCount: allCards.value.length,
     }
   }
 
@@ -129,6 +128,6 @@ export function useAutomationSpotter() {
     onMoved,
     moveCard,
     checkAnswers,
-    resetBoard
+    resetBoard,
   }
 }

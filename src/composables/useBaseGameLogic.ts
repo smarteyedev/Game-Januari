@@ -1,7 +1,11 @@
 import { ref, onMounted, watch } from 'vue'
 import type { IntroData } from '@/domain/types'
 import { levelRepository } from '@/infrastructure'
-import { useGameService, type GameServiceOptions, type FinishOptions } from '@/application/services/GameService'
+import {
+  useGameService,
+  type GameServiceOptions,
+  type FinishOptions,
+} from '@/application/services/GameService'
 
 export interface BaseGameLogicOptions<T = any> extends GameServiceOptions {
   levelId?: number
@@ -20,7 +24,7 @@ export function useBaseGameLogic<T = any>(options: BaseGameLogicOptions<T>) {
     offline = true,
     maxTime = 180,
     introId = 0,
-    skipIntroFetch = false
+    skipIntroFetch = false,
   } = options
 
   // UI State
@@ -36,7 +40,7 @@ export function useBaseGameLogic<T = any>(options: BaseGameLogicOptions<T>) {
     ...options,
     maxTime,
     minigameId,
-    offline
+    offline,
   })
 
   // Watch for timeout
@@ -72,10 +76,10 @@ export function useBaseGameLogic<T = any>(options: BaseGameLogicOptions<T>) {
   // Lifecycle
   onMounted(async () => {
     gameLoading.value = true
-    
+
     const fetchIntroPromise = (async () => {
       if (skipIntroFetch) return
-      
+
       if (typeof introId === 'object' && introId !== null) {
         introData.value = introId as IntroData
         return
@@ -112,7 +116,7 @@ export function useBaseGameLogic<T = any>(options: BaseGameLogicOptions<T>) {
     isFinished: gameService._isFinished,
     isWon: gameService._isWon,
     isLost: gameService._isLost,
-    
+
     showIntro,
     attempts,
     introData,
@@ -122,6 +126,6 @@ export function useBaseGameLogic<T = any>(options: BaseGameLogicOptions<T>) {
     start,
     retryGame,
     finishGame,
-    setIntroData
+    setIntroData,
   }
 }

@@ -107,7 +107,7 @@ function toggleFullscreen() {
   const el = gameWrapper.value
   if (!el) return
   if (!document.fullscreenElement) {
-    el.requestFullscreen().catch(err => console.warn('Fullscreen failed', err))
+    el.requestFullscreen().catch((err) => console.warn('Fullscreen failed', err))
   } else {
     document.exitFullscreen()
   }
@@ -146,79 +146,83 @@ function handleCheck() {
 </script>
 
 <template>
-  <GameState
-:loading="loading"
-:error="error"
-:retryFn="retryFn">
+  <GameState :loading="loading" :error="error" :retryFn="retryFn">
     <div
-ref="gameWrapper"
-class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
-:style="{
-      backgroundImage: `url(${Background})`,
-      backgroundPosition: 'center',
-      backgroundSize: 'cover',
-      backgroundRepeat: 'no-repeat',
-    }">
+      ref="gameWrapper"
+      class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
+      :style="{
+        backgroundImage: `url(${Background})`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+        backgroundRepeat: 'no-repeat',
+      }"
+    >
       <TopNavigation
-:text="moduleTitle"
-:is-intro="showIntro"
-class="z-60"
-@toggle-fullscreen="toggleFullscreen"
+        :text="moduleTitle"
+        :is-intro="showIntro"
+        class="z-60"
+        @toggle-fullscreen="toggleFullscreen"
         @toggle-summary="handleViewSummary"
-:current="currentProgress"
-:target="targetProgress"
-:isChecked="isChecked"
+        :current="currentProgress"
+        :target="targetProgress"
+        :isChecked="isChecked"
         :isWin="isWin"
-:isShown="showSummaryLocal" />
+        :isShown="showSummaryLocal"
+      />
 
       <div class="flex-1 flex flex-col relative">
         <GameOverlayManager
-:show-intro="showIntro"
-:show-result="showResultLocal"
-:show-summary="showSummaryLocal"
+          :show-intro="showIntro"
+          :show-result="showResultLocal"
+          :show-summary="showSummaryLocal"
           :title="title"
-:intro-data="introData"
-:is-win="isWin"
-:success-result="successResult"
+          :intro-data="introData"
+          :is-win="isWin"
+          :success-result="successResult"
           @update:show-intro="emit('update:showIntro', $event)"
-@update:show-result="showResultLocal = $event"
+          @update:show-result="showResultLocal = $event"
           @update:show-summary="showSummaryLocal = $event"
-@start="handleStart"
-@retry="handleRetry"
+          @start="handleStart"
+          @retry="handleRetry"
           @cleared="handleCleared"
-@toggle-summary="handleViewSummary" />
+          @toggle-summary="handleViewSummary"
+        />
 
         <div
-v-if="!showIntro && !showResultLocal && !showSummaryLocal"
-          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700">
+          v-if="!showIntro && !showResultLocal && !showSummaryLocal"
+          class="border-[3px] md:border-[6px] border-primary-700 flex flex-col items-center gap-6 md:gap-8 w-full max-w-full p-4 md:p-5 rounded-[24px] md:rounded-[36px] bg-white shadow-xl shadow-primary-700"
+        >
           <slot name="header">
             <GameHeader
-:title="title"
-:description="description"
-:question="question"
-:time="time" />
+              :title="title"
+              :description="description"
+              :question="question"
+              :time="time"
+            />
           </slot>
 
           <slot />
 
           <slot
-name="footer"
-:onCheck="handleCheck"
-:onRetry="handleRetry"
-:onCleared="handleCleared"
-            :onOpenResult="handleOpenResult">
+            name="footer"
+            :onCheck="handleCheck"
+            :onRetry="handleRetry"
+            :onCleared="handleCleared"
+            :onOpenResult="handleOpenResult"
+          >
             <GameFooter
-:current="currentProgress"
-:target="targetProgress"
-:showProgress="showProgress"
+              :current="currentProgress"
+              :target="targetProgress"
+              :showProgress="showProgress"
               :isChecked="isChecked"
-:isWin="isWin"
-:hasLost="hasLost"
-:hideSubmit="hideSubmit"
-@check="handleCheck"
+              :isWin="isWin"
+              :hasLost="hasLost"
+              :hideSubmit="hideSubmit"
+              @check="handleCheck"
               @retry="handleRetry"
-@cleared="handleCleared"
-@open-result="handleOpenResult">
+              @cleared="handleCleared"
+              @open-result="handleOpenResult"
+            >
               <template #footer-left>
                 <slot name="footer-left" />
               </template>

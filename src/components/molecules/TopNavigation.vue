@@ -3,30 +3,31 @@
     <div v-if="text && !isIntro">
       <Title :text="text" />
     </div>
-    <div
-class="flex w-full gap-2.5"
-:class="{ 'justify-end': isIntro }">
+    <div class="flex w-full gap-2.5" :class="{ 'justify-end': isIntro }">
       <UiButton
-v-if="!isIntro"
-:size="!isXs && !isSm ? 'md' : 'xs'"
-:icon-size="!isXs && !isSm ? 32 : 24"
+        v-if="!isIntro"
+        :size="!isXs && !isSm ? 'md' : 'xs'"
+        :icon-size="!isXs && !isSm ? 32 : 24"
         :square="true"
-icon="ri:home-5-fill"
-@click="goToHome" />
+        icon="ri:home-5-fill"
+        @click="goToHome"
+      />
       <UiButton
-v-if="!isIntro"
-:size="!isXs && !isSm ? 'md' : 'xs'"
-variant="primary"
-text="View Summary"
+        v-if="!isIntro"
+        :size="!isXs && !isSm ? 'md' : 'xs'"
+        variant="primary"
+        text="View Summary"
         class="grow w-full"
-@click="$emit('toggle-summary')"
-:disabled="!isChecked || !isWin" />
+        @click="$emit('toggle-summary')"
+        :disabled="!isChecked || !isWin"
+      />
       <UiButton
-:size="!isXs && !isSm ? 'md' : 'xs'"
-:icon-size="!isXs && !isSm ? 32 : 24"
-:square="true"
+        :size="!isXs && !isSm ? 'md' : 'xs'"
+        :icon-size="!isXs && !isSm ? 32 : 24"
+        :square="true"
         icon="ic:outline-fullscreen"
-@click="$emit('toggle-fullscreen')" />
+        @click="$emit('toggle-fullscreen')"
+      />
     </div>
   </div>
 </template>

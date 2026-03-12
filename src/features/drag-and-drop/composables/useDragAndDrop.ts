@@ -4,7 +4,7 @@ import { levelRepository } from '@/infrastructure'
 import { MinigameId } from '@/domain/types'
 import { shuffle } from '@/utils/shuffle'
 
-export type BoardPart = 
+export type BoardPart =
   | { type: 'text'; value: string }
   | { type: 'slot'; id: number; item: Blank | null }
 
@@ -17,14 +17,14 @@ export function useDragAndDrop() {
   const isLocked = ref(false)
   const loading = ref(false)
   const error = ref<unknown>(null)
-  
+
   const sentence = ref('')
   const rawBlanks = ref<Blank[]>([])
   const correctCount = ref(0)
 
   const totalSlots = computed(() => {
-    return board.value.filter((part): part is Extract<BoardPart, { type: 'slot' }> => 
-      part.type === 'slot'
+    return board.value.filter(
+      (part): part is Extract<BoardPart, { type: 'slot' }> => part.type === 'slot',
     ).length
   })
 
@@ -39,15 +39,15 @@ export function useDragAndDrop() {
       const data = await levelRepository.getLevel<DragAndDropLevelData>(
         MinigameId.DragAndDrop,
         levelId,
-        offline
+        offline,
       )
-      
+
       const content = data.content
       sentence.value = content?.sentence ?? ''
       rawBlanks.value = (content?.blanks as unknown as Blank[]) ?? []
-      
+
       loadBoard()
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -138,7 +138,7 @@ export function useDragAndDrop() {
 
   function checkAnswers() {
     isChecked.value = true
-    
+
     let count = 0
     Object.entries(slots.value).forEach(([slotIdStr, item]) => {
       const slotId = Number(slotIdStr)
@@ -154,7 +154,7 @@ export function useDragAndDrop() {
     return {
       won,
       correctCount: count,
-      totalSlots: totalSlots.value
+      totalSlots: totalSlots.value,
     }
   }
 
@@ -177,6 +177,6 @@ export function useDragAndDrop() {
     fetchLevel,
     moveWord,
     checkAnswers,
-    reset
+    reset,
   }
 }
