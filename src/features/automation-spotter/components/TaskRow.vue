@@ -2,7 +2,6 @@
 import { DropZone } from '@/components/dragengine'
 import DraggableCard from './DraggableCard.vue'
 import type { DragCard } from '@/domain/types'
-import { computed } from 'vue'
 import { useGameViewContext } from '@/composables/useGameViewContext'
 
 const props = defineProps<{
@@ -12,7 +11,7 @@ const props = defineProps<{
   disabled: boolean
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'update:modelValue', v: DragCard[]): void
   (e: 'moved', ids: number[]): void
   (e: 'move', payload: any): void

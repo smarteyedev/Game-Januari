@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { Blank } from '@/domain/types'
+import { ref } from 'vue'
 import BlankSlot from './components/BlankSlot.vue'
 import WordItem from './components/WordItem.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
@@ -92,36 +91,70 @@ const ghostClass =
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Drag and Drop Prompt'"
-    :description="'Isilah bagian kosong dengan kata yang sesuai!'" :time="time" :maxTime="MAX_TIME"
-    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)" v-model:showIntro="showIntro" :introData="introData" :isWin="_isWon"
-    :hasLost="_isLost" :isChecked="isChecked" :currentProgress="correctCount" :targetProgress="totalSlots"
-    :showProgress="true" @start="start" @retry="retryGame(() => { checkResult = null; resetGame(); })"
-    @check="checkAnswers" @cleared="handleContinue" :successResult="successResultData">
+  <BaseGame
+module-title="Explore Artificial Intelligence (AI) Tools"
+:title="'Drag and Drop Prompt'"
+    :description="'Isilah bagian kosong dengan kata yang sesuai!'"
+:time="time"
+:maxTime="MAX_TIME"
+    :loading="baseLoading || introLoading || gameLoading"
+:error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)"
+v-model:showIntro="showIntro"
+:introData="introData"
+:isWin="_isWon"
+    :hasLost="_isLost"
+:isChecked="isChecked"
+:currentProgress="correctCount"
+:targetProgress="totalSlots"
+    :showProgress="true"
+@start="start"
+@retry="retryGame(() => { checkResult = null; resetGame(); })"
+    @check="checkAnswers"
+@cleared="handleContinue"
+:successResult="successResultData">
     <DragProvider>
       <!-- Sentence Board -->
       <div
         class="border-2 rounded-xl px-2.5 py-3.25 md:p-2.5 text-justify text-primary-700 font-semibold text-body-xs md:text-body-sm">
-        <template v-for="(part, index) in board" :key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
+        <template
+v-for="(part, index) in board"
+:key="part.type === 'slot' ? `slot-${part.id}` : `text-${index}`">
           <span v-if="part.type === 'text'">
             {{ part.value }}
           </span>
-          <BlankSlot v-else :item="slots[part.id]" :slotId="part.id" :isCorrect="slotCorrectness[part.id]"
-            :disabled="isLocked" @move="moveWord" />
+          <BlankSlot
+v-else
+:item="slots[part.id]"
+:slotId="part.id"
+:isCorrect="slotCorrectness[part.id]"
+            :disabled="isLocked"
+@move="moveWord" />
         </template>
       </div>
 
       <!-- Word Pool -->
-      <EngineDropZone zone-id="pool" :items="items" :max-drag-item="99" @move="moveWord"
+      <EngineDropZone
+zone-id="pool"
+:items="items"
+:max-drag-item="99"
+@move="moveWord"
         class="flex flex-wrap gap-3 justify-center border-none bg-transparent p-0">
-        <WordItem v-for="(item, index) in items" :key="item.id" :item="item" :inSlot="false"
-          :drag-data="{ item: item, index: index, zoneId: 'pool' }" :disabled="isLocked" @drag-end="playClick" />
+        <WordItem
+v-for="(item, index) in items"
+:key="item.id"
+:item="item"
+:inSlot="false"
+          :drag-data="{ item: item, index: index, zoneId: 'pool' }"
+:disabled="isLocked"
+@drag-end="playClick" />
       </EngineDropZone>
 
       <template #preview="{ item }">
         <div class="drag-preview-container">
-          <Card :label="(item as any).word" :custom-class="ghostClass" />
+          <Card
+:label="(item as any).word"
+:custom-class="ghostClass" />
         </div>
       </template>
     </DragProvider>

@@ -105,7 +105,7 @@ export const AccuracyScoringStrategy: ScoringStrategy = {
  */
 export const MemoryGameScoringStrategy: ScoringStrategy = {
   name: 'memory-game',
-  computeScore(context, params = {}) {
+  computeScore(context, _ = {}) {
     if(safeNumber(context.timeUsed) <= 0) return 0
 
     const attempts = safeNumber(context.attempts, Number.MAX_VALUE)

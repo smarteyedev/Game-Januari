@@ -23,8 +23,13 @@ const previewStyle = computed(() => {
   <slot />
 
   <Teleport to="body">
-    <div v-if="dragState.dragging" class="drag-preview" :style="previewStyle">
-      <slot name="preview" :item="dragState.payload?.item" />
+    <div
+v-if="dragState.dragging"
+class="drag-preview"
+:style="previewStyle">
+      <slot
+name="preview"
+:item="dragState.payload?.item" />
     </div>
   </Teleport>
 

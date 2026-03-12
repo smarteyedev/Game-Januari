@@ -1,11 +1,17 @@
 <template>
   <!-- FLIP VARIANT -->
-  <div v-if="variant === 'flip'" class="perspective cursor-pointer" :class="[sizeClass, customClass]"
+  <div
+v-if="variant === 'flip'"
+class="perspective cursor-pointer"
+:class="[sizeClass, customClass]"
     @click="handleClick">
-    <div class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
+    <div
+class="relative w-full h-full transition-transform duration-500 transform preserve-3d"
       :class="{ 'rotate-y-180': flipped }">
       <!-- BACK -->
-      <div class="absolute inset-0 backface-hidden" :class="backClass">
+      <div
+class="absolute inset-0 backface-hidden"
+:class="backClass">
         <slot name="back">
           <div class="flex items-center justify-center w-full h-full">
             ?
@@ -14,7 +20,9 @@
       </div>
 
       <!-- FRONT -->
-      <div class="absolute inset-0 backface-hidden rotate-y-180" :class="frontClass">
+      <div
+class="absolute inset-0 backface-hidden rotate-y-180"
+:class="frontClass">
         <slot name="front" />
       </div>
     </div>
@@ -49,7 +57,9 @@
       'cursor-grab'
     ]"
   >
-    <div @click="handleClick" :class="{ 'flex items-center justify-center': centered }">
+    <div
+@click="handleClick"
+:class="{ 'flex items-center justify-center': centered }">
       <slot>
         {{ label }}
       </slot>
@@ -57,7 +67,10 @@
   </DragItem>
 
   <!-- NON-DRAGGABLE DEFAULT VARIANT -->
-  <div v-else @click="handleClick" :class="[
+  <div
+v-else
+@click="handleClick"
+:class="[
     baseClass,
     customClass,
     {

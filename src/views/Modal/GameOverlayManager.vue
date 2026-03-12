@@ -33,15 +33,30 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
-    @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData" @start="emit('start')"
+  <GameIntroModal
+v-if="showIntro && introData"
+:modelValue="showIntro"
+    @update:modelValue="emit('update:showIntro', $event)"
+:title="title"
+:introData="introData"
+@start="emit('start')"
     :containerPosition="containerPosition" />
 
-  <GameResultModal v-else-if="showResult" :success="isWin" :successResult="successResult ?? undefined"
-    :modelValue="showResult" @update:modelValue="emit('update:showResult', $event)" @retry="emit('retry')"
-    @cleared="emit('cleared')" :containerPosition="containerPosition" />
+  <GameResultModal
+v-else-if="showResult"
+:success="isWin"
+:successResult="successResult ?? undefined"
+    :modelValue="showResult"
+@update:modelValue="emit('update:showResult', $event)"
+@retry="emit('retry')"
+    @cleared="emit('cleared')"
+:containerPosition="containerPosition" />
 
-  <GameResultSummaryModal v-else-if="showSummary" :resultSummary="successResult" :modelValue="showSummary"
-    @update:modelValue="emit('update:showSummary', $event)" @toggle-summary="emit('toggle-summary')"
+  <GameResultSummaryModal
+v-else-if="showSummary"
+:resultSummary="successResult"
+:modelValue="showSummary"
+    @update:modelValue="emit('update:showSummary', $event)"
+@toggle-summary="emit('toggle-summary')"
     :containerPosition="containerPosition" />
 </template>

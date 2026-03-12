@@ -7,13 +7,18 @@ import { dragState } from "./dragEngine"
   <slot />
 
   <Teleport to="body">
-    <div v-if="dragState.dragging" class="drag-preview" :style="{
+    <div
+v-if="dragState.dragging"
+class="drag-preview"
+:style="{
       transform: `translate(
           ${dragState.x - dragState.offsetX}px,
           ${dragState.y - dragState.offsetY}px
         )`
     }">
-      <slot name="preview" :item="dragState.payload?.item" />
+      <slot
+name="preview"
+:item="dragState.payload?.item" />
     </div>
   </Teleport>
 

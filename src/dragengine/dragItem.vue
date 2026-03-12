@@ -31,7 +31,7 @@ function pointerMove(e: PointerEvent) {
     moveDrag(e)
 }
 
-function pointerUp(e: PointerEvent) {
+function pointerUp(_: PointerEvent) {
 
     window.removeEventListener("pointermove", pointerMove)
     window.removeEventListener("pointerup", pointerUp)
@@ -44,7 +44,9 @@ function pointerUp(e: PointerEvent) {
 
 <template>
 
-    <div class="drag-item" @pointerdown="pointerDown">
+    <div
+class="drag-item"
+@pointerdown="pointerDown">
         <slot :item="itemData" />
     </div>
 

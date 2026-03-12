@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
 import MemoryCardItem from './components/MemoryCardItem.vue'
 import BaseGame from '@/components/templates/BaseGame.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
@@ -51,10 +51,6 @@ const {
 // Watch for win condition
 watch(isAllMatched, async (matched) => {
   if (matched && !isWon.value && !isLost.value) {
-    const totalPairs = cards.value.length / 2
-    // Calculate penalties: every turn above minimum possible turns (totalPairs)
-    const penalties = Math.max(0, turns.value - totalPairs)
-
     await finishGame(true, {
       scoreContext: {
         attempts: turns.value,
@@ -94,24 +90,46 @@ function handleContinue() {
 </script>
 
 <template>
-  <BaseGame module-title="Explore Artificial Intelligence (AI) Tools" :title="'Memory Game'"
-    :description="'Pasangkan kartu dengan deskripsi yang benar!'" :time="time" :maxTime="MAX_TIME"
-    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)" v-model:showIntro="showIntro" :introData="introData" :isWin="isWon"
-    :hasLost="isLost" :hideSubmit="true" :isChecked="isAllMatched" :successResult="successResultData" @start="start"
-    @retry="retryGame(resetGame)" @cleared="handleContinue">
+  <BaseGame
+module-title="Explore Artificial Intelligence (AI) Tools"
+:title="'Memory Game'"
+    :description="'Pasangkan kartu dengan deskripsi yang benar!'"
+:time="time"
+:maxTime="MAX_TIME"
+    :loading="baseLoading || introLoading || gameLoading"
+:error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)"
+v-model:showIntro="showIntro"
+:introData="introData"
+:isWin="isWon"
+    :hasLost="isLost"
+:hideSubmit="true"
+:isChecked="isAllMatched"
+:successResult="successResultData"
+@start="start"
+    @retry="retryGame(resetGame)"
+@cleared="handleContinue">
     <div class="flex flex-wrap justify-center gap-4.5 max-w-screen-3xl mx-auto basis-1/5">
-      <MemoryCardItem v-for="card in cards" :key="card.id" :content-type="card.contentType"
+      <MemoryCardItem
+v-for="card in cards"
+:key="card.id"
+:content-type="card.contentType"
         :logo="card.contentType === 'svg' ? card.value : undefined"
         :text="card.contentType === 'text' || card.contentType === 'img' ? card.value : undefined"
-        :flipped="card.flipped || false" :matched="card.matched || false" @click="handleFlip(card)" />
+        :flipped="card.flipped || false"
+:matched="card.matched || false"
+@click="handleFlip(card)" />
     </div>
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col xs:flex-row justify-between w-full items-center">
         <span class="text-body-xs xl:text-body-md text-primary-700 font-bold w-full">
           Card Turns: {{ turns }}
         </span>
-        <UiButton v-if="isAllMatched || time <= 0" :size="buttonSize" text="Continue" variant="primary"
+        <UiButton
+v-if="isAllMatched || time <= 0"
+:size="buttonSize"
+text="Continue"
+variant="primary"
           @click="onOpenResult">
         </UiButton>
       </div>

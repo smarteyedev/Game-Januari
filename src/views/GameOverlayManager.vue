@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import GameIntroModal from './GameIntroModal.vue'
-import GameResultModal from './GameResultModal.vue'
-import GameResultSummaryModal from './GameResultSummaryModal.vue'
+import GameIntroModal from './Modal/GameIntroModal.vue'
+import GameResultModal from './Modal/GameResultModal.vue'
+import GameResultSummaryModal from './Modal/GameResultSummaryModal.vue'
 import type { IntroData, SuccessResultData } from '@/domain/types'
-import type { TContainerPosition } from '../components/organisms/modal/types'
+import type { TContainerPosition } from '@/components/molecules/modal/types'
 
 interface Props {
   showIntro: boolean
@@ -33,15 +33,30 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <GameIntroModal v-if="showIntro && introData" :modelValue="showIntro"
-    @update:modelValue="emit('update:showIntro', $event)" :title="title" :introData="introData" @start="emit('start')"
+  <GameIntroModal
+v-if="showIntro && introData"
+:modelValue="showIntro"
+    @update:modelValue="emit('update:showIntro', $event)"
+:title="title"
+:introData="introData"
+@start="emit('start')"
     :containerPosition="containerPosition" />
 
-  <GameResultModal v-else-if="showResult" :success="isWin" :successResult="successResult ?? undefined"
-    :modelValue="showResult" @update:modelValue="emit('update:showResult', $event)" @retry="emit('retry')"
-    @cleared="emit('cleared')" :containerPosition="containerPosition" />
+  <GameResultModal
+v-else-if="showResult"
+:success="isWin"
+:successResult="successResult ?? undefined"
+    :modelValue="showResult"
+@update:modelValue="emit('update:showResult', $event)"
+@retry="emit('retry')"
+    @cleared="emit('cleared')"
+:containerPosition="containerPosition" />
 
-  <GameResultSummaryModal v-else-if="showSummary" :resultSummary="successResult" :modelValue="showSummary"
-    @update:modelValue="emit('update:showSummary', $event)" @toggle-summary="emit('toggle-summary')"
+  <GameResultSummaryModal
+v-else-if="showSummary"
+:resultSummary="successResult"
+:modelValue="showSummary"
+    @update:modelValue="emit('update:showSummary', $event)"
+@toggle-summary="emit('toggle-summary')"
     :containerPosition="containerPosition" />
 </template>

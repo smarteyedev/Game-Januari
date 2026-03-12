@@ -14,7 +14,7 @@ const props = defineProps<{
   disabled: boolean
 }>()
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'update:modelValue', value: DragCard[]): void
   (e: 'moved', ids: number[]): void
   (e: 'move', payload: any): void
@@ -31,22 +31,33 @@ const textColorClass = computed(() => {
 </script>
 
 <template>
-  <div :class="[
+  <div
+:class="[
     'relative w-full px-2.5 py-4 rounded-lg md:rounded-2xl min-w-32 min-h-14 md:min-h-37.5',
     className,
   ]">
-    <p :class="[
+    <p
+:class="[
       'font-semibold text-body-sm md:text-body-md xl:text-body-xl absolute inset-0 flex items-center justify-center pointer-events-none px-1 text-center',
       textColorClass,
     ]">
       {{ text }}
     </p>
 
-    <EngineDropZone :zone-id="id" :items="modelValue" :max-drag-item="99" @move="$emit('move', $event)"
+    <EngineDropZone
+:zone-id="id"
+:items="modelValue"
+:max-drag-item="99"
+@move="$emit('move', $event)"
       class="relative gap-2 flex flex-col h-full w-full rounded-xl transition-all duration-200">
-      <DraggableCard v-for="(card, index) in modelValue" :key="`${card.id}-${isChecked}`" :card="card"
-        :is-in-zone="true" :drag-data="{ item: card, index: index, zoneId: id }"
-        :checked="isChecked && checkedMap[card.id] !== undefined ? checkedMap[card.id] : null" :class="{
+      <DraggableCard
+v-for="(card, index) in modelValue"
+:key="`${card.id}-${isChecked}`"
+:card="card"
+        :is-in-zone="true"
+:drag-data="{ item: card, index: index, zoneId: id }"
+        :checked="isChecked && checkedMap[card.id] !== undefined ? checkedMap[card.id] : null"
+:class="{
           'cursor-grab active:cursor-grabbing': !disabled,
           'cursor-default': disabled,
         }" />

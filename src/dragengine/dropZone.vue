@@ -42,7 +42,10 @@ watch(() => dragState.dragging, (v) => {
 
 <template>
 
-    <div ref="zoneRef" class="dropzone" :class="{ active: dragState.activeZone === zoneId }">
+    <div
+ref="zoneRef"
+class="dropzone"
+:class="{ active: dragState.activeZone === zoneId }">
         <slot />
     </div>
 

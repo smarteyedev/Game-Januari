@@ -94,16 +94,34 @@ function getSolvedColor(index: number) {
 </script>
 
 <template>
-  <BaseGame title="Connections Game" moduleTitle="Explore Artificial Intelligence (AI) Tools"
-    description="Connections game" :time="time" :maxTime="MAX_TIME" v-model:showIntro="showIntro" :introData="introData"
-    :loading="baseLoading || introLoading || gameLoading" :error="error || gameError"
-    :retryFn="() => fetchLevel(1, true)" :isWin="_isWon" :hasLost="_isLost" :isChecked="isChecked"
-    :successResult="successResultData" @start="start" @retry="retryGame(resetGame)" @check="submitSelection"
+  <BaseGame
+title="Connections Game"
+moduleTitle="Explore Artificial Intelligence (AI) Tools"
+    description="Connections game"
+:time="time"
+:maxTime="MAX_TIME"
+v-model:showIntro="showIntro"
+:introData="introData"
+    :loading="baseLoading || introLoading || gameLoading"
+:error="error || gameError"
+    :retryFn="() => fetchLevel(1, true)"
+:isWin="_isWon"
+:hasLost="_isLost"
+:isChecked="isChecked"
+    :successResult="successResultData"
+@start="start"
+@retry="retryGame(resetGame)"
+@check="submitSelection"
     @cleared="handleContinue">
     <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 w-full">
       <div class="col-span-4 lg:col-start-3 lg:col-span-4 grid grid-cols-4 gap-5">
-        <Card v-for="index in 4" :key="index" variant="connections" :label="getSolvedGroup(index - 1)?.label || ''"
-          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'" :color="getSolvedColor(index - 1)"
+        <Card
+v-for="index in 4"
+:key="index"
+variant="connections"
+:label="getSolvedGroup(index - 1)?.label || ''"
+          :state="getSolvedGroup(index - 1) ? 'solved' : 'idle'"
+:color="getSolvedColor(index - 1)"
           :clickable="false" />
       </div>
     </div>
@@ -112,8 +130,15 @@ function getSolvedColor(index: number) {
         four</span>
     </div>
     <div class="grid grid-cols-4 lg:grid-cols-8 gap-5 place-items-center w-full">
-      <Card v-for="item in items" :key="item.label" variant="connections" :label="item.label" :state="item.state"
-        :color="categoryColorMap[item.category]" :clickable="item.state !== 'solved'" @click="handleToggleItem(item)" />
+      <Card
+v-for="item in items"
+:key="item.label"
+variant="connections"
+:label="item.label"
+:state="item.state"
+        :color="categoryColorMap[item.category]"
+:clickable="item.state !== 'solved'"
+@click="handleToggleItem(item)" />
     </div>
 
     <template #footer="{ onOpenResult }">
@@ -128,19 +153,24 @@ function getSolvedColor(index: number) {
           <span v-if="_isLost">You lose</span>
         </div>
         <div class="flex gap-4">
-          <UiButton :size="buttonSize" text="Submit" variant="primary"
-            :disabled="selected.length !== 4 || _isWon || _isLost" @click="submitSelection">
+          <UiButton
+:size="buttonSize"
+text="Submit"
+variant="primary"
+            :disabled="selected.length !== 4 || _isWon || _isLost"
+@click="submitSelection">
           </UiButton>
 
-          <UiButton :size="buttonSize" text="Continue" v-if="_isWon || _isLost" :color="'success'"
+          <UiButton
+:size="buttonSize"
+text="Continue"
+v-if="_isWon || _isLost"
+:color="'success'"
             @click="() => onOpenResult && onOpenResult()">
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
-          <<<<<<< HEAD <span :label="`You have ${attemptsLeft} attempts left`" />
-          =======
           <span> You have {{ attemptsLeft }} attempts left</span>
-          >>>>>>> dev
         </div>
       </div>
     </template>

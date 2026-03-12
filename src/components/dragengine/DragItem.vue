@@ -54,6 +54,8 @@ async function pointerUp(e: PointerEvent) {
         style="touch-action: none;"
         @pointerdown="pointerDown"
     >
-        <slot :item="itemData" :isDragging="isDragging" />
+        <slot
+:item="itemData"
+:isDragging="isDragging" />
     </div>
 </template>

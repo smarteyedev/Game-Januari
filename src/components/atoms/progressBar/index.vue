@@ -27,10 +27,14 @@ const isComplete = computed(() => {
 </script>
 
 <template>
-  <div class="ui-progress-wrapper" :class="`ui-progress--${variant}`">
+  <div
+class="ui-progress-wrapper"
+:class="`ui-progress--${variant}`">
 
     <!-- BAR -->
-    <div class="ui-progress-bar" :style="{
+    <div
+class="ui-progress-bar"
+:style="{
       '--progress-total': progress || 0,
       '--progress-max': max || 100,
       '--progress-background-color': ui?.backgroundColor,
@@ -39,14 +43,21 @@ const isComplete = computed(() => {
       <div class="ui-progress-bar__meter"></div>
       <div class="ui-progress-bar__value"></div>
 
-      <div class="ui-progress-bar__text" v-if="showLabel">
-        <slot name="label" v-bind="{ percent }">{{ percent }}%</slot>
+      <div
+class="ui-progress-bar__text"
+v-if="showLabel">
+        <slot
+name="label"
+v-bind="{ percent }">{{ percent }}%</slot>
       </div>
     </div>
 
     <!-- ICON VARIANT -->
     <template v-if="variant === 'with-icon'">
-      <UiIcon name="mdi:star" size="20" :class="[
+      <UiIcon
+name="mdi:star"
+size="20"
+:class="[
         'shrink-0 transition-all duration-300',
         isComplete ? 'text-yellow-400 scale-110' : 'text-gray-300'
       ]" />
