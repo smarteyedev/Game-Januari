@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import GameIntroModal from './GameIntroModal.vue'
-import GameResultModal from './GameResultModal.vue'
-import GameResultSummaryModal from './GameResultSummaryModal.vue'
+import GameIntroModal from './Modal/GameIntroModal.vue'
+import GameResultModal from './Modal/GameResultModal.vue'
+import GameResultSummaryModal from './Modal/GameResultSummaryModal.vue'
 import type { IntroData, SuccessResultData } from '@/domain/types'
 import type { TContainerPosition } from '@/components/molecules/modal/types'
 

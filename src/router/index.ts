@@ -2,7 +2,14 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useSessionStore } from '@/stores/session'
 import { pinia } from '@/main'
 
-import { AutomationSpotterView, ConnectionsGameView, DragAndDropView, MemoryGameView, ScramblesGameView, MatrixGameView } from '@/features'
+import {
+  AutomationSpotterView,
+  ConnectionsGameView,
+  DragAndDropView,
+  MemoryGameView,
+  ScramblesGameView,
+  MatrixGameView,
+} from '@/features'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

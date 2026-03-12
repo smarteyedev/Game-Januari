@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="T">
-import { startDrag, moveDrag, endDrag, dragState } from '@/composables/useDragEngine'
-import { computed } from 'vue'
+import { startDrag, moveDrag, endDrag } from './dragEngine'
 
 const props = defineProps<{
   itemData: T
@@ -10,15 +9,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['dragEnd'])
 
-const isDragging = computed(
-  () =>
-    dragState.dragging &&
-    dragState.payload?.sourceZone === props.zoneId &&
-    dragState.payload?.index === props.index,
-)
-
 function pointerDown(e: PointerEvent) {
-  e.stopPropagation()
   const el = e.currentTarget as HTMLElement
   el.setPointerCapture(e.pointerId)
 
@@ -39,18 +30,25 @@ function pointerMove(e: PointerEvent) {
   moveDrag(e)
 }
 
-async function pointerUp(e: PointerEvent) {
+function pointerUp(_: PointerEvent) {
   window.removeEventListener('pointermove', pointerMove)
   window.removeEventListener('pointerup', pointerUp)
 
-  moveDrag(e)
   emit('dragEnd')
-  await endDrag()
+
+  endDrag()
 }
 </script>
 
 <template>
-  <div class="drag-item-container" style="touch-action: none" @pointerdown="pointerDown">
-    <slot :item="itemData" :isDragging="isDragging" />
+  <div class="drag-item" @pointerdown="pointerDown">
+    <slot :item="itemData" />
   </div>
 </template>
+
+<style scoped>
+.drag-item {
+  touch-action: none;
+  cursor: grab;
+}
+</style>

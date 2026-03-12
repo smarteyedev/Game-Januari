@@ -1,15 +1,6 @@
 <template>
-  <svg
-width="84"
-height="80"
-viewBox="0 0 84 80"
-fill="none"
-xmlns="http://www.w3.org/2000/svg">
-    <path
-fill-rule="evenodd"
-clip-rule="evenodd"
-d="M84 63H81V80H84V63Z"
-fill="#8E8E8E" />
+  <svg width="84" height="80" viewBox="0 0 84 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M84 63H81V80H84V63Z" fill="#8E8E8E" />
     <path
       fill-rule="evenodd"
       clip-rule="evenodd"

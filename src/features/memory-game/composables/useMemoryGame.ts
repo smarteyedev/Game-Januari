@@ -9,7 +9,7 @@ export function useMemoryGame() {
   const turns = ref(0)
   const loading = ref(false)
   const error = ref<unknown>(null)
-  
+
   // Game state
   const isLocked = ref(false)
   const firstCard = ref<MemoryCard | null>(null)
@@ -28,21 +28,24 @@ export function useMemoryGame() {
       const data = await levelRepository.getLevel<MemoryLevelData>(
         MinigameId.Memory,
         levelId,
-        offline
+        offline,
       )
-      
+
       const rawCards = data.content?.card || []
-      
+
       // Initialize cards
       cards.value = shuffle(
-        rawCards.map((c) => ({
-          ...c,
-          // Ensure these properties exist for the UI
-          flipped: false,
-          matched: false,
-        } as MemoryCard))
+        rawCards.map(
+          (c) =>
+            ({
+              ...c,
+              // Ensure these properties exist for the UI
+              flipped: false,
+              matched: false,
+            }) as MemoryCard,
+        ),
       )
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -89,7 +92,7 @@ export function useMemoryGame() {
     turns.value = 0
     firstCard.value = null
     isLocked.value = false
-    cards.value.forEach(c => {
+    cards.value.forEach((c) => {
       c.flipped = false
       c.matched = false
     })
@@ -104,6 +107,6 @@ export function useMemoryGame() {
     isAllMatched,
     fetchLevel,
     flipCard,
-    reset
+    reset,
   }
 }

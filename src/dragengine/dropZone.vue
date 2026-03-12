@@ -1,19 +1,17 @@
 <script setup lang="ts" generic="T">
-import { onMounted, onUnmounted, ref, watch, computed } from 'vue'
-import { dragState, registerZone, unregisterZone } from '@/composables/useDragEngine'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
+import { dragState, registerZone, unregisterZone } from './dragEngine'
 
 const props = defineProps<{
   zoneId: string
   items: T[]
   maxDragItem: number
-  activeClass?: string
+  swapping?: boolean
 }>()
 
 const emit = defineEmits(['move'])
 
 const zoneRef = ref<HTMLElement>()
-
-const isOver = computed(() => dragState.activeZone === props.zoneId)
 
 onMounted(() => {
   registerZone(props.zoneId, zoneRef.value!)
@@ -40,7 +38,21 @@ watch(
 </script>
 
 <template>
-  <div ref="zoneRef" class="dropzone-container" :class="[isOver ? activeClass : '']">
-    <slot :isOver="isOver" />
+  <div ref="zoneRef" class="dropzone" :class="{ active: dragState.activeZone === zoneId }">
+    <slot />
   </div>
 </template>
+
+<style scoped>
+.dropzone {
+  min-height: 80px;
+  border: 2px dashed #bbb;
+  padding: 8px;
+  transition: 0.2s;
+}
+
+.dropzone.active {
+  border-color: #4f8cff;
+  background: #eef5ff;
+}
+</style>

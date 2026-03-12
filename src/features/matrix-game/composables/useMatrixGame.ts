@@ -19,7 +19,7 @@ export function useMatrixGame() {
   const questions = ref<MatrixQuestion[]>([])
   const answers = ref<Record<string, number | undefined>>({})
   const title = ref('')
-  
+
   const isChecked = ref(false)
   const loading = ref(false)
   const error = ref<unknown>(null)
@@ -31,25 +31,25 @@ export function useMatrixGame() {
       const data = await levelRepository.getLevel<MatrixLevelData>(
         MinigameId.Matrix,
         levelId,
-        offline
+        offline,
       )
-      
+
       const content = data.content
       title.value = content?.question || data.intro?.title || ''
-      
-      options.value = (content?.options || []).map(opt => ({
+
+      options.value = (content?.options || []).map((opt) => ({
         value: opt.id,
-        label: opt.label
+        label: opt.label,
       }))
-      
-      questions.value = (content?.subquestions || []).map(sq => ({
+
+      questions.value = (content?.subquestions || []).map((sq) => ({
         id: String(sq.id),
         label: sq.label,
-        correctAnswer: sq.answer
+        correctAnswer: sq.answer,
       }))
-      
+
       resetBoard()
-      
+
       return data
     } catch (err) {
       error.value = err
@@ -61,7 +61,7 @@ export function useMatrixGame() {
 
   function resetBoard() {
     answers.value = {}
-    questions.value.forEach(q => {
+    questions.value.forEach((q) => {
       answers.value[q.id] = undefined
     })
     isChecked.value = false
@@ -69,23 +69,23 @@ export function useMatrixGame() {
 
   function checkAnswers() {
     let correct = 0
-    questions.value.forEach(q => {
+    questions.value.forEach((q) => {
       if (answers.value[q.id] === q.correctAnswer) {
         correct++
       }
     })
-    
+
     isChecked.value = true
     const won = correct === questions.value.length
-    
+
     return {
       won,
       correctCount: correct,
       totalCount: questions.value.length,
-      responses: questions.value.map(q => ({
+      responses: questions.value.map((q) => ({
         questionId: q.id,
-        answer: answers.value[q.id]
-      }))
+        answer: answers.value[q.id],
+      })),
     }
   }
 
@@ -99,6 +99,6 @@ export function useMatrixGame() {
     error,
     fetchLevel,
     checkAnswers,
-    resetBoard
+    resetBoard,
   }
 }

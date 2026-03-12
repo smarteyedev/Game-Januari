@@ -55,8 +55,14 @@ const iconSizeClass = computed(() => {
 </script>
 
 <template>
-  <UiModal :container-position="props.containerPosition" :prevent-close="false" :modelValue="modelValue" size="md"
-    position="center" scroll-mode="content" :content-style="{
+  <UiModal
+    :container-position="props.containerPosition"
+    :prevent-close="false"
+    :modelValue="modelValue"
+    size="md"
+    position="center"
+    scroll-mode="content"
+    :content-style="{
       border: '6px solid #006082',
       boxShadow: '0px 8px 0px #006082',
       borderRadius: '40px',
@@ -65,7 +71,10 @@ const iconSizeClass = computed(() => {
       gap: '20px',
       display: 'flex',
       flexDirection: 'column',
-    }" @update:modelValue="emit('update:modelValue', $event)" @cancel="onClose">
+    }"
+    @update:modelValue="emit('update:modelValue', $event)"
+    @cancel="onClose"
+  >
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex flex-col justify-center items-center w-full gap-2">
@@ -92,7 +101,13 @@ const iconSizeClass = computed(() => {
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <UiButton v-if="success" text="Continue" variant="primary" :size="buttonSize" @click="onContinue" />
+        <UiButton
+          v-if="success"
+          text="Continue"
+          variant="primary"
+          :size="buttonSize"
+          @click="onContinue"
+        />
         <UiButton v-else text="Retry" variant="danger" :size="buttonSize" @click="onRetry" />
       </div>
     </template>
