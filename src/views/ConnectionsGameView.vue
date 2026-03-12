@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { UiLabel } from '@/components/atoms/label'
 import ConnectionsCard from '@/components/atoms/ConnectionsCard.vue'
 import { MINIGAME_IDS } from '@/utils/constants'
 import BaseGame from '@/components/templates/BaseGame.vue'
@@ -121,12 +119,12 @@ function getSolvedColor(index: number) {
     <template #footer="{ onOpenResult }">
       <div class="flex flex-col items-center gap-4.5">
         <div class="text-primary-700 text-body-xs md:text-body-sm lg:text-body-xl font-bold">
-          <UiLabel v-if="wrongCount !== null && !(_isWon || _isLost)"
-            :label="`Wrong, you are ${wrongCount} away to form a correct group`" />
-          <UiLabel v-if="solvedNewGroup !== null && !(_isWon || _isLost)"
-            :label="`You found a new group: ${solvedNewGroup.label}`" />
-          <UiLabel v-if="_isWon" :label="`You win`" />
-          <UiLabel v-if="_isLost" :label="`you lose`" />
+          <span v-if="wrongCount !== null && !(_isWon || _isLost)">Wrong, you are {{ wrongCount }} away to form a correct
+            group</span>
+          <span v-if="solvedNewGroup !== null && !(_isWon || _isLost)">You found a new group:
+            {{ solvedNewGroup.label }}</span>
+          <span v-if="_isWon">You win</span>
+          <span v-if="_isLost">You lose</span>
         </div>
         <div class="flex gap-4">
           <UiButton :size="buttonSize" text="Submit" variant="primary"
@@ -138,7 +136,7 @@ function getSolvedColor(index: number) {
           </UiButton>
         </div>
         <div class="text-primary-700 font-semibold text-body-xs md:text-body-sm lg:text-body-xl">
-          <UiLabel :label="`You have ${attemptsLeft} attempts left`" />
+          <span :label="`You have ${attemptsLeft} attempts left`" />
         </div>
       </div>
     </template>

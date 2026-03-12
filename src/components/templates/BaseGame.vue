@@ -90,7 +90,7 @@ const showSummaryLocal = ref<boolean>(props.showSummary ?? false)
 
 // when progress bar is displayed, we want to wait a moment so the animation
 // can finish before showing the result popup.
-const RESULT_MODAL_DELAY = 3000
+const RESULT_MODAL_DELAY = 2000 //ms
 let resultTimer: number | undefined
 const isDelayActive = ref(false)
 
