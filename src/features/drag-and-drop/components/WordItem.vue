@@ -40,7 +40,7 @@ const customClass = computed(() => {
     classes.push('bg-transparent p-0 m-0 rounded-none border-0 min-w-0')
   } else {
     classes.push(
-      'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center',
+      'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-primary-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center',
     )
   }
 

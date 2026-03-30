@@ -86,7 +86,7 @@ const emit = defineEmits<{
 }>()
 
 const ghostClass =
-  'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-blue-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center'
+  'text-[10px] md:text-[12px] min-h-[24px] font-semibold bg-primary-100 px-2 md:px-[12px] md:py-[10px] border border-primary-500 rounded-[8px] text-center'
 </script>
 
 <template>

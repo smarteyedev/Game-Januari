@@ -128,7 +128,7 @@ function handleContinue() {
           Card Turns: {{ turns }}
         </span>
         <UiButton
-          v-if="isAllMatched || time <= 0"
+          v-if="isWon || isLost"
           :size="buttonSize"
           text="Continue"
           variant="primary"
