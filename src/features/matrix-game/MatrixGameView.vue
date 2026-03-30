@@ -111,7 +111,9 @@ function handleContinue() {
     </div>
 
     <template #footer="{ onOpenResult }">
-      <div v-if="!isXs" class="flex flex-wrap items-center justify-center gap-4">
+      <div
+v-if="!isXs"
+class="flex flex-wrap items-center justify-center gap-4">
         <UiButton
           :size="buttonSize"
           @click="submit"
@@ -127,7 +129,9 @@ function handleContinue() {
         >
         </UiButton>
       </div>
-      <div v-else class="flex flex-col items-center justify-center gap-4 w-full">
+      <div
+v-else
+class="flex flex-col items-center justify-center gap-4 w-full">
         <div class="flex gap-2.5 items-center justify-center w-full">
           <UiButton
             :size="buttonSize"

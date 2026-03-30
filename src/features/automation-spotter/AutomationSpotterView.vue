@@ -139,7 +139,12 @@ const emit = defineEmits<{
       </div>
 
       <template #preview="{ item }">
-        <DraggableCard v-if="item" :card="item as any" :is-in-zone="false" :checked="null" />
+        <DraggableCard 
+        v-if="item" 
+        :card="item as any" 
+        :is-in-zone="false" 
+        :checked="null"
+         />
       </template>
     </DragProvider>
   </BaseGame>

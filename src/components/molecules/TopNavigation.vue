@@ -3,7 +3,9 @@
     <div v-if="text && !isIntro">
       <Title :text="text" />
     </div>
-    <div class="flex w-full gap-2.5" :class="{ 'justify-end': isIntro }">
+    <div
+class="flex w-full gap-2.5"
+:class="{ 'justify-end': isIntro }">
       <UiButton
         v-if="!isIntro"
         :size="!isXs && !isSm ? 'md' : 'xs'"

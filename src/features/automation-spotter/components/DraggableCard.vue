@@ -12,6 +12,7 @@ const props = defineProps<{
     index: number
     zoneId: string
   }
+  class?: any
 }>()
 
 const emit = defineEmits<{
@@ -20,6 +21,7 @@ const emit = defineEmits<{
 
 const customClass = computed(() => {
   const classes = []
+  if (props.class) classes.push(props.class)
 
   if (props.isInZone) {
     classes.push('px-3 py-1 border rounded text-center text-body-sm font-medium w-full')

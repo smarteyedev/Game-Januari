@@ -32,7 +32,9 @@ const isComplete = computed(() => {
 </script>
 
 <template>
-  <div class="ui-progress-wrapper" :class="`ui-progress--${variant}`">
+  <div
+class="ui-progress-wrapper"
+:class="`ui-progress--${variant}`">
     <!-- BAR -->
     <div
       class="ui-progress-bar"
@@ -46,8 +48,12 @@ const isComplete = computed(() => {
       <div class="ui-progress-bar__meter"></div>
       <div class="ui-progress-bar__value"></div>
 
-      <div class="ui-progress-bar__text" v-if="showLabel">
-        <slot name="label" v-bind="{ percent }">{{ percent }}%</slot>
+      <div
+class="ui-progress-bar__text"
+v-if="showLabel">
+        <slot
+name="label"
+v-bind="{ percent }">{{ percent }}%</slot>
       </div>
     </div>
 

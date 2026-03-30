@@ -41,7 +41,9 @@ function pointerUp(_: PointerEvent) {
 </script>
 
 <template>
-  <div class="drag-item" @pointerdown="pointerDown">
+  <div
+class="drag-item"
+@pointerdown="pointerDown">
     <slot :item="itemData" />
   </div>
 </template>

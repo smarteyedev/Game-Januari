@@ -83,14 +83,18 @@ const customClass = 'min-w-21.5 min-h-24.5 md:min-w-40 md:min-h-47.5'
   >
     <!-- BACK SIDE (What is shown when UNFLIPPED) -->
     <template #back>
-      <div class="w-full h-full flex items-center justify-center" :style="backStyle">
+      <div
+class="w-full h-full flex items-center justify-center"
+:style="backStyle">
         <span class="text-primary-500 text-5xl font-bold">?</span>
       </div>
     </template>
 
     <!-- FRONT SIDE (What is shown when FLIPPED) -->
     <template #front>
-      <div class="w-full h-full flex items-center justify-center" :style="frontStyle">
+      <div
+class="w-full h-full flex items-center justify-center"
+:style="frontStyle">
         <!-- TEXT CARD -->
         <div
           v-if="contentType === 'text'"
@@ -106,7 +110,9 @@ const customClass = 'min-w-21.5 min-h-24.5 md:min-w-40 md:min-h-47.5'
           v-else-if="contentType === 'svg'"
           class="w-full h-full flex items-center justify-center"
         >
-          <component :is="LogoComponent" class="w-14 md:w-[128px] h-auto" />
+          <component
+:is="LogoComponent"
+class="w-14 md:w-[128px] h-auto" />
         </div>
 
         <!-- IMAGE CARD -->

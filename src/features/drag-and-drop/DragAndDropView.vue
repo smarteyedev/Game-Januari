@@ -162,7 +162,9 @@ const ghostClass =
 
       <template #preview="{ item }">
         <div class="drag-preview-container">
-          <Card :label="(item as any).word" :custom-class="ghostClass" />
+          <Card 
+          :label="(item as any).word" 
+          :custom-class="ghostClass" />
         </div>
       </template>
     </DragProvider>

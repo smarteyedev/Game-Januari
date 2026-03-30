@@ -11,14 +11,18 @@
       :class="{ 'rotate-y-180': flipped }"
     >
       <!-- BACK -->
-      <div class="absolute inset-0 backface-hidden" :class="backClass">
+      <div
+class="absolute inset-0 backface-hidden"
+:class="backClass">
         <slot name="back">
           <div class="flex items-center justify-center w-full h-full">?</div>
         </slot>
       </div>
 
       <!-- FRONT -->
-      <div class="absolute inset-0 backface-hidden rotate-y-180" :class="frontClass">
+      <div
+class="absolute inset-0 backface-hidden rotate-y-180"
+:class="frontClass">
         <slot name="front" />
       </div>
     </div>
@@ -41,20 +45,23 @@
   </button>
 
   <!-- DRAGGABLE DEFAULT VARIANT -->
-  <DragItem
-    v-else-if="draggable && !disabled"
-    :item-data="dragData?.item"
-    :index="dragData?.index ?? 0"
-    :zone-id="dragData?.zoneId ?? ''"
-    @drag-end="emit('drag-end')"
-    :class="[baseClass, customClass, 'cursor-grab']"
+<DragItem
+  v-else-if="draggable && !disabled"
+  :item-data="dragData?.item"
+  :index="dragData?.index ?? 0"
+  :zone-id="dragData?.zoneId ?? ''"
+  @drag-end="emit('drag-end')"
+  class="cursor-grab"
+>
+  <div
+    @click="handleClick"
+    :class="[baseClass, customClass, { 'flex items-center justify-center': centered }]"
   >
-    <div @click="handleClick" :class="{ 'flex items-center justify-center': centered }">
-      <slot>
-        {{ label }}
-      </slot>
-    </div>
-  </DragItem>
+    <slot>
+      {{ label }}
+    </slot>
+  </div>
+</DragItem>
 
   <!-- NON-DRAGGABLE DEFAULT VARIANT -->
   <div
@@ -77,7 +84,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import DragItem from '@/components/dragengine/DragItem.vue'
+import { DragItem } from '@/components/dragengine'
 
 const props = withDefaults(
   defineProps<{

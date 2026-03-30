@@ -40,7 +40,10 @@ watch(
 </script>
 
 <template>
-  <div ref="zoneRef" class="dropzone-container" :class="[isOver ? activeClass : '']">
+  <div
+ref="zoneRef"
+class="dropzone-container"
+:class="[isOver ? activeClass : '']">
     <slot :isOver="isOver" />
   </div>
 </template>

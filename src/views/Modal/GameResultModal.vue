@@ -78,12 +78,18 @@ const iconSizeClass = computed(() => {
     <!-- HEADER ICON -->
     <template #header-title>
       <div class="flex flex-col justify-center items-center w-full gap-2">
-        <SuccessIcon :class="iconSizeClass" v-if="success" />
-        <FailedIcon :class="iconSizeClass" v-else />
+        <SuccessIcon
+:class="iconSizeClass"
+v-if="success" />
+        <FailedIcon
+:class="iconSizeClass"
+v-else />
         <p class="text-body-lg font-extrabold text-primary-700 md:text-h2">
           {{ success ? 'SUCCESSFUL' : 'FAILED' }}
         </p>
-        <div v-if="successResult?.score !== undefined" class="text-center">
+        <div
+v-if="successResult?.score !== undefined"
+class="text-center">
           <p class="text-h2 font-black text-primary-700">Score: {{ successResult.score }}</p>
         </div>
       </div>
@@ -95,7 +101,9 @@ const iconSizeClass = computed(() => {
 
     <!-- BODY -->
     <div class="flex-1 overflow-y-auto flex justify-center">
-      <GameResult :success="success" :successResult="successResult" />
+      <GameResult
+:success="success"
+:successResult="successResult" />
     </div>
 
     <!-- FOOTER -->
@@ -108,7 +116,12 @@ const iconSizeClass = computed(() => {
           :size="buttonSize"
           @click="onContinue"
         />
-        <UiButton v-else text="Retry" variant="danger" :size="buttonSize" @click="onRetry" />
+        <UiButton
+v-else
+text="Retry"
+variant="danger"
+:size="buttonSize"
+@click="onRetry" />
       </div>
     </template>
   </UiModal>

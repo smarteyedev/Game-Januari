@@ -16,7 +16,9 @@ import { dragState } from './dragEngine'
         )`,
       }"
     >
-      <slot name="preview" :item="dragState.payload?.item" />
+      <slot
+name="preview"
+:item="dragState.payload?.item" />
     </div>
   </Teleport>
 </template>

@@ -91,7 +91,11 @@ const iconSizeClass = computed(() => {
     <!-- FOOTER -->
     <template #footer>
       <div class="flex justify-center shrink-0">
-        <UiButton text="Mulai Game" variant="primary" :size="buttonSize" @click="onStart" />
+        <UiButton
+text="Mulai Game"
+variant="primary"
+:size="buttonSize"
+@click="onStart" />
       </div>
     </template>
   </UiModal>

@@ -121,13 +121,17 @@ function handleContinue() {
   >
     <div class="flex flex-col gap-4">
       <div class="flex flex-col gap-3 md:gap-5 justify-center items-center">
-        <BoxInput :value="userInput" :locked="hints" />
+        <BoxInput
+:value="userInput"
+:locked="hints" />
         <span class="text-primary-700 font-semibold text-body-xs md:text-body-md"
           >You have {{ attempts }} attempts left</span
         >
       </div>
 
-      <div ref="scrollContainer" class="h-35 overflow-y-auto">
+      <div
+ref="scrollContainer"
+class="h-35 overflow-y-auto">
         <div class="flex flex-col justify-center items-center gap-6 py-3">
           <div
             v-for="(s, i) in submissions"
@@ -161,7 +165,9 @@ function handleContinue() {
     </div>
 
     <template #footer="{ onOpenResult }">
-      <div v-if="!isXs" class="flex gap-2.5">
+      <div
+v-if="!isXs"
+class="flex gap-2.5">
         <UiButton
           :size="buttonSize"
           text="Delete"
@@ -170,7 +176,11 @@ function handleContinue() {
           :disabled="!isPlaying"
         >
         </UiButton>
-        <UiButton :size="buttonSize" text="Submit" @click="submitAnswer" :disabled="!isPlaying">
+        <UiButton
+:size="buttonSize"
+text="Submit"
+@click="submitAnswer"
+:disabled="!isPlaying">
         </UiButton>
 
         <UiButton
@@ -181,7 +191,9 @@ function handleContinue() {
         >
         </UiButton>
       </div>
-      <div v-else class="flex flex-col gap-2.5 w-full justify-center items-center">
+      <div
+v-else
+class="flex flex-col gap-2.5 w-full justify-center items-center">
         <div class="flex gap-2.5 w-full justify-center items-center">
           <UiButton
             class="w-full"

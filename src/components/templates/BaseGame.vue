@@ -146,7 +146,10 @@ function handleCheck() {
 </script>
 
 <template>
-  <GameState :loading="loading" :error="error" :retryFn="retryFn">
+  <GameState
+:loading="loading"
+:error="error"
+:retryFn="retryFn">
     <div
       ref="gameWrapper"
       class="min-h-screen flex flex-col p-4 gap-4 2xl:py-6 2xl:px-9.5 2xl:gap-8 w-full"
